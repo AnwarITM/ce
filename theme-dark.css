@@ -1,0 +1,30 @@
+:root {
+    /* Base Colors */
+    --bg-color: #1a1a1a; /* Deep black */
+    --card-bg: #252525; 
+    --border-color: #3a3a3a;
+    
+    /* Pink Accents - Lots-o'-Pink */
+    --primary-color: #ff6b9e; /* Vibrant pink */
+    --primary-hover: #ff4785; /* Darker pink */
+    --secondary-color: #ff9ec6; /* Soft pink */
+    --effect-color: rgba(255, 107, 158, 0.15); /* Pink glow */
+    
+    /* Text Colors */
+    --text-color: #f0f0f0;
+    --text-secondary: #d0d0d0;
+    --header-text-color: #ff6b9e; /* Pink header */
+    
+    /* Status Colors */
+    --success-color: #6bff9e; /* Pink-tinted green */
+    --danger-color: #ff6b6b;
+    --warning-color: #ffdb6b;
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 6px 0 rgba(255, 107, 158, 0.1);
+    --shadow-md: 0 4px 12px -2px rgba(255, 107, 158, 0.2);
+    --shadow-lg: 0 10px 24px -5px rgba(255, 107, 158, 0.3);
+    
+    /* Animation */
+    --blink-speed: 3s;
+}
