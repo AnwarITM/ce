@@ -1,43 +1,42 @@
 :root {
-    /* Background */
-    --bg-color: #0b0b0b;            /* Jet black */
-    --card-bg: #151515;            /* Sedikit lebih terang */
-    --border-color: #333333;       /* Soft grey border */
+  /* === BACKGROUND & BASE === */
+  --bg-color: #0a0a1a;
+  --card-bg: rgba(10, 10, 20, 0.85);  /* transparan gelap */
+  --border-color: #1f2937;
 
-    /* Aksen Emas */
-    --primary-color: #ffd700;      /* Gold */
-    --primary-hover: #e6c200;      /* Darker gold saat hover */
-    --secondary-color: #1a1a1a;    /* Untuk elemen sekunder */
-    --effect-color: rgba(255, 215, 0, 0.15); /* Gold glow soft */
+  /* === NEON COLORS === */
+  --primary-color: #00fff7;        /* Neon Cyan */
+  --primary-hover: #00c2bd;        /* Cyan hover */
+  --secondary-color: #1f1f3a;      /* Untuk kotak & tab */
 
-    /* Teks */
-    --text-color: #f5f5dc;         /* Warm white (beige) */
-    --text-secondary: #c8b87d;     /* Gold-krem lembut */
-    --header-text-color: #ffd700;  /* Gold untuk judul/tab aktif */
+  --effect-color: rgba(0, 255, 247, 0.1);
 
-    /* Status */
-    --success-color: #a7ff5b;      /* Hijau lemon */
-    --danger-color: #ff4c4c;       /* Merah solid */
-    --warning-color: #ffcc00;      /* Emas terang */
+  /* === TEXT === */
+  --text-color: #e0e0ff;
+  --text-secondary: #8899aa;
+  --header-text-color: #ff0055;   /* Neon merah INTIKOM */
 
-    /* Shadows (Glow Emas) */
-    --shadow-sm: 0 0 4px rgba(255, 215, 0, 0.1);
-    --shadow-md: 0 0 8px rgba(255, 215, 0, 0.15);
-    --shadow-lg: 0 0 16px rgba(255, 215, 0, 0.25);
+  /* === STATUS === */
+  --success-color: #00ff88;
+  --danger-color: #ff4c4c;
+  --warning-color: #ffc600;
 
-    /* Blink */
-    --blink-speed: 3s;
+  /* === SHADOWS / GLOW === */
+  --shadow-sm: 0 0 6px rgba(0, 255, 247, 0.1);
+  --shadow-md: 0 0 12px rgba(0, 255, 247, 0.2);
+  --shadow-lg: 0 0 24px rgba(255, 0, 85, 0.3);
+
+  /* === GRADIENT === */
+  --gradient-primary: linear-gradient(135deg, #00fff7, #ff0055);
 }
 
-/* Animasi blink emas */
-@keyframes gold-pulse {
-    0%, 100% { opacity: 0.95; text-shadow: 0 0 6px var(--primary-color); }
-    50% { opacity: 1; text-shadow: 0 0 12px var(--primary-color); }
-}
-
-/* Elemen premium dengan efek menyala */
-body.dark .header h1,
-body.dark .stat-number,
-body.dark .tab.active {
-    animation: gold-pulse var(--blink-speed) infinite;
+/* === BACKGROUND === */
+body {
+  background-image: url('img.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-color: #0a0a1a;
+  color: var(--text-color);
 }
