@@ -1,30 +1,43 @@
 :root {
-    /* Base Colors */
-    --bg-color: #1a1a1a; /* Deep black */
-    --card-bg: #252525; 
-    --border-color: #3a3a3a;
-    
-    /* Pink Accents - Lots-o'-Pink */
-    --primary-color: #ff6b9e; /* Vibrant pink */
-    --primary-hover: #ff4785; /* Darker pink */
-    --secondary-color: #ff9ec6; /* Soft pink */
-    --effect-color: rgba(255, 107, 158, 0.15); /* Pink glow */
-    
-    /* Text Colors */
-    --text-color: #f0f0f0;
-    --text-secondary: #d0d0d0;
-    --header-text-color: #ff6b9e; /* Pink header */
-    
-    /* Status Colors */
-    --success-color: #6bff9e; /* Pink-tinted green */
-    --danger-color: #ff6b6b;
-    --warning-color: #ffdb6b;
-    
-    /* Shadows */
-    --shadow-sm: 0 1px 6px 0 rgba(255, 107, 158, 0.1);
-    --shadow-md: 0 4px 12px -2px rgba(255, 107, 158, 0.2);
-    --shadow-lg: 0 10px 24px -5px rgba(255, 107, 158, 0.3);
-    
-    /* Animation */
+    /* Background */
+    --bg-color: #0b0b0b;            /* Jet black */
+    --card-bg: #151515;            /* Sedikit lebih terang */
+    --border-color: #333333;       /* Soft grey border */
+
+    /* Aksen Emas */
+    --primary-color: #ffd700;      /* Gold */
+    --primary-hover: #e6c200;      /* Darker gold saat hover */
+    --secondary-color: #1a1a1a;    /* Untuk elemen sekunder */
+    --effect-color: rgba(255, 215, 0, 0.15); /* Gold glow soft */
+
+    /* Teks */
+    --text-color: #f5f5dc;         /* Warm white (beige) */
+    --text-secondary: #c8b87d;     /* Gold-krem lembut */
+    --header-text-color: #ffd700;  /* Gold untuk judul/tab aktif */
+
+    /* Status */
+    --success-color: #a7ff5b;      /* Hijau lemon */
+    --danger-color: #ff4c4c;       /* Merah solid */
+    --warning-color: #ffcc00;      /* Emas terang */
+
+    /* Shadows (Glow Emas) */
+    --shadow-sm: 0 0 4px rgba(255, 215, 0, 0.1);
+    --shadow-md: 0 0 8px rgba(255, 215, 0, 0.15);
+    --shadow-lg: 0 0 16px rgba(255, 215, 0, 0.25);
+
+    /* Blink */
     --blink-speed: 3s;
+}
+
+/* Animasi blink emas */
+@keyframes gold-pulse {
+    0%, 100% { opacity: 0.95; text-shadow: 0 0 6px var(--primary-color); }
+    50% { opacity: 1; text-shadow: 0 0 12px var(--primary-color); }
+}
+
+/* Elemen premium dengan efek menyala */
+body.dark .header h1,
+body.dark .stat-number,
+body.dark .tab.active {
+    animation: gold-pulse var(--blink-speed) infinite;
 }
