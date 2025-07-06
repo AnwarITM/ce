@@ -291,13 +291,14 @@ th:nth-child(5), td:nth-child(5) { width: 20%; padding-left: 0px; }
 }
 
 .notes-marquee {
-    display: block;
+    display: inline-block;
     white-space: nowrap;
     overflow: hidden;
     animation: marquee 10s linear infinite;
     font-size: 12px;
     color: var(--text-secondary);
     margin-top: 4px;
+    width: 150%;
 }
 
 @keyframes marquee {
