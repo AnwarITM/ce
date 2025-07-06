@@ -9,8 +9,7 @@ function initializeData() {
         const savedTheme = localStorage.getItem('theme') || 'light';
         const themeLink = document.getElementById('theme-link');
         themeLink.href = savedTheme === 'dark' ? 'theme-dark.css' : 'theme-light.css';
-        
-        // Tambahkan class dark ke body jika tema gelap
+
         if (savedTheme === 'dark') {
             document.body.classList.add('dark');
         } else {
@@ -129,9 +128,12 @@ function renderTable() {
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>${index + 1}</td>
-            <td><span class="notes-indicator" onclick="showEditModal(${index}, true)" title="Edit Notes">📝</span></td>
             <td>
-                <span class="machine-data ${item.notes && item.notes.trim() ? 'has-notes' : ''}" onclick="editMachineData(${index})" title="Click to edit">${item.machineData}</span>
+                <span class="machine-data ${item.notes && item.notes.trim() ? 'has-notes' : ''}"
+                    onclick="showEditModal(${index})"
+                    title="Click to edit machine name & notes">
+                    ${item.machineData}
+                </span>
                 ${item.notes && item.notes.trim() ? `<span class="notes-marquee">${item.notes}</span>` : ''}
             </td>
             <td>
@@ -173,24 +175,14 @@ function showAddModal() {
     document.getElementById('machineData').disabled = false;
 }
 
-function showEditModal(index, notesOnly = false) {
+function showEditModal(index) {
     editIndex = index;
     const item = tabs[currentTab].data[index];
     document.getElementById('addModal').style.display = 'flex';
-    document.getElementById('modalTitle').textContent = 'Edit Notes';
+    document.getElementById('modalTitle').textContent = 'Edit Data';
     document.getElementById('machineData').value = item.machineData;
     document.getElementById('notes').value = item.notes || '';
-    document.getElementById('machineData').disabled = notesOnly;
-}
-
-function editMachineData(index) {
-    const newData = prompt('Edit Machine Data:', tabs[currentTab].data[index].machineData);
-    if (newData && newData.trim()) {
-        tabs[currentTab].data[index].machineData = newData.trim();
-        saveToLocalStorage();
-        renderTable();
-        updateStats();
-    }
+    document.getElementById('machineData').disabled = false;
 }
 
 function updatePeriod(index, value) {
@@ -232,9 +224,7 @@ function saveData() {
                 notes
             });
         } else {
-            if (!document.getElementById('machineData').disabled) {
-                tabs[currentTab].data[editIndex].machineData = machineData;
-            }
+            tabs[currentTab].data[editIndex].machineData = machineData;
             tabs[currentTab].data[editIndex].notes = notes;
         }
 
