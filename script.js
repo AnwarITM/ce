@@ -91,13 +91,35 @@ function switchTab(index) {
 }
 
 function renameTab() {
-    const newName = prompt('Enter new tab name:', tabs[currentTab].name);
-    if (newName && newName.trim()) {
-        tabs[currentTab].name = newName.trim();
+    document.getElementById('renameModal').style.display = 'flex';
+    document.getElementById('newTabName').value = tabs[currentTab].name;
+    document.getElementById('newTabName').focus();
+}
+
+function closeRenameModal() {
+    document.getElementById('renameModal').style.display = 'none';
+}
+
+function confirmRenameTab() {
+    const loader = document.getElementById('renameLoader');
+    loader.style.display = 'block';
+    
+    setTimeout(() => {
+        const newName = document.getElementById('newTabName').value.trim();
+        
+        if (!newName) {
+            alert('Tab name cannot be empty!');
+            loader.style.display = 'none';
+            return;
+        }
+        
+        tabs[currentTab].name = newName;
         saveToLocalStorage();
         renderTabs();
         updateHeaderTitle();
-    }
+        closeRenameModal();
+        loader.style.display = 'none';
+    }, 500);
 }
 
 function updateHeaderTitle() {
