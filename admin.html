@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Panduan Gambar</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#2196f3" />
+  <link rel="icon" href="icon.png" />
+</head>
+<body>
+  <div class="container">
+    <h1>Admin - Panduan Gambar + Caption</h1>
+    <input type="file" id="imageInput" accept="image/*" />
+    <textarea id="captionInput" placeholder="Tulis caption di sini..."></textarea>
+    <div class="buttons">
+      <button onclick="addEntry()">Tambah</button>
+      <button onclick="exportPDF()">Export ke PDF</button>
+    </div>
+    <hr />
+    <div id="entries"></div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="script.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(reg => console.log("Service Worker registered"))
+        .catch(err => console.log("SW registration failed", err));
+    }
+  </script>
+</body>
+</html>
