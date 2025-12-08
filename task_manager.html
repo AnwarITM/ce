@@ -23,6 +23,122 @@
     <link rel="icon" type="image/png" sizes="32x32" href="icon-32x32.png">
     <link rel="apple-touch-icon" sizes="192x192" href="icon-192x192.png">
     <link rel="apple-touch-icon" sizes="512x512" href="icon-512x512.png">
+    <style>
+        body {
+            background: linear-gradient(135deg, #e0f2fe 0%, #ede9fe 100%) !important;
+            min-height: 100vh;
+            color: #1e293b !important;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.7) !important;
+            backdrop-filter: blur(12px) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.8) !important;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06) !important;
+        }
+
+        .header h1 {
+            color: #4f46e5 !important;
+            background: none !important;
+            -webkit-text-fill-color: #4f46e5 !important;
+        }
+
+        .stats {
+            background: rgba(255, 255, 255, 0.6) !important;
+            backdrop-filter: blur(10px) !important;
+            -webkit-backdrop-filter: blur(10px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.8) !important;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06) !important;
+        }
+
+        .tabs {
+            background: rgba(255, 255, 255, 0.6) !important;
+            backdrop-filter: blur(10px) !important;
+            -webkit-backdrop-filter: blur(10px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.8) !important;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.15)) !important;
+            color: #4f46e5 !important;
+        }
+
+        .table-container {
+            background: rgba(255, 255, 255, 0.7) !important;
+            backdrop-filter: blur(12px) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.8) !important;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06) !important;
+        }
+
+        th {
+            background: rgba(99, 102, 241, 0.08) !important;
+            color: #4f46e5 !important;
+        }
+
+        button {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(139, 92, 246, 0.9)) !important;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, rgba(79, 70, 229, 1), rgba(124, 58, 237, 1)) !important;
+        }
+
+        /* Status dropdown colors dengan class-based */
+        select {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        select:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        /* Outstanding = Merah */
+        select.status-outstanding {
+            background: rgba(239, 68, 68, 0.15) !important;
+            color: #dc2626 !important;
+            border-color: rgba(239, 68, 68, 0.4) !important;
+        }
+
+        /* Done = Hijau */
+        select.status-done {
+            background: rgba(34, 197, 94, 0.15) !important;
+            color: #16a34a !important;
+            border-color: rgba(34, 197, 94, 0.4) !important;
+        }
+
+        /* Hover effects */
+        select.status-outstanding:hover {
+            background: rgba(239, 68, 68, 0.25) !important;
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.2);
+        }
+
+        select.status-done:hover {
+            background: rgba(34, 197, 94, 0.25) !important;
+            box-shadow: 0 2px 8px rgba(34, 197, 94, 0.2);
+        }
+    </style>
 </head>
 
 <body>

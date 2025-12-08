@@ -79,7 +79,7 @@ function removeTab() {
         showAlertModal('Cannot delete first tab!');
         return;
     }
-    
+
     showConfirmModal(
         'Delete this tab and all its data?',
         () => {
@@ -118,16 +118,16 @@ function closeRenameModal() {
 function confirmRenameTab() {
     const loader = document.getElementById('renameLoader');
     loader.style.display = 'block';
-    
+
     setTimeout(() => {
         const newName = document.getElementById('newTabName').value.trim();
-        
+
         if (!newName) {
             showAlertModal('Tab name cannot be empty!');
             loader.style.display = 'none';
             return;
         }
-        
+
         tabs[currentTab].name = newName;
         saveToLocalStorage();
         renderTabs();
@@ -171,7 +171,7 @@ function renderTable() {
         row.addEventListener('dragleave', handleDragLeave);
         row.addEventListener('drop', handleDrop);
         row.addEventListener('dragend', handleDragEnd);
-        
+
         row.innerHTML = `
             <td>${index + 1}</td>
             <td>
@@ -223,15 +223,15 @@ function handleDrop(e) {
     e.stopPropagation();
     e.preventDefault();
     this.classList.remove('drag-over');
-    
+
     if (draggedItem !== this) {
         const fromIndex = parseInt(draggedItem.getAttribute('data-index'));
         const toIndex = parseInt(this.getAttribute('data-index'));
-        
+
         // Reorder the data array
         const movedItem = tabs[currentTab].data.splice(fromIndex, 1)[0];
         tabs[currentTab].data.splice(toIndex, 0, movedItem);
-        
+
         // Save and re-render
         saveToLocalStorage();
         renderTable();
@@ -407,7 +407,7 @@ function importData(event) {
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = function(e) {
+    reader.onload = function (e) {
         try {
             const importedData = JSON.parse(e.target.result);
             if (Array.isArray(importedData) && importedData.every(item =>
@@ -447,7 +447,7 @@ function showConfirmModal(message, action, options = {}) {
         title = 'Confirm',
         btnClass = ''
     } = options;
-    
+
     document.getElementById('confirmTitle').textContent = title;
     document.getElementById('confirmMessage').textContent = message;
     const confirmBtn = document.getElementById('confirmActionBtn');
@@ -468,7 +468,7 @@ function executeConfirmedAction() {
 }
 
 function showAlertModal(message, title = 'Alert') {
-    showConfirmModal(message, () => {}, {
+    showConfirmModal(message, () => { }, {
         btnText: 'OK',
         title: title,
         btnClass: 'btn-secondary'
@@ -495,6 +495,23 @@ function loadFromLocalStorage() {
             );
         });
     }
+}
+
+// Update status and change CSS class
+function updateStatus(index, value) {
+    tabs[currentTab].data[index].status = value;
+    saveToLocalStorage();
+    updateStats();
+
+    // Update class on the select element
+    const select = event.target;
+    select.className = `status-${value.toLowerCase()}`;
+}
+
+// Update period
+function updatePeriod(index, value) {
+    tabs[currentTab].data[index].period = value;
+    saveToLocalStorage();
 }
 
 // Initialize the app when DOM is loaded

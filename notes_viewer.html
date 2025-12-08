@@ -7,6 +7,183 @@
   <title>Catatan Troubleshoot ATM</title>
   <link rel="stylesheet" href="design-tokens.css">
   <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+      background: linear-gradient(135deg, #e0f2fe 0%, #ede9fe 100%);
+      min-height: 100vh;
+      color: #1e293b;
+    }
+
+    h1 {
+      text-align: center;
+      color: #4f46e5;
+      margin-bottom: 32px;
+      font-size: 32px;
+      font-weight: 700;
+      text-shadow: 0 2px 8px rgba(79, 70, 229, 0.1);
+    }
+
+    #search {
+      width: 100%;
+      padding: 14px 20px;
+      margin-bottom: 32px;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      border-radius: 16px;
+      font-size: 16px;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      color: #1e293b;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s ease;
+    }
+
+    #search::placeholder {
+      color: #94a3b8;
+    }
+
+    #search:focus {
+      outline: none;
+      border-color: rgba(99, 102, 241, 0.5);
+      background: rgba(255, 255, 255, 0.85);
+      box-shadow: 0 8px 32px rgba(99, 102, 241, 0.15);
+      transform: translateY(-2px);
+    }
+
+    .catatan {
+      margin-bottom: 20px;
+      border-radius: 16px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .catatan:hover {
+      box-shadow: 0 12px 48px rgba(99, 102, 241, 0.12);
+      transform: translateY(-4px);
+      border-color: rgba(99, 102, 241, 0.3);
+    }
+
+    /* Caption dengan glassmorphism */
+    .judul {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(139, 92, 246, 0.12));
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      color: #4f46e5;
+      padding: 18px 24px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 17px;
+      transition: all 0.3s ease;
+      position: relative;
+      user-select: none;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+    }
+
+    .judul:hover {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.18), rgba(139, 92, 246, 0.18));
+      padding-left: 28px;
+      color: #4338ca;
+    }
+
+    .judul::after {
+      content: '▼';
+      position: absolute;
+      right: 24px;
+      transition: transform 0.3s ease;
+      font-size: 12px;
+      opacity: 0.6;
+    }
+
+    .judul:hover::after {
+      transform: translateY(2px);
+      opacity: 1;
+    }
+
+    /* Box isi dengan glassmorphism */
+    .detail {
+      background: rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-top: none;
+      display: none;
+      animation: slideDown 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .kategori {
+      background: rgba(99, 102, 241, 0.08);
+      color: #4f46e5;
+      padding: 10px 20px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+    }
+
+    .isi {
+      padding: 24px;
+      line-height: 1.8;
+      font-size: 15px;
+      color: #334155;
+      background: rgba(255, 255, 255, 0.3);
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    #dataContainer:empty::after {
+      content: 'Tidak ada catatan ditemukan';
+      display: block;
+      text-align: center;
+      padding: 60px 20px;
+      color: #94a3b8;
+      font-style: italic;
+      font-size: 16px;
+      background: rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 16px;
+      margin-top: 20px;
+    }
+
+    /* Smooth scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(99, 102, 241, 0.3);
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(99, 102, 241, 0.5);
+    }
+  </style>
 </head>
 
 <body>
