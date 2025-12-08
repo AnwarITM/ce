@@ -133,3 +133,51 @@ body {
   font-weight: 600;
   color: #1e293b;
 }
+
+/* Mobile responsive styles */
+@media (max-width: 768px) {
+  .welcome-container {
+    padding: 16px;
+    gap: 20px;
+  }
+
+  .welcome-container h1 {
+    font-size: clamp(28px, 6vw, 36px);
+  }
+
+  .continue-btn {
+    padding: 14px 32px;
+    font-size: 16px;
+    min-width: 200px;
+  }
+
+  .modal-content {
+    padding: 30px;
+    font-size: 18px;
+    margin: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .welcome-container {
+    padding: 12px;
+    gap: 16px;
+  }
+
+  .welcome-container h1 {
+    font-size: clamp(24px, 7vw, 32px);
+  }
+
+  .continue-btn {
+    padding: 12px 24px;
+    font-size: 15px;
+    min-width: 180px;
+  }
+
+  .modal-content {
+    padding: 24px;
+    font-size: 16px;
+    margin: 16px;
+    border-radius: 16px;
+  }
+}

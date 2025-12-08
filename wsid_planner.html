@@ -269,14 +269,159 @@
       border-color: rgba(46, 204, 113, 0.35);
     }
 
-    /* Mobile tweaks */
-    @media (max-width: 560px) {
+    /* Mobile responsive styles */
+    @media (max-width: 768px) {
       .page {
         padding: 12px;
+        gap: 12px;
+      }
+
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .title {
+        font-size: 20px;
+      }
+
+      .hint {
+        font-size: 11px;
+      }
+
+      .row {
+        gap: 8px;
+      }
+
+      .card {
+        padding: 14px;
+        border-radius: 12px;
+      }
+
+      .card h3 {
+        font-size: 14px;
+        margin-bottom: 10px;
+      }
+
+      .btn {
+        padding: 8px 12px;
+        font-size: 13px;
+        border-radius: 10px;
+      }
+
+      .input,
+      select,
+      textarea {
+        padding: 8px 10px;
+        font-size: 13px;
+        border-radius: 10px;
+      }
+
+      .tabs {
+        gap: 6px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .tab {
+        padding: 8px 12px;
+        font-size: 12px;
+        white-space: nowrap;
+      }
+
+      .seg button {
+        padding: 6px 10px;
+        font-size: 12px;
+      }
+
+      .table-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      table {
+        font-size: 12px;
+      }
+
+      th,
+      td {
+        padding: 8px 6px;
+        font-size: 11px;
+      }
+
+      th {
+        font-size: 10px;
+      }
+
+      .status-select {
+        font-size: 11px;
+        padding: 6px 8px;
+      }
+
+      textarea {
+        min-height: 60px;
+        font-size: 12px;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .page {
+        padding: 8px;
+        gap: 10px;
       }
 
       .title {
         font-size: 18px;
+      }
+
+      .hint {
+        font-size: 10px;
+      }
+
+      .card {
+        padding: 12px;
+      }
+
+      .card h3 {
+        font-size: 13px;
+      }
+
+      .btn {
+        padding: 7px 10px;
+        font-size: 12px;
+      }
+
+      .input,
+      select,
+      textarea {
+        padding: 7px 9px;
+        font-size: 12px;
+      }
+
+      .tab {
+        padding: 7px 10px;
+        font-size: 11px;
+      }
+
+      .seg button {
+        padding: 5px 8px;
+        font-size: 11px;
+      }
+
+      th,
+      td {
+        padding: 6px 4px;
+        font-size: 10px;
+      }
+
+      th {
+        font-size: 9px;
+      }
+
+      .status-select {
+        font-size: 10px;
+        padding: 5px 6px;
       }
     }
   </style>
