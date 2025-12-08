@@ -1,0 +1,46 @@
+const CACHE_NAME = 'task-manager-v1';
+const urlsToCache = [
+  '/EPS/',
+  '/EPS/index.html',
+  '/EPS/app.html',
+  '/EPS/styles.css',
+  '/EPS/script.js',
+  '/EPS/theme-light.css',
+  '/EPS/theme-dark.css',
+  '/EPS/manifest.json',
+  '/EPS/icon-16x16.png',
+  '/EPS/icon-32x32.png',
+  '/EPS/icon-192x192.png',
+  '/EPS/icon-512x512.png'
+];
+
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      console.log('Opened cache');
+      return cache.addAll(urlsToCache.map(url => new Request(url, { cache: 'reload' })));
+    })
+  );
+});
+
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    caches.match(event.request).then((response) => {
+      return response || fetch(event.request);
+    })
+  );
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          if (cacheName !== CACHE_NAME) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+});

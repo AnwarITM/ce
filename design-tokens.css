@@ -1,0 +1,44 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* Font */
+  --font-family: 'Inter', sans-serif;
+
+  /* Core palette */
+  --primary-color: #6366f1;
+  /* indigo-500 */
+  --primary-hover: #4f46e5;
+  --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+  /* Backgrounds */
+  --bg-color-light: #f6f6f6;
+  --bg-color-dark: #0b0c0f;
+  --bg-color: var(--bg-color-light);
+
+  /* Card background */
+  --card-bg-light: #ffffff;
+  --card-bg-dark: #14161a;
+  --card-bg: var(--card-bg-light);
+
+  /* Text colors */
+  --text-color-light: #333333;
+  --text-color-dark: #e8eefc;
+  --text-color: var(--text-color-light);
+  --text-secondary: #666666;
+
+  /* Misc colors */
+  --secondary-color: #00e5ff;
+  --danger-color: #ff6b6b;
+  --header-text-color: #ffffff;
+
+  /* Borders & shadows */
+  --border-radius: 12px;
+  --border-color: rgba(255, 255, 255, .12);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.2);
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+body {
+  font-family: var(--font-family);
+}

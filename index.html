@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Welcome to Task Manager</title>
+
+  <!-- PWA Meta and Manifest -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#00e5ff" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="TaskManager" />
+  <meta name="mobile-web-app-capable" content="yes" />
+
+  <!-- Favicon and Icons -->
+  <link rel="icon" type="image/png" sizes="16x16" href="icon-16x16.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="icon-32x32.png" />
+  <link rel="apple-touch-icon" sizes="192x192" href="icon-192x192.png" />
+  <link rel="apple-touch-icon" sizes="512x512" href="icon-512x512.png" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="design-tokens.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <div class="welcome-container">
+    <h1>
+      <a href="admin_notes.html" style="text-decoration: none; color: inherit; cursor: pointer;">Task Manager CE</a>
+    </h1>
+    <a href="task_manager.html" class="continue-btn">List Mesin</a>
+    <a href="notes_viewer.html" class="continue-btn">Catatan</a>
+  </div>
+  <a href="wsid_planner.html" class="continue-btn">cooming soon</a>
+  </div>
+
+  <!-- MODAL -->
+  <div id="myModal" class="modal">
+    <div class="modal-content">
+      <p>Halaman dimuat ulang</p>
+    </div>
+  </div>
+
+  <!-- TAP 5X SCRIPT -->
+  <script>
+    let tapCount = 0;
+    let tapTimer;
+
+    document.body.addEventListener("click", () => {
+      tapCount++;
+      clearTimeout(tapTimer);
+      tapTimer = setTimeout(() => tapCount = 0, 1000);
+
+      if (tapCount === 5) {
+        tapCount = 0;
+        showModal();
+      }
+    });
+
+    function showModal() {
+      const modal = document.getElementById("myModal");
+      modal.style.display = "flex";
+
+      setTimeout(() => {
+        modal.style.display = "none";
+        location.reload();
+      }, 1500);
+    }
+  </script>
+
+  <!-- PWA Script: Service Worker + Install Prompt -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/EPS/sw.js')
+        .then((reg) => console.log('Service Worker registered from index.html', reg))
+        .catch((err) => console.error('SW registration failed', err));
+    }
+
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      console.log('Install prompt available');
+      // Tampilkan tombol install jika ingin
+    });
+
+    window.addEventListener('appinstalled', () => {
+      console.log('App installed from index.html');
+    });
+  </script>
+</body>
+
+</html>

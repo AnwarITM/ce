@@ -1,0 +1,28 @@
+{
+  "name": "Task Manager - Multi Tab",
+  "short_name": "TaskManager",
+  "description": "Professional Task Manager with Multi-Tab Support",
+  "start_url": "/EPS/index.html",
+  "display": "standalone",
+  "background_color": "#0a0a0f",
+  "theme_color": "#00e5ff",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "EPS/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["productivity", "business"],
+  "lang": "en",
+  "dir": "ltr",
+  "scope": "/EPS/",
+  "prefer_related_applications": false
+}
+
