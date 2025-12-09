@@ -278,6 +278,22 @@
       border-color: rgba(46, 204, 113, 0.35);
     }
 
+    /* Reset override from global styles.css */
+    #table th,
+    #table td {
+      width: auto;
+      /* let colgroup decide */
+    }
+
+    th.cell-left {
+      text-align: left;
+    }
+
+    .status-select {
+      text-align: center;
+      text-align-last: center;
+    }
+
     /* Mobile responsive styles */
     @media (max-width: 768px) {
       .page {
@@ -817,7 +833,7 @@
         return [
           { key: '__handle', width: 'var(--w-handle)' },
           { key: 'WSID', width: 'var(--w-wsid)' },
-          { key: 'Lokasi', width: 'var(--w-lokasi)' },
+          { key: 'Lokasi', width: 'var(--w-lokasi)', cls: 'cell-left' },
           { key: 'Plan', width: 'var(--w-plan)' },
           { key: 'Status', width: 'var(--w-status)' },
           { key: 'Note', width: 'var(--w-note)' },
@@ -825,7 +841,7 @@
       } else {
         return [
           { key: 'WSID', width: 'var(--w-wsid)' },
-          { key: 'Lokasi', width: 'var(--w-lokasi)' },
+          { key: 'Lokasi', width: 'var(--w-lokasi)', cls: 'cell-left' },
           { key: 'Plan', width: 'var(--w-plan)' },
           { key: 'Status', width: 'var(--w-status)' },
         ];
@@ -843,7 +859,10 @@
       const tr = document.createElement('tr');
       for (const c of cols) {
         if (c.key === '__handle') { const th = document.createElement('th'); th.innerHTML = ''; tr.appendChild(th); continue; }
-        const th = document.createElement('th'); th.textContent = c.key; tr.appendChild(th);
+        const th = document.createElement('th');
+        th.textContent = c.key;
+        if (c.cls) th.className = c.cls;
+        tr.appendChild(th);
       }
       thead.appendChild(tr);
     }
