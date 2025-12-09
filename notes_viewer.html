@@ -107,26 +107,26 @@
       opacity: 1;
     }
 
-    /* Box isi dengan glassmorphism */
+    /* Box isi dengan glassmorphism + Smooth Transition */
     .detail {
       background: rgba(255, 255, 255, 0.5);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
       border-top: none;
-      display: none;
-      animation: slideDown 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+      /* Smooth expanding animation using max-height */
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    @keyframes slideDown {
-      from {
-        opacity: 0;
-        transform: translateY(-10px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    .detail.open {
+      max-height: 2000px;
+      /* Cukup besar untuk konten panjang */
+      opacity: 1;
+      padding-bottom: 24px;
+      /* Space bawah saat buka */
     }
 
     .kategori {
@@ -313,7 +313,8 @@
         `;
 
         judul.onclick = () => {
-          detail.style.display = detail.style.display === "none" ? "block" : "none";
+          // Toggle class 'open' instead of inline display style
+          detail.classList.toggle("open");
         };
 
         wrapper.appendChild(judul);
