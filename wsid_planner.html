@@ -296,6 +296,15 @@
 
     /* Mobile responsive styles */
     @media (max-width: 768px) {
+      :root {
+        --w-handle: 30px;
+        --w-wsid: 60px;
+        --w-lokasi: 110px;
+        --w-plan: 70px;
+        --w-status: 85px;
+        --w-note: 120px;
+      }
+
       .page {
         padding: 12px;
         gap: 12px;
@@ -367,12 +376,16 @@
 
       table {
         font-size: 12px;
+        width: 100%;
+        /* Fit to screen */
       }
 
       th,
       td {
-        padding: 8px 6px;
+        padding: 8px 4px;
         font-size: 11px;
+        white-space: normal;
+        /* Allow wrap on mobile */
       }
 
       th {
