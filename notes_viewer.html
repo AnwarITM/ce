@@ -12,18 +12,18 @@
       max-width: 900px;
       margin: 0 auto;
       padding: 20px;
-      background: linear-gradient(135deg, #e0f2fe 0%, #ede9fe 100%);
+      /* Background handled by styles.css */
       min-height: 100vh;
-      color: #1e293b;
+      color: var(--text-color);
     }
 
     h1 {
       text-align: center;
-      color: #4f46e5;
+      color: var(--primary-color);
       margin-bottom: 32px;
       font-size: 32px;
       font-weight: 700;
-      text-shadow: 0 2px 8px rgba(79, 70, 229, 0.1);
+      text-shadow: 0 2px 8px rgba(6, 182, 212, 0.1);
     }
 
     #search {
@@ -47,9 +47,9 @@
 
     #search:focus {
       outline: none;
-      border-color: rgba(99, 102, 241, 0.5);
+      border-color: rgba(6, 182, 212, 0.5);
       background: rgba(255, 255, 255, 0.85);
-      box-shadow: 0 8px 32px rgba(99, 102, 241, 0.15);
+      box-shadow: 0 8px 32px rgba(6, 182, 212, 0.15);
       transform: translateY(-2px);
     }
 
@@ -66,17 +66,17 @@
     }
 
     .catatan:hover {
-      box-shadow: 0 12px 48px rgba(99, 102, 241, 0.12);
+      box-shadow: 0 12px 48px rgba(6, 182, 212, 0.12);
       transform: translateY(-4px);
-      border-color: rgba(99, 102, 241, 0.3);
+      border-color: rgba(6, 182, 212, 0.3);
     }
 
     /* Caption dengan glassmorphism */
     .judul {
-      background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(139, 92, 246, 0.12));
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.12), rgba(59, 130, 246, 0.12));
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
-      color: #4f46e5;
+      color: var(--primary-hover);
       padding: 18px 24px;
       cursor: pointer;
       font-weight: 600;
@@ -88,9 +88,9 @@
     }
 
     .judul:hover {
-      background: linear-gradient(135deg, rgba(99, 102, 241, 0.18), rgba(139, 92, 246, 0.18));
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.18), rgba(59, 130, 246, 0.18));
       padding-left: 28px;
-      color: #4338ca;
+      color: var(--primary-color);
     }
 
     .judul::after {
@@ -130,8 +130,8 @@
     }
 
     .kategori {
-      background: rgba(99, 102, 241, 0.08);
-      color: #4f46e5;
+      background: rgba(6, 182, 212, 0.08);
+      color: var(--primary-color);
       padding: 10px 20px;
       font-size: 12px;
       font-weight: 700;

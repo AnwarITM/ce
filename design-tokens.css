@@ -1,41 +1,50 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap');
 
 :root {
   /* Font */
-  --font-family: 'Inter', sans-serif;
+  --font-family: 'Outfit', 'Inter', sans-serif;
 
-  /* Core palette */
-  --primary-color: #6366f1;
-  --primary-hover: #4f46e5;
-  --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  /* Core palette - Ocean Fresh */
+  --primary-color: #06b6d4;
+  /* Cyan-500 */
+  --primary-hover: #0891b2;
+  /* Cyan-600 */
+  --gradient-primary: linear-gradient(135deg, #22d3ee 0%, #3b82f6 100%);
+  /* Cyan to Blue */
+  --accent-color: #f472b6;
+  /* Pink accent for fun */
 
   /* Backgrounds */
-  --bg-color-light: #f6f6f6;
-  --bg-color-dark: #0b0c0f;
+  --bg-color-light: #f0f9ff;
+  --bg-color-dark: #0f172a;
   --bg-color: var(--bg-color-light);
 
-  /* Card background */
-  --card-bg-light: #ffffff;
-  --card-bg-dark: #14161a;
+  /* Card background (Glass) */
+  --card-bg-light: rgba(255, 255, 255, 0.65);
+  --card-bg-dark: rgba(15, 23, 42, 0.6);
   --card-bg: var(--card-bg-light);
 
   /* Text colors */
-  --text-color-light: #333333;
-  --text-color-dark: #e8eefc;
+  --text-color-light: #1e293b;
+  /* Slate-800 */
+  --text-color-dark: #f1f5f9;
   --text-color: var(--text-color-light);
-  --text-secondary: #666666;
+  --text-secondary: #64748b;
+  /* Slate-500 */
+  --header-text-color: #0f172a;
 
   /* Misc colors */
-  --secondary-color: #e0e7ff;
-  --danger-color: #ff6b6b;
-  --header-text-color: #ffffff;
+  --secondary-color: rgba(255, 255, 255, 0.5);
+  --danger-color: #ef4444;
+  --success-color: #22c55e;
 
   /* Borders & shadows */
-  --border-radius: 12px;
-  --border-color: rgba(0, 0, 0, 0.1);
-  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
-  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.2);
-  --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --border-radius: 16px;
+  --border-color: rgba(255, 255, 255, 0.6);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.4);
+  --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
 }
 
 body {
