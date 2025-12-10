@@ -388,8 +388,15 @@
         white-space: normal;
         /* Allow wrap on mobile */
         text-align: center !important;
-        /* Force center alignment for user request */
+        /* Force center alignment */
         vertical-align: middle;
+      }
+
+      /* Specific override for cell-left on mobile to ensure center */
+      .cell-left,
+      th.cell-left,
+      td.cell-left {
+        text-align: center !important;
       }
 
       th {
