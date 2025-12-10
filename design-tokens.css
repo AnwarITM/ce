@@ -52,6 +52,7 @@ body {
 }
 
 /* Welcome page with glassmorphism */
+/* Welcome page with glassmorphism */
 .welcome-container {
   display: flex;
   flex-direction: column;
@@ -60,7 +61,7 @@ body {
   min-height: 100vh;
   gap: 24px;
   padding: 20px;
-  background: linear-gradient(135deg, #e0f2fe 0%, #ede9fe 100%);
+  /* Background removed to show body img */
 }
 
 .welcome-container h1 {
