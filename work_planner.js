@@ -191,12 +191,11 @@ const app = {
         $('#mOut').textContent = out;
         $('#emptyState').style.display = total === 0 ? 'block' : 'none';
 
-        // Sort: Date Ascending
-        filtered.sort((a, b) => {
-            const dateA = parseDateScore(a.plan);
-            const dateB = parseDateScore(b.plan);
-            return dateA - dateB || (a.timestamp || 0) - (b.timestamp || 0);
-        });
+        /* 
+           REMOVED AUTOMATIC SORTING HERE 
+           Reason: To allow manual Drag & Drop reordering. 
+           Sorting is now applied only once during Import/Process.
+        */
 
         // Render Rows
         filtered.forEach((row, index) => {
@@ -232,6 +231,7 @@ const app = {
                 this.state.dragItem = row;
                 tr.style.opacity = '0.5';
             });
+            // ... (Drag listeners continue as before)
             tr.addEventListener('dragend', () => {
                 this.state.dragItem = null;
                 tr.style.opacity = '1';
@@ -253,6 +253,16 @@ const app = {
     },
 
     // --- Actions ---
+    // Helper to sort current tab once (e.g. after import)
+    sortTabByDate() {
+        const tab = this.getCurrentTab();
+        tab.data.sort((a, b) => {
+            const dateA = parseDateScore(a.plan);
+            const dateB = parseDateScore(b.plan);
+            return dateA - dateB || (a.timestamp || 0) - (b.timestamp || 0);
+        });
+    },
+
     updateStatus(id, newStatus) {
         const row = this.getCurrentTab().data.find(r => r.id === id);
         if (row) {
@@ -415,6 +425,7 @@ const app = {
             }
 
             tab.data = [...tab.data, ...newData];
+            this.sortTabByDate();
             this.saveState();
             this.renderTableData();
             alert(`Berhasil import ${newData.length} baris (Header di baris ${headerIdx + 1}).`);
@@ -469,6 +480,7 @@ const app = {
                     }
 
                     tab.data = [...tab.data, ...newData];
+                    this.sortTabByDate();
                     this.saveState();
                     this.renderTableData();
                     alert(`Imported ${newData.length} items.`);
