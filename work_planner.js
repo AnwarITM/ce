@@ -137,8 +137,6 @@ const app = {
         // 3. Excel Specifics
         if (tab.mode === 'excel') {
             $('#myWsids').value = tab.excelConfig.myWsids.join(', ');
-            // Re-populate mapping dropdowns if file loaded would be complex, 
-            // for now just ensure UI is ready.
         }
 
         // 4. Metrics & Table
@@ -193,8 +191,12 @@ const app = {
         $('#mOut').textContent = out;
         $('#emptyState').style.display = total === 0 ? 'block' : 'none';
 
-        // Sort (Basic: PlanAt time or ID)
-        filtered.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+        // Sort: Date Ascending
+        filtered.sort((a, b) => {
+            const dateA = parseDateScore(a.plan);
+            const dateB = parseDateScore(b.plan);
+            return dateA - dateB || (a.timestamp || 0) - (b.timestamp || 0);
+        });
 
         // Render Rows
         filtered.forEach((row, index) => {
@@ -204,7 +206,7 @@ const app = {
 
             // Drag Handle
             tr.innerHTML = `
-                <td class="col-drag" onmousedown="app.dragStart(event, '${row.id}')">⋮⋮</td>
+                <td class="col-drag" style="cursor:grab;">⋮⋮</td>
                 <td style="font-weight:600; color:#4f46e5;">${row.wsid}</td>
                 <td class="cell-left">${row.lokasi || '-'}</td>
                 <td>${row.plan || '-'}</td>
@@ -226,6 +228,7 @@ const app = {
             // Drag Events
             tr.addEventListener('dragstart', (e) => {
                 e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', row.id);
                 this.state.dragItem = row;
                 tr.style.opacity = '0.5';
             });
@@ -239,7 +242,7 @@ const app = {
             });
             tr.addEventListener('drop', (e) => {
                 e.stopPropagation();
-                if (this.state.dragItem !== row) {
+                if (this.state.dragItem && this.state.dragItem.id !== row.id) {
                     this.reorderItems(this.state.dragItem.id, row.id);
                 }
                 return false;
@@ -422,72 +425,79 @@ const app = {
         }
     },
 
-    // Helpers untuk isi dropdown mapping saat file dipilih
-    importData(input) {
+    // --- Import/Export (Unified) ---
+    importUniversal(input) {
         const file = input.files[0];
         if (!file) return;
         const reader = new FileReader();
         reader.onload = (e) => {
             try {
                 const json = JSON.parse(e.target.result);
-                if (json.tabs) {
-                    this.state = json;
+
+                // Case 1: Full Backup (Object with 'tabs')
+                if (json.tabs && Array.isArray(json.tabs)) {
+                    if (confirm("Restore full application state? This will replace all current tabs.")) {
+                        this.state = json;
+                        this.saveState();
+                        this.init(); // Reload all
+                        alert("Full Restore Success!");
+                    }
+                    return;
+                }
+
+                // Case 2: Simple List (Array) -> Import to Current Tab
+                let list = json;
+                // Maybe it's wrapped?
+                if (json.data && Array.isArray(json.data)) list = json.data;
+
+                if (Array.isArray(list)) {
+                    // Map items
+                    const newData = list.map((item, idx) => ({
+                        id: 'imp_' + Date.now() + '_' + idx,
+                        wsid: item.machineData || item.wsid || 'Unknown',
+                        lokasi: item.lokasi || '',
+                        plan: item.period || item.plan || '',
+                        status: (item.status && item.status.toLowerCase() === 'done') ? 'done' : 'outstanding',
+                        note: item.notes || item.note || '',
+                        timestamp: Date.now() + idx
+                    }));
+
+                    const tab = this.getCurrentTab();
+                    if (tab.data.length > 0 && !confirm(`Append ${newData.length} items to current tab "${tab.name}"?`)) {
+                        input.value = '';
+                        return;
+                    }
+
+                    tab.data = [...tab.data, ...newData];
                     this.saveState();
-                    this.init();
-                    alert("Data berhasil di-restore!");
+                    this.renderTableData();
+                    alert(`Imported ${newData.length} items.`);
+                } else {
+                    alert("Unrecognized JSON format. Must be an Array or Full Backup.");
                 }
-            } catch (err) { alert("Format JSON invalid"); }
+
+            } catch (err) { alert("Invalid JSON: " + err.message); }
+            input.value = ''; // Reset
         };
         reader.readAsText(file);
     },
 
-    importManualJson(input) {
-        const file = input.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            try {
-                const json = JSON.parse(e.target.result);
-                if (!Array.isArray(json)) {
-                    alert("Format JSON harus berupa array.");
-                    return;
-                }
+    exportTabData() {
+        const tab = this.getCurrentTab();
+        // Export in a clean friendly format
+        const cleanData = tab.data.map(r => ({
+            machineData: r.wsid,
+            period: r.plan,
+            status: r.status === 'done' ? 'Done' : 'Outstanding',
+            notes: r.note,
+            lokasi: r.lokasi
+        }));
 
-                const newData = json.map((item, idx) => ({
-                    id: 'm_imp_' + Date.now() + '_' + idx,
-                    wsid: item.machineData || item.wsid || 'Unknown',
-                    lokasi: item.lokasi || '',
-                    plan: item.period || item.plan || '',
-                    status: (item.status && item.status.toLowerCase() === 'done') ? 'done' : 'outstanding',
-                    note: item.notes || item.note || '',
-                    timestamp: Date.now() + idx
-                }));
-
-                const tab = this.getCurrentTab();
-                if (tab.data.length > 0 && !confirm(`Tambahkan ${newData.length} item ke data yang sudah ada?`)) {
-                    input.value = '';
-                    return;
-                }
-
-                tab.data = [...tab.data, ...newData];
-                this.saveState();
-                this.renderTableData();
-                alert(`Berhasil import ${newData.length} item.`);
-            } catch (err) {
-                console.error(err);
-                alert("Gagal membaca file JSON: " + err.message);
-            }
-            input.value = ''; // Reset input
-        };
-        reader.readAsText(file);
-    },
-
-    exportData() {
-        const str = JSON.stringify(this.state, null, 2);
+        const str = JSON.stringify(cleanData, null, 2);
         const blob = new Blob([str], { type: 'application/json' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = 'eps-work-planner-backup.json';
+        a.download = `data-${tab.name.replace(/\s+/g, '_')}.json`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -506,6 +516,38 @@ const app = {
         if (saved) document.getElementById('theme-link').setAttribute('href', saved);
     }
 };
+
+// --- Helpers ---
+function parseDateScore(str) {
+    if (!str) return 9999999999;
+    str = String(str).trim().toLowerCase();
+
+    // Month Names lookup
+    const MONTHS = {
+        'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3, 'may': 4, 'jun': 5,
+        'jul': 6, 'aug': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dec': 11,
+        'mei': 4, 'agt': 7, 'okt': 9, 'des': 11
+    };
+
+    // Try detecting Month Name
+    for (const [m, val] of Object.entries(MONTHS)) {
+        if (str.startsWith(m) || str.includes(' ' + m)) {
+            // Found a month. Assume Current Year if not present
+            // Simple score: Month Index (0-11)
+            // To make it sortable across years if year is present? 
+            // If year is present "Oct 2024", we need to parse.
+            // But this simple lookup is good for "Sep", "Oct".
+            // Let's try to see if there is a year number around?
+            return val;
+        }
+    }
+
+    // Try parsing date
+    const d = new Date(str);
+    if (!isNaN(d.getTime())) return d.getTime();
+
+    return 9999999999; // Unknown go last
+}
 
 // --- Helper for detecting header row index ---
 function findHeaderRow(matrix) {

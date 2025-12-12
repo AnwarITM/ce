@@ -376,9 +376,10 @@
             <div class="app-title" onclick="app.renameTab()">Work Planner</div>
             <div style="display:flex; gap:8px;">
                 <button class="btn-glass" onclick="app.toggleTheme()" title="Toggle Theme">🌗</button>
-                <button class="btn-glass" onclick="app.exportData()" title="Backup JSON">⬇ Export</button>
-                <button class="btn-glass" onclick="$('#fileJson').click()" title="Restore JSON">⬆ Import</button>
-                <input type="file" id="fileJson" hidden accept=".json" onchange="app.importData(this)">
+                <button class="btn-glass" onclick="$('#fileImport').click()" title="Import JSON/Backup">⬇
+                    Import</button>
+                <button class="btn-glass" onclick="app.exportTabData()" title="Export JSON">⬆ Export</button>
+                <input type="file" id="fileImport" hidden accept=".json" onchange="app.importUniversal(this)">
             </div>
         </header>
 
@@ -419,8 +420,6 @@
             <!-- Manual Controls -->
             <div id="manualControls" style="display:none; gap:8px; flex-wrap:wrap;">
                 <button class="btn-glass btn-primary" onclick="app.showAddModal()">+ Add Data</button>
-                <button class="btn-glass" onclick="$('#fileManualJson').click()">⚡ Import JSON</button>
-                <input type="file" id="fileManualJson" hidden accept=".json" onchange="app.importManualJson(this)">
                 <button class="btn-glass" onclick="app.resetStatus()">↺ Reset Status</button>
                 <button class="btn-glass btn-danger" onclick="app.deleteAll()">🗑 Delete All</button>
             </div>
