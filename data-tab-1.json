@@ -1,0 +1,14 @@
+[
+  {
+    "machineData": "Machine A",
+    "period": "Jan",
+    "status": "Done",
+    "notes": "Initial check"
+  },
+  {
+    "machineData": "Machine B",
+    "period": "Feb",
+    "status": "Outstanding",
+    "notes": ""
+  }
+]

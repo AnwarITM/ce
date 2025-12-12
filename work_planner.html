@@ -230,6 +230,14 @@
             border: none;
         }
 
+        .btn-primary:hover,
+        .btn-primary:focus,
+        .btn-primary:active {
+            background: var(--gradient-primary);
+            color: white !important;
+            opacity: 0.9;
+        }
+
         .btn-danger {
             color: #dc2626;
             border-color: rgba(220, 38, 38, 0.3);
@@ -411,6 +419,8 @@
             <!-- Manual Controls -->
             <div id="manualControls" style="display:none; gap:8px; flex-wrap:wrap;">
                 <button class="btn-glass btn-primary" onclick="app.showAddModal()">+ Add Data</button>
+                <button class="btn-glass" onclick="$('#fileManualJson').click()">⚡ Import JSON</button>
+                <input type="file" id="fileManualJson" hidden accept=".json" onchange="app.importManualJson(this)">
                 <button class="btn-glass" onclick="app.resetStatus()">↺ Reset Status</button>
                 <button class="btn-glass btn-danger" onclick="app.deleteAll()">🗑 Delete All</button>
             </div>
@@ -419,7 +429,6 @@
             <div id="excelControls" class="import-area" style="display:none;">
                 <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
                     <input type="file" id="fileExcel" accept=".xlsx" style="font-size:12px;">
-                    <button class="btn-glass btn-primary" onclick="app.processExcel()">Proses Excel</button>
                 </div>
                 <div class="mapping-grid">
                     <div>
@@ -439,6 +448,9 @@
                     <div class="metric-label">WSID Peganganku (Filter)</div>
                     <textarea id="myWsids" class="cell-note" placeholder="Masukkan daftar WSID (pisahkan koma/enter)..."
                         style="background:rgba(255,255,255,0.5);"></textarea>
+                </div>
+                <div style="text-align:right;">
+                    <button class="btn-glass btn-primary" onclick="app.processExcel()">Proses Excel</button>
                 </div>
             </div>
 

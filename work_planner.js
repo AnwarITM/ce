@@ -441,6 +441,47 @@ const app = {
         reader.readAsText(file);
     },
 
+    importManualJson(input) {
+        const file = input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const json = JSON.parse(e.target.result);
+                if (!Array.isArray(json)) {
+                    alert("Format JSON harus berupa array.");
+                    return;
+                }
+
+                const newData = json.map((item, idx) => ({
+                    id: 'm_imp_' + Date.now() + '_' + idx,
+                    wsid: item.machineData || item.wsid || 'Unknown',
+                    lokasi: item.lokasi || '',
+                    plan: item.period || item.plan || '',
+                    status: (item.status && item.status.toLowerCase() === 'done') ? 'done' : 'outstanding',
+                    note: item.notes || item.note || '',
+                    timestamp: Date.now() + idx
+                }));
+
+                const tab = this.getCurrentTab();
+                if (tab.data.length > 0 && !confirm(`Tambahkan ${newData.length} item ke data yang sudah ada?`)) {
+                    input.value = '';
+                    return;
+                }
+
+                tab.data = [...tab.data, ...newData];
+                this.saveState();
+                this.renderTableData();
+                alert(`Berhasil import ${newData.length} item.`);
+            } catch (err) {
+                console.error(err);
+                alert("Gagal membaca file JSON: " + err.message);
+            }
+            input.value = ''; // Reset input
+        };
+        reader.readAsText(file);
+    },
+
     exportData() {
         const str = JSON.stringify(this.state, null, 2);
         const blob = new Blob([str], { type: 'application/json' });
