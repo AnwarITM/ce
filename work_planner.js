@@ -360,28 +360,49 @@ const app = {
             const buf = await f.arrayBuffer();
             const wb = XLSX.read(buf, { type: 'array' });
             const ws = wb.Sheets[wb.SheetNames[0]];
-            const json = XLSX.utils.sheet_to_json(ws, { defval: '' });
 
-            const newData = json.map((row, idx) => {
-                const rawDate = row[mapPlan];
+            // Re-read matrix + header detection logic
+            const matrix = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '', blankrows: false });
+
+            // Pakai header index yang didapat dari event change sebelumnya (atau deteksi ulang)
+            let headerIdx = parseInt($('#fileExcel').dataset.headerRowIdx);
+            if (isNaN(headerIdx)) headerIdx = findHeaderRow(matrix);
+
+            const headers = matrix[headerIdx].map(String);
+
+            // Map keys
+            const keyWSID = headers.indexOf(mapWSID);
+            const keyLok = headers.indexOf(mapLok);
+            const keyPlan = headers.indexOf(mapPlan);
+
+            if (keyWSID < 0) throw new Error("Kolom WSID tidak ditemukan di baris header ke-" + (headerIdx + 1));
+
+            // Parse data rows (start from headerIdx + 1)
+            const newData = [];
+            for (let i = headerIdx + 1; i < matrix.length; i++) {
+                const row = matrix[i];
+                const rawWSID = row[keyWSID];
+                if (!rawWSID) continue; // Skip empty wsid
+
+                const rawDate = keyPlan >= 0 ? row[keyPlan] : '';
                 let planDate = rawDate;
 
                 // Try parse Excel serial date
                 if (typeof rawDate === 'number') {
                     const d = XLSX.SSF.parse_date_code(rawDate);
-                    if (d) planDate = `${d.d}/${d.m}/${d.y}`; // Simple format
+                    if (d) planDate = `${d.d}/${d.m}/${d.y}`;
                 }
 
-                return {
-                    id: 'x_' + idx + '_' + Math.random().toString(36).substr(2, 5),
-                    wsid: row[mapWSID],
-                    lokasi: row[mapLok] || '',
-                    plan: planDate || '',
-                    status: 'outstanding', // Default
+                newData.push({
+                    id: 'x_' + i + '_' + Math.random().toString(36).substr(2, 5),
+                    wsid: String(rawWSID).trim(),
+                    lokasi: keyLok >= 0 ? String(row[keyLok] || '') : '',
+                    plan: planDate ? String(planDate) : '',
+                    status: 'outstanding',
                     note: '',
-                    timestamp: idx // Keep excel order initially
-                };
-            }).filter(item => item.wsid);
+                    timestamp: i
+                });
+            }
 
             // Replace data or append? Usually replace for Excel import flows or append?
             // User flow: Import usually means loading a dataset. Let's append to avoid accidental loss, 
@@ -393,7 +414,7 @@ const app = {
             tab.data = [...tab.data, ...newData];
             this.saveState();
             this.renderTableData();
-            alert(`Berhasil import ${newData.length} baris.`);
+            alert(`Berhasil import ${newData.length} baris (Header di baris ${headerIdx + 1}).`);
 
         } catch (e) {
             console.error(e);
@@ -445,25 +466,61 @@ const app = {
     }
 };
 
+// --- Helper for detecting header row index ---
+function findHeaderRow(matrix) {
+    const CAND_WS = ['wsid', 'id mesin', 'id_ws', 'id atm', 'no wsid', 'data mesin'];
+    const CAND_LOC = ['lokasi', 'alamat', 'location', 'site', 'address'];
+    const CAND_PLAN = ['plan', 'bulan', 'month', 'jadwal', 'periode', 'period', 'tanggal', 'date'];
+
+    const hasAny = (row, arr) => row.some(c => arr.some(k => String(c).toLowerCase().includes(k)));
+
+    for (let i = 0; i < Math.min(matrix.length, 25); i++) {
+        const row = matrix[i].map(x => String(x || ''));
+        const score =
+            (hasAny(row, CAND_WS) ? 1 : 0) +
+            (hasAny(row, CAND_LOC) ? 1 : 0) +
+            (hasAny(row, CAND_PLAN) ? 1 : 0);
+        // Jika ketemu keyword kuat atau skor tinggi
+        if (score >= 1 || row.join('').toLowerCase().includes('wsid')) {
+            return i;
+        }
+    }
+    return 0; // fallback to row 0 if not found
+}
+
 // Excel Header Detection Helper
 $('#fileExcel').addEventListener('change', async (e) => {
     const f = e.target.files[0];
     if (!f) return;
-    const buf = await f.arrayBuffer();
-    const wb = XLSX.read(buf, { type: 'array' });
-    const ws = wb.Sheets[wb.SheetNames[0]];
-    const headers = XLSX.utils.sheet_to_json(ws, { header: 1 })[0] || [];
+    try {
+        const buf = await f.arrayBuffer();
+        const wb = XLSX.read(buf, { type: 'array' });
+        const ws = wb.Sheets[wb.SheetNames[0]];
 
-    ['mapWSID', 'mapLok', 'mapPlan'].forEach(id => {
-        const sel = $('#' + id);
-        sel.innerHTML = '<option value="">-- Pilih --</option>';
-        headers.forEach(h => {
-            const opt = document.createElement('option');
-            opt.value = h;
-            opt.textContent = h;
-            sel.appendChild(opt);
+        // Read raw matrix
+        const matrix = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '', blankrows: false });
+        if (!matrix || matrix.length === 0) return;
+
+        // Auto detect header row
+        const headerIdx = findHeaderRow(matrix);
+        const headers = matrix[headerIdx].map(String);
+
+        // Simpan info header index di state sementara (atau atribut elemen) agar processExcel tau
+        $('#fileExcel').dataset.headerRowIdx = headerIdx;
+
+        ['mapWSID', 'mapLok', 'mapPlan'].forEach(id => {
+            const sel = $('#' + id);
+            sel.innerHTML = '<option value="">-- Pilih --</option>';
+            headers.forEach(h => {
+                const opt = document.createElement('option');
+                opt.value = h;
+                opt.textContent = h;
+                sel.appendChild(opt);
+            });
         });
-    });
+
+        // Auto select suggestion? Optional, but nice.
+    } catch (err) { console.error(err); alert("Gagal baca header Excel"); }
 });
 
 // Init
