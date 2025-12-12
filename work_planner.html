@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Work Planner • EPS</title>
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4f46e5">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="description" content="Unified Task & WSID Planner">
+
+    <!-- Icons -->
+    <link rel="icon" type="image/png" sizes="16x16" href="icon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="icon-32x32.png">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="design-tokens.css">
+    <link rel="stylesheet" href="styles.css">
+    <link id="theme-link" rel="stylesheet" href="theme-light.css">
+
+    <!-- Excel Parser -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
+
+    <style>
+        :root {
+            /* Column widths */
+            --w-handle: 40px;
+            --w-data: 140px;
+            --w-loc: 250px;
+            --w-plan: 110px;
+            --w-status: 120px;
+            --w-note: 200px;
+            --w-action: 80px;
+        }
+
+        /* Layout Overrides for Unified Look */
+        body {
+            /* Background handled by global styles */
+            min-height: 100vh;
+        }
+
+        .page-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* Header Area */
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .app-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-hover);
+            cursor: pointer;
+        }
+
+        /* Status Colors (shared logic) */
+        select.status-select {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 8px;
+            padding: 6px;
+            font-weight: 600;
+            font-size: 13px;
+            text-align: center;
+            text-align-last: center;
+            color: var(--text-color);
+        }
+
+        .status-outstanding {
+            background: rgba(239, 68, 68, 0.15) !important;
+            color: #dc2626 !important;
+            border-color: rgba(239, 68, 68, 0.35) !important;
+        }
+
+        .status-done {
+            background: rgba(34, 197, 94, 0.15) !important;
+            color: #16a34a !important;
+            border-color: rgba(34, 197, 94, 0.35) !important;
+        }
+
+        /* Tab Bar (Scrollable) */
+        .tabs-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .tab-item {
+            padding: 10px 16px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+            white-space: nowrap;
+            color: var(--text-color);
+            transition: all 0.2s;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .tab-item.active {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2));
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .tab-add-btn {
+            padding: 10px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.4);
+            border: 1px dashed var(--text-color);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.6;
+        }
+
+        .tab-add-btn:hover {
+            opacity: 1;
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        /* Metrics & Toolbar */
+        .dashboard-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .metric-card {
+            flex: 1;
+            min-width: 100px;
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            padding: 12px;
+            border-radius: 12px;
+            border: var(--glass-border);
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .metric-val {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+
+        .metric-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Controls Section */
+        .controls-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            padding: 16px;
+            border-radius: 12px;
+            border: var(--glass-border);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .mode-switch {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .radio-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        /* Buttons shared */
+        .btn-glass {
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-color);
+        }
+
+        .btn-glass:hover {
+            background: rgba(255, 255, 255, 0.8);
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+        }
+
+        .btn-danger {
+            color: #dc2626;
+            border-color: rgba(220, 38, 38, 0.3);
+        }
+
+        /* Import Section Specifics */
+        .import-area {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 12px;
+            background: rgba(99, 102, 241, 0.05);
+            border-radius: 8px;
+            border: 1px dashed rgba(99, 102, 241, 0.3);
+        }
+
+        .mapping-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 8px;
+        }
+
+        select.map-select {
+            width: 100%;
+            padding: 6px;
+            border-radius: 6px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            font-size: 12px;
+        }
+
+        /* Table */
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: var(--glass-border);
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(10px);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        th {
+            background: rgba(99, 102, 241, 0.08);
+            color: var(--primary-color);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+            padding: 10px;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            vertical-align: middle;
+            text-align: center;
+        }
+
+        .cell-left {
+            text-align: left;
+        }
+
+        .col-drag {
+            width: 30px;
+            cursor: grab;
+            color: #94a3b8;
+        }
+
+        textarea.cell-note {
+            width: 100%;
+            min-height: 32px;
+            padding: 4px;
+            border-radius: 6px;
+            border: 1px solid transparent;
+            background: transparent;
+            font-family: inherit;
+            font-size: 12px;
+            resize: vertical;
+            color: var(--text-color);
+        }
+
+        textarea.cell-note:focus {
+            background: rgba(255, 255, 255, 0.8);
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .page-container {
+                padding: 8px;
+            }
+
+            .dashboard-row {
+                gap: 8px;
+            }
+
+            .metric-card {
+                padding: 8px;
+            }
+
+            .metric-val {
+                font-size: 16px;
+            }
+
+            /* Table Compact for Mobile */
+            th,
+            td {
+                padding: 8px 4px;
+                font-size: 11px;
+            }
+
+            .status-select {
+                font-size: 10px;
+                padding: 4px;
+            }
+
+            /* Hide less critical columns on very small screens if needed, 
+               but user wanted "No Horizontal Scroll" previously. 
+               We will trust the table layout auto or use CSS grid for cards if needed.
+               For now, stick to table but keep minimal padding. */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="app-title" onclick="app.renameTab()">Work Planner</div>
+            <div style="display:flex; gap:8px;">
+                <button class="btn-glass" onclick="app.toggleTheme()" title="Toggle Theme">🌗</button>
+                <button class="btn-glass" onclick="app.exportData()" title="Backup JSON">⬇ Export</button>
+                <button class="btn-glass" onclick="$('#fileJson').click()" title="Restore JSON">⬆ Import</button>
+                <input type="file" id="fileJson" hidden accept=".json" onchange="app.importData(this)">
+            </div>
+        </header>
+
+        <!-- Tabs -->
+        <div class="tabs-wrapper" id="tabsContainer">
+            <!-- Tabs injected by JS -->
+            <div class="tab-add-btn" onclick="app.addTab()">+</div>
+        </div>
+
+        <!-- Metric Cards -->
+        <div class="dashboard-row">
+            <div class="metric-card">
+                <div class="metric-val" id="mTotal">0</div>
+                <div class="metric-label">Total</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-val" id="mDone">0</div>
+                <div class="metric-label">Done</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-val" id="mOut">0</div>
+                <div class="metric-label">Outstanding</div>
+            </div>
+        </div>
+
+        <!-- Controls Area -->
+        <div class="controls-card">
+            <div class="mode-switch">
+                <span class="metric-label">Mode:</span>
+                <label class="radio-label">
+                    <input type="radio" name="mode" value="manual" onchange="app.setMode('manual')"> Manual
+                </label>
+                <label class="radio-label">
+                    <input type="radio" name="mode" value="excel" onchange="app.setMode('excel')"> Import Excel
+                </label>
+            </div>
+
+            <!-- Manual Controls -->
+            <div id="manualControls" style="display:none; gap:8px; flex-wrap:wrap;">
+                <button class="btn-glass btn-primary" onclick="app.showAddModal()">+ Add Data</button>
+                <button class="btn-glass" onclick="app.resetStatus()">↺ Reset Status</button>
+                <button class="btn-glass btn-danger" onclick="app.deleteAll()">🗑 Delete All</button>
+            </div>
+
+            <!-- Excel Controls -->
+            <div id="excelControls" class="import-area" style="display:none;">
+                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                    <input type="file" id="fileExcel" accept=".xlsx" style="font-size:12px;">
+                    <button class="btn-glass btn-primary" onclick="app.processExcel()">Proses Excel</button>
+                </div>
+                <div class="mapping-grid">
+                    <div>
+                        <div class="metric-label">Kolom WSID/Data</div>
+                        <select id="mapWSID" class="map-select"></select>
+                    </div>
+                    <div>
+                        <div class="metric-label">Kolom Lokasi</div>
+                        <select id="mapLok" class="map-select"></select>
+                    </div>
+                    <div>
+                        <div class="metric-label">Kolom Plan</div>
+                        <select id="mapPlan" class="map-select"></select>
+                    </div>
+                </div>
+                <div>
+                    <div class="metric-label">WSID Peganganku (Filter)</div>
+                    <textarea id="myWsids" class="cell-note" placeholder="Masukkan daftar WSID (pisahkan koma/enter)..."
+                        style="background:rgba(255,255,255,0.5);"></textarea>
+                </div>
+            </div>
+
+            <!-- Filter Segment -->
+            <div style="display:flex; gap:4px; margin-top:4px;">
+                <button class="btn-glass active" data-filter="all" onclick="app.setFilter('all')">All</button>
+                <button class="btn-glass" data-filter="done" onclick="app.setFilter('done')">Done</button>
+                <button class="btn-glass" data-filter="outstanding"
+                    onclick="app.setFilter('outstanding')">Outstanding</button>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-responsive">
+            <table id="mainTable">
+                <thead>
+                    <tr>
+                        <th width="40">::</th>
+                        <th>Data / WSID</th>
+                        <th>Lokasi</th>
+                        <th>Plan</th>
+                        <th>Status</th>
+                        <th>Notes</th>
+                        <th width="50">Act</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Rows injected by JS -->
+                </tbody>
+            </table>
+            <div id="emptyState" style="text-align:center; padding:30px; color:#9ca3af; font-size:14px;">
+                Belum ada data. Tambahkan manual atau import Excel.
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <dialog id="addModal"
+        style="border:none; border-radius:12px; padding:20px; box-shadow:0 10px 25px rgba(0,0,0,0.2); backdrop-filter:blur(5px); background:rgba(255,255,255,0.9);">
+        <h3 style="margin-top:0;">Add New Data</h3>
+        <input id="inpData" type="text" placeholder="Data Mesin / WSID"
+            style="width:100%; padding:8px; margin-bottom:8px; border-radius:6px; border:1px solid #ccc;">
+        <input id="inpLok" type="text" placeholder="Lokasi (Optional)"
+            style="width:100%; padding:8px; margin-bottom:8px; border-radius:6px; border:1px solid #ccc;">
+        <input id="inpPlan" type="text" placeholder="Plan/Periode (e.g. Dec 2024)"
+            style="width:100%; padding:8px; margin-bottom:12px; border-radius:6px; border:1px solid #ccc;">
+        <div style="display:flex; justify-content:flex-end; gap:8px;">
+            <button class="btn-glass" onclick="document.getElementById('addModal').close()">Cancel</button>
+            <button class="btn-glass btn-primary" onclick="app.saveAddData()">Save</button>
+        </div>
+    </dialog>
+
+    <!-- Scripts -->
+    <script src="work_planner.js"></script>
+</body>
+
+</html>
