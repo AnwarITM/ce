@@ -417,14 +417,16 @@ const app = {
                 });
             }
 
-            // Replace data or append? Usually replace for Excel import flows or append?
-            // User flow: Import usually means loading a dataset. Let's append to avoid accidental loss, 
-            // but Warn if not empty?
-            if (tab.data.length > 0 && !confirm("Append to existing data? Cancel to Abort.")) {
-                return;
+            // Replace data or append? 
+            // User request: Avoid "double data" when re-importing. Default to Overwrite.
+            if (tab.data.length > 0) {
+                if (!confirm("Terdapat data di tab ini. Timpa (Hapus & Ganti) dengan data baru?\nKlik OK untuk TIMPA\nKlik Cancel untuk BATAL")) {
+                    return;
+                }
+                tab.data = newData;
+            } else {
+                tab.data = newData;
             }
-
-            tab.data = [...tab.data, ...newData];
             this.sortTabByDate();
             this.saveState();
             this.renderTableData();
