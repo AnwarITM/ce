@@ -468,10 +468,10 @@ const app = {
                     const newData = list.map((item, idx) => ({
                         id: 'imp_' + Date.now() + '_' + idx,
                         wsid: item.machineData || item.wsid || 'Unknown',
-                        lokasi: item.lokasi || '',
+                        lokasi: item.lokasi || item.notes || '', // Map notes to layout/catatan col
                         plan: item.period || item.plan || '',
                         status: (item.status && item.status.toLowerCase() === 'done') ? 'done' : 'outstanding',
-                        note: item.notes || item.note || '',
+                        note: item.note || '', // Only take explicit note field, not notes
                         timestamp: Date.now() + idx
                     }));
 
