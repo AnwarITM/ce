@@ -421,7 +421,6 @@
             <div id="manualControls" style="display:none; gap:8px; flex-wrap:wrap;">
                 <button class="btn-glass btn-primary" onclick="app.showAddModal()">+ Add Data</button>
                 <button class="btn-glass" onclick="app.resetStatus()">↺ Reset Status</button>
-                <button class="btn-glass btn-danger" onclick="app.deleteAll()">🗑 Delete All</button>
             </div>
 
             <!-- Excel Controls -->
@@ -449,8 +448,6 @@
                         style="background:rgba(255,255,255,0.5);"></textarea>
                 </div>
                 <div style="text-align:right;">
-                    <button class="btn-glass btn-danger" onclick="app.deleteAll()" style="margin-right: 8px;">🗑 Delete
-                        All</button>
                     <button class="btn-glass btn-primary" onclick="app.processExcel()">Proses Excel</button>
                 </div>
             </div>
@@ -461,6 +458,8 @@
                 <button class="btn-glass" data-filter="done" onclick="app.setFilter('done')">Done</button>
                 <button class="btn-glass" data-filter="outstanding"
                     onclick="app.setFilter('outstanding')">Outstanding</button>
+                <button class="btn-glass btn-danger" onclick="app.deleteAll()" style="margin-left:auto;">🗑 Delete
+                    All</button>
             </div>
         </div>
 
