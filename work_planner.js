@@ -139,7 +139,13 @@ const app = {
             $('#myWsids').value = tab.excelConfig.myWsids.join(', ');
         }
 
-        // 4. Metrics & Table
+        // 4. Update Dynamic Header Label
+        const headerLabel = $('#headerLabelDynamic');
+        if (headerLabel) {
+            headerLabel.textContent = tab.mode === 'excel' ? 'Lokasi' : 'Catatan';
+        }
+
+        // 5. Metrics & Table
         this.renderTableData();
     },
 
@@ -468,7 +474,8 @@ const app = {
                     const newData = list.map((item, idx) => ({
                         id: 'imp_' + Date.now() + '_' + idx,
                         wsid: item.machineData || item.wsid || 'Unknown',
-                        lokasi: item.lokasi || item.notes || '', // Map notes to layout/catatan col
+                        // User Request: In manual mode (JSON Import), map 'notes' from JSON to this column (lokasi data field)
+                        lokasi: item.lokasi || item.notes || '',
                         plan: item.period || item.plan || '',
                         status: (item.status && item.status.toLowerCase() === 'done') ? 'done' : 'outstanding',
                         note: item.note || '', // Only take explicit note field, not notes

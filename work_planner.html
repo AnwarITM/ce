@@ -387,6 +387,8 @@
         <div class="tabs-wrapper" id="tabsContainer">
             <!-- Tabs injected by JS -->
             <div class="tab-add-btn" onclick="app.addTab()">+</div>
+            <div class="tab-add-btn" onclick="app.deleteTab()" style="border-color:rgba(239,68,68,0.5); color:#ef4444;"
+                title="Hapus Tab Aktif">✕</div>
         </div>
 
         <!-- Metric Cards -->
@@ -434,7 +436,7 @@
                         <select id="mapWSID" class="map-select"></select>
                     </div>
                     <div>
-                        <div class="metric-label">Kolom Catatan</div>
+                        <div class="metric-label">Kolom Lokasi</div>
                         <select id="mapLok" class="map-select"></select>
                     </div>
                     <div>
@@ -470,7 +472,7 @@
                     <tr>
                         <th width="40">::</th>
                         <th>Data / WSID</th>
-                        <th>Catatan</th>
+                        <th id="headerLabelDynamic">Catatan</th>
                         <th>Plan</th>
                         <th>Status</th>
                         <th>Notes (Update)</th>
