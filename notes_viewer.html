@@ -7,6 +7,8 @@
   <title>Catatan Troubleshoot ATM</title>
   <link rel="stylesheet" href="design-tokens.css">
   <link rel="stylesheet" href="styles.css">
+  <link id="theme-link" rel="stylesheet" href="theme-light.css">
+  <script src="theme_manager.js"></script>
   <style>
     body {
       max-width: 900px;
@@ -267,7 +269,12 @@
 
 <body>
 
-  <h1>Catatan Troubleshoot ATM</h1>
+  <h1 style="display:flex; justify-content:center; align-items:center; gap:12px;">
+    Catatan Troubleshoot ATM
+    <button onclick="toggleGlobalTheme()"
+      style="background:transparent; border:none; font-size:24px; cursor:pointer; padding:0;"
+      title="Switch Theme">🌗</button>
+  </h1>
   <input type="text" id="search" placeholder="Cari catatan... (judul, kategori, isi)" oninput="cariCatatan()">
   <div id="dataContainer"></div>
 
