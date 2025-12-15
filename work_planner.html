@@ -331,6 +331,26 @@
             outline: none;
         }
 
+        input.cell-edit,
+        select.cell-edit {
+            width: 100%;
+            padding: 4px;
+            border-radius: 6px;
+            border: 1px solid transparent;
+            background: rgba(255, 255, 255, 0.3);
+            font-family: inherit;
+            font-size: 13px;
+            color: var(--text-color);
+        }
+
+        input.cell-edit:focus,
+        select.cell-edit:focus {
+            background: rgba(255, 255, 255, 0.9);
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
+        }
+
         /* Mobile Responsive */
         @media (max-width: 768px) {
             .page-container {
@@ -495,10 +515,25 @@
         <h3 style="margin-top:0;">Add New Data</h3>
         <input id="inpData" type="text" placeholder="Data Mesin / WSID"
             style="width:100%; padding:8px; margin-bottom:8px; border-radius:6px; border:1px solid #ccc;">
-        <input id="inpLok" type="text" placeholder="Catatan (Optional)"
+        <input id="inpLok" type="text" placeholder="Catatan"
             style="width:100%; padding:8px; margin-bottom:8px; border-radius:6px; border:1px solid #ccc;">
-        <input id="inpPlan" type="text" placeholder="Plan/Periode (e.g. Dec 2024)"
-            style="width:100%; padding:8px; margin-bottom:12px; border-radius:6px; border:1px solid #ccc;">
+
+        <select id="inpPlan"
+            style="width:100%; padding:8px; margin-bottom:12px; border-radius:6px; border:1px solid #ccc; background:#fff;">
+            <option value="" disabled selected>Pilih Bulan Plan...</option>
+            <option value="Jan">Januari</option>
+            <option value="Feb">Februari</option>
+            <option value="Mar">Maret</option>
+            <option value="Apr">April</option>
+            <option value="May">Mei</option>
+            <option value="Jun">Juni</option>
+            <option value="Jul">Juli</option>
+            <option value="Aug">Agustus</option>
+            <option value="Sep">September</option>
+            <option value="Oct">Oktober</option>
+            <option value="Nov">November</option>
+            <option value="Dec">Desember</option>
+        </select>
         <div style="display:flex; justify-content:flex-end; gap:8px;">
             <button class="btn-glass" onclick="document.getElementById('addModal').close()">Cancel</button>
             <button class="btn-glass btn-primary" onclick="app.saveAddData()">Save</button>

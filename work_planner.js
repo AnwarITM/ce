@@ -197,11 +197,7 @@ const app = {
         $('#mOut').textContent = out;
         $('#emptyState').style.display = total === 0 ? 'block' : 'none';
 
-        /* 
-           REMOVED AUTOMATIC SORTING HERE 
-           Reason: To allow manual Drag & Drop reordering. 
-           Sorting is now applied only once during Import/Process.
-        */
+        const isManual = tab.mode === 'manual';
 
         // Render Rows
         filtered.forEach((row, index) => {
@@ -209,12 +205,41 @@ const app = {
             tr.draggable = true;
             tr.dataset.id = row.id;
 
+            // Prepare Plan Cell Content
+            let planCellHtml;
+            if (isManual) {
+                // Generate Month Dropdown
+                const months = [
+                    { v: 'Jan', l: 'Januari' }, { v: 'Feb', l: 'Februari' }, { v: 'Mar', l: 'Maret' },
+                    { v: 'Apr', l: 'April' }, { v: 'May', l: 'Mei' }, { v: 'Jun', l: 'Juni' },
+                    { v: 'Jul', l: 'Juli' }, { v: 'Aug', l: 'Agustus' }, { v: 'Sep', l: 'September' },
+                    { v: 'Oct', l: 'Oktober' }, { v: 'Nov', l: 'November' }, { v: 'Dec', l: 'Desember' }
+                ];
+                let opts = `<option value="">--</option>`;
+                months.forEach(m => {
+                    const sel = (row.plan === m.v) ? 'selected' : '';
+                    opts += `<option value="${m.v}" ${sel}>${m.l}</option>`;
+                });
+                planCellHtml = `<select class="cell-edit" onchange="app.updatePlan('${row.id}', this.value)">${opts}</select>`;
+            } else {
+                planCellHtml = row.plan || '-';
+            }
+
+            // Prepare Lokasi/Catatan Cell Content
+            let lokCellHtml;
+            if (isManual) {
+                lokCellHtml = `<input type="text" class="cell-edit" value="${row.lokasi || ''}" 
+                                onchange="app.updateLokasi('${row.id}', this.value)" placeholder="Catatan...">`;
+            } else {
+                lokCellHtml = row.lokasi || '-';
+            }
+
             // Drag Handle
             tr.innerHTML = `
                 <td class="col-drag" style="cursor:grab;">⋮⋮</td>
                 <td style="font-weight:600; color:#4f46e5;">${row.wsid}</td>
-                <td class="cell-left">${row.lokasi || '-'}</td>
-                <td>${row.plan || '-'}</td>
+                <td class="cell-left">${lokCellHtml}</td>
+                <td>${planCellHtml}</td>
                 <td>
                     <select class="status-select ${row.status === 'done' ? 'status-done' : 'status-outstanding'}" 
                         onchange="app.updateStatus('${row.id}', this.value)">
@@ -267,6 +292,22 @@ const app = {
             const dateB = parseDateScore(b.plan);
             return dateA - dateB || (a.timestamp || 0) - (b.timestamp || 0);
         });
+    },
+
+    updateLokasi(id, val) {
+        const row = this.getCurrentTab().data.find(r => r.id === id);
+        if (row) {
+            row.lokasi = val;
+            this.saveState();
+        }
+    },
+
+    updatePlan(id, val) {
+        const row = this.getCurrentTab().data.find(r => r.id === id);
+        if (row) {
+            row.plan = val;
+            this.saveState();
+        }
     },
 
     updateStatus(id, newStatus) {
@@ -505,13 +546,13 @@ const app = {
 
     exportTabData() {
         const tab = this.getCurrentTab();
-        // Export in a clean friendly format
+        // Export in a clean friendly format matching data-tab.json
         const cleanData = tab.data.map(r => ({
             machineData: r.wsid,
             period: r.plan,
             status: r.status === 'done' ? 'Done' : 'Outstanding',
-            notes: r.note,
-            lokasi: r.lokasi
+            notes: r.lokasi, // In data-tab.json, 'notes' corresponds to the Catatan/Lokasi column
+            note: r.note // Preserve the separate 'Notes (Update)' column as 'note' (singular)
         }));
 
         const str = JSON.stringify(cleanData, null, 2);
