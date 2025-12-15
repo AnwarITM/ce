@@ -7,7 +7,8 @@ const $ = s => document.querySelector(s);
 const $$ = s => document.querySelectorAll(s);
 
 const STORAGE_KEY = 'eps_work_planner_v1';
-const THEME_KEY = 'eps_theme_pref';
+// THEME_KEY is handled by theme_manager.js or we use string literal to avoid collision
+// const THEME_KEY = 'eps_theme_pref';
 
 // Initial State Template
 const createNewTab = (id) => ({
@@ -600,11 +601,11 @@ const app = {
         const curr = link.getAttribute('href');
         const next = curr.includes('light') ? 'theme-dark.css' : 'theme-light.css';
         link.setAttribute('href', next);
-        localStorage.setItem(THEME_KEY, next);
+        localStorage.setItem('eps_theme_pref', next);
     },
 
     loadTheme() {
-        const saved = localStorage.getItem(THEME_KEY);
+        const saved = localStorage.getItem('eps_theme_pref');
         if (saved) document.getElementById('theme-link').setAttribute('href', saved);
     }
 };
