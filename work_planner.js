@@ -205,40 +205,37 @@ const app = {
             tr.draggable = true;
             tr.dataset.id = row.id;
 
+            // Prepare WSID Cell (Clickable in Manual Mode)
+            let wsidHtml;
+            if (isManual) {
+                wsidHtml = `<span class="clickable-wsid" onclick="app.showDataModal('edit', '${row.id}')">${row.wsid}</span>`;
+            } else {
+                wsidHtml = `<span style="font-weight:600; color:#4f46e5;">${row.wsid}</span>`;
+            }
+
             // Prepare Plan Cell Content
             let planCellHtml;
             if (isManual) {
-                // Generate Month Dropdown
-                const months = [
-                    { v: 'Jan', l: 'Januari' }, { v: 'Feb', l: 'Februari' }, { v: 'Mar', l: 'Maret' },
-                    { v: 'Apr', l: 'April' }, { v: 'May', l: 'Mei' }, { v: 'Jun', l: 'Juni' },
-                    { v: 'Jul', l: 'Juli' }, { v: 'Aug', l: 'Agustus' }, { v: 'Sep', l: 'September' },
-                    { v: 'Oct', l: 'Oktober' }, { v: 'Nov', l: 'November' }, { v: 'Dec', l: 'Desember' }
-                ];
+                // Generate Month Dropdown with Short Names
+                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
                 let opts = `<option value="">--</option>`;
                 months.forEach(m => {
-                    const sel = (row.plan === m.v) ? 'selected' : '';
-                    opts += `<option value="${m.v}" ${sel}>${m.l}</option>`;
+                    const sel = (row.plan === m) ? 'selected' : '';
+                    opts += `<option value="${m}" ${sel}>${m}</option>`;
                 });
                 planCellHtml = `<select class="cell-edit" onchange="app.updatePlan('${row.id}', this.value)">${opts}</select>`;
             } else {
                 planCellHtml = row.plan || '-';
             }
 
-            // Prepare Lokasi/Catatan Cell Content
-            let lokCellHtml;
-            if (isManual) {
-                lokCellHtml = `<input type="text" class="cell-edit" value="${row.lokasi || ''}" 
-                                onchange="app.updateLokasi('${row.id}', this.value)" placeholder="Catatan...">`;
-            } else {
-                lokCellHtml = row.lokasi || '-';
-            }
+            // Prepare Lokasi/Catatan Cell Content (Wrapped Text) - No input here, edit via Modal
+            const lokHtml = `<div class="cell-wrapped">${row.lokasi || '-'}</div>`;
 
             // Drag Handle
             tr.innerHTML = `
                 <td class="col-drag" style="cursor:grab;">⋮⋮</td>
-                <td style="font-weight:600; color:#4f46e5;">${row.wsid}</td>
-                <td class="cell-left">${lokCellHtml}</td>
+                <td>${wsidHtml}</td>
+                <td class="cell-left">${lokHtml}</td>
                 <td>${planCellHtml}</td>
                 <td>
                     <select class="status-select ${row.status === 'done' ? 'status-done' : 'status-outstanding'}" 
@@ -365,35 +362,68 @@ const app = {
         }
     },
 
-    // --- Manual Entry ---
-    showAddModal() {
-        $('#inpData').value = '';
-        $('#inpLok').value = '';
-        $('#inpPlan').value = '';
-        document.getElementById('addModal').showModal();
+    // --- Data Modal (Add/Edit) ---
+    showDataModal(mode = 'add', id = null) {
+        const modal = document.getElementById('dataModal');
+        const title = document.getElementById('modalTitle');
+        const inpId = document.getElementById('inpId');
+        const inpData = document.getElementById('inpData');
+        const inpLok = document.getElementById('inpLok');
+        const inpPlan = document.getElementById('inpPlan');
+
+        if (mode === 'edit' && id) {
+            const item = this.getCurrentTab().data.find(r => r.id === id);
+            if (!item) return;
+            title.textContent = 'Edit Data';
+            inpId.value = id;
+            inpData.value = item.wsid;
+            inpLok.value = item.lokasi || '';
+            inpPlan.value = item.plan || '';
+        } else {
+            title.textContent = 'Add New Data';
+            inpId.value = '';
+            inpData.value = '';
+            inpLok.value = '';
+            inpPlan.value = '';
+        }
+        modal.showModal();
     },
 
-    saveAddData() {
+    saveData() {
+        const id = document.getElementById('inpId').value;
         const wsid = $('#inpData').value.trim();
         const lok = $('#inpLok').value.trim();
         const plan = $('#inpPlan').value.trim();
 
         if (!wsid) { alert('Data/WSID wajib diisi'); return; }
 
-        const newItem = {
-            id: 'm_' + Date.now(),
-            wsid: wsid,
-            lokasi: lok,
-            plan: plan,
-            status: 'outstanding',
-            note: '',
-            timestamp: Date.now()
-        };
+        const tab = this.getCurrentTab();
 
-        this.getCurrentTab().data.push(newItem);
+        if (id) {
+            // Edit Mode
+            const item = tab.data.find(r => r.id === id);
+            if (item) {
+                item.wsid = wsid;
+                item.lokasi = lok;
+                item.plan = plan;
+            }
+        } else {
+            // Add Mode
+            const newItem = {
+                id: 'm_' + Date.now(),
+                wsid: wsid,
+                lokasi: lok,
+                plan: plan,
+                status: 'outstanding',
+                note: '',
+                timestamp: Date.now()
+            };
+            tab.data.push(newItem);
+        }
+
         this.saveState();
         this.renderTableData();
-        document.getElementById('addModal').close();
+        document.getElementById('dataModal').close();
     },
 
     // --- Excel Import Logic ---

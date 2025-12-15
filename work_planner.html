@@ -351,6 +351,27 @@
             box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
         }
 
+        .clickable-wsid {
+            cursor: pointer;
+            color: var(--primary-color);
+            font-weight: 700;
+            border-bottom: 1px dashed var(--primary-color);
+            transition: all 0.2s;
+        }
+
+        .clickable-wsid:hover {
+            opacity: 0.8;
+            border-bottom-style: solid;
+        }
+
+        .cell-wrapped {
+            white-space: pre-wrap;
+            word-break: break-word;
+            /* Ensure nice wrapping */
+            line-height: 1.4;
+            max-width: 250px;
+        }
+
         /* Mobile Responsive */
         @media (max-width: 768px) {
             .page-container {
@@ -441,7 +462,7 @@
 
             <!-- Manual Controls -->
             <div id="manualControls" style="display:none; gap:8px; flex-wrap:wrap;">
-                <button class="btn-glass btn-primary" onclick="app.showAddModal()">+ Add Data</button>
+                <button class="btn-glass btn-primary" onclick="app.showDataModal('add')">+ Add Data</button>
                 <button class="btn-glass" onclick="app.resetStatus()">↺ Reset Status</button>
             </div>
 
@@ -510,33 +531,40 @@
     </div>
 
     <!-- Modals -->
-    <dialog id="addModal"
-        style="border:none; border-radius:12px; padding:20px; box-shadow:0 10px 25px rgba(0,0,0,0.2); backdrop-filter:blur(5px); background:rgba(255,255,255,0.9);">
-        <h3 style="margin-top:0;">Add New Data</h3>
-        <input id="inpData" type="text" placeholder="Data Mesin / WSID"
-            style="width:100%; padding:8px; margin-bottom:8px; border-radius:6px; border:1px solid #ccc;">
-        <input id="inpLok" type="text" placeholder="Catatan"
-            style="width:100%; padding:8px; margin-bottom:8px; border-radius:6px; border:1px solid #ccc;">
+    <dialog id="dataModal"
+        style="border:none; border-radius:12px; padding:20px; box-shadow:0 10px 25px rgba(0,0,0,0.2); backdrop-filter:blur(5px); background:rgba(255,255,255,0.9); width: 90%; max-width: 400px;">
+        <h3 id="modalTitle" style="margin-top:0; color:var(--primary-color);">Data Editor</h3>
+        <input type="hidden" id="inpId">
 
+        <label style="display:block; margin-bottom:4px; font-size:12px; font-weight:600;">Data / WSID</label>
+        <input id="inpData" type="text" placeholder="Data Mesin / WSID"
+            style="width:100%; padding:10px; margin-bottom:12px; border-radius:8px; border:1px solid #ccc;">
+
+        <label style="display:block; margin-bottom:4px; font-size:12px; font-weight:600;">Catatan / Lokasi</label>
+        <textarea id="inpLok" placeholder="Tulis catatan di sini..." rows="3"
+            style="width:100%; padding:10px; margin-bottom:12px; border-radius:8px; border:1px solid #ccc; font-family:inherit; resize:vertical;"></textarea>
+
+        <label style="display:block; margin-bottom:4px; font-size:12px; font-weight:600;">Plan (Bulan)</label>
         <select id="inpPlan"
-            style="width:100%; padding:8px; margin-bottom:12px; border-radius:6px; border:1px solid #ccc; background:#fff;">
-            <option value="" disabled selected>Pilih Bulan Plan...</option>
-            <option value="Jan">Januari</option>
-            <option value="Feb">Februari</option>
-            <option value="Mar">Maret</option>
-            <option value="Apr">April</option>
-            <option value="May">Mei</option>
-            <option value="Jun">Juni</option>
-            <option value="Jul">Juli</option>
-            <option value="Aug">Agustus</option>
-            <option value="Sep">September</option>
-            <option value="Oct">Oktober</option>
-            <option value="Nov">November</option>
-            <option value="Dec">Desember</option>
+            style="width:100%; padding:10px; margin-bottom:20px; border-radius:8px; border:1px solid #ccc; background:#fff;">
+            <option value="" disabled selected>Pilih Bulan...</option>
+            <option value="Jan">Jan</option>
+            <option value="Feb">Feb</option>
+            <option value="Mar">Mar</option>
+            <option value="Apr">Apr</option>
+            <option value="May">May</option>
+            <option value="Jun">Jun</option>
+            <option value="Jul">Jul</option>
+            <option value="Aug">Aug</option>
+            <option value="Sep">Sep</option>
+            <option value="Oct">Oct</option>
+            <option value="Nov">Nov</option>
+            <option value="Dec">Dec</option>
         </select>
+
         <div style="display:flex; justify-content:flex-end; gap:8px;">
-            <button class="btn-glass" onclick="document.getElementById('addModal').close()">Cancel</button>
-            <button class="btn-glass btn-primary" onclick="app.saveAddData()">Save</button>
+            <button class="btn-glass" onclick="document.getElementById('dataModal').close()">Cancel</button>
+            <button class="btn-glass btn-primary" onclick="app.saveData()">Simpan</button>
         </div>
     </dialog>
 
