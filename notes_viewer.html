@@ -7,8 +7,10 @@
   <title>Catatan Troubleshoot ATM</title>
   <link rel="stylesheet" href="design-tokens.css">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="seasonal-effects.css">
   <link id="theme-link" rel="stylesheet" href="theme-light.css">
   <script src="theme_manager.js"></script>
+  <script src="seasonal-effects.js" defer></script>
   <style>
     body {
       max-width: 900px;
@@ -269,9 +271,9 @@
 
 <body>
 
-  <h1>Catatan Troubleshoot ATM</h1>
+  <h1 class="seasonal-snow-target" data-seasonal-title>Catatan Troubleshoot ATM</h1>
   <input type="text" id="search" placeholder="Cari catatan... (judul, kategori, isi)" oninput="cariCatatan()">
-  <div id="dataContainer"></div>
+  <div id="dataContainer" class="seasonal-snow-target"></div>
 
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>

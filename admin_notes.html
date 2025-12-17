@@ -7,6 +7,8 @@
   <title>Admin Catatan Troubleshoot ATM</title>
   <link rel="stylesheet" href="design-tokens.css">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="seasonal-effects.css">
+  <script src="seasonal-effects.js" defer></script>
   <style>
     body {
       max-width: 700px;
@@ -246,14 +248,14 @@
 
 <body>
 
-  <div class="card" id="loginForm">
-    <h2>Login Admin</h2>
+  <div class="card seasonal-snow-target" id="loginForm">
+    <h2 data-seasonal-title>Login Admin</h2>
     <input type="password" id="adminPassword" placeholder="Masukkan password admin">
     <button onclick="login()">Login</button>
   </div>
 
-  <div class="card" id="formInput" style="display:none">
-    <h2 id="formTitle">Input Catatan Baru</h2>
+  <div class="card seasonal-snow-target" id="formInput" style="display:none">
+    <h2 id="formTitle" data-seasonal-title>Input Catatan Baru</h2>
     <input type="text" id="judul" placeholder="Judul catatan">
     <input type="text" id="kategori" placeholder="Kategori (misal: NCR, PSU, EPP)">
     <textarea id="isi" placeholder="Isi catatan troubleshooting..." rows="6"></textarea>

@@ -19,10 +19,12 @@
     <!-- Styles -->
     <link rel="stylesheet" href="design-tokens.css">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="seasonal-effects.css">
     <link id="theme-link" rel="stylesheet" href="theme-light.css">
 
     <!-- Excel Parser -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
+    <script src="seasonal-effects.js" defer></script>
 
     <style>
         :root {
@@ -383,11 +385,11 @@
 <body>
     <div class="page-container">
         <!-- Header -->
-        <header class="app-header">
+        <header class="app-header seasonal-snow-target">
             <div class="header-left">
                 <!-- Theme Toggle -->
                 <button class="theme-toggle" onclick="toggleGlobalTheme()" title="Switch Theme">🌙</button>
-                <div class="app-title" onclick="app.renameTab()">Work Planner</div>
+                <div class="app-title" onclick="app.renameTab()" data-seasonal-title>Work Planner</div>
             </div>
 
             <div class="header-right">
@@ -406,22 +408,22 @@
 
         <!-- Metric Cards -->
         <div class="dashboard-row">
-            <div class="metric-card">
+            <div class="metric-card seasonal-snow-target">
                 <div class="metric-val" id="mTotal">0</div>
                 <div class="metric-label">Total</div>
             </div>
-            <div class="metric-card">
+            <div class="metric-card seasonal-snow-target">
                 <div class="metric-val" id="mDone">0</div>
                 <div class="metric-label">Done</div>
             </div>
-            <div class="metric-card">
+            <div class="metric-card seasonal-snow-target">
                 <div class="metric-val" id="mOut">0</div>
                 <div class="metric-label">Outstanding</div>
             </div>
         </div>
 
         <!-- Controls Area -->
-        <div class="controls-card">
+        <div class="controls-card seasonal-snow-target">
 
             <div class="main-toolbar">
                 <!-- Action Buttons: Side by Side on Mobile -->
@@ -469,7 +471,7 @@
         </div>
 
         <!-- Table -->
-        <div class="table-responsive">
+        <div class="table-responsive seasonal-snow-target">
             <table id="mainTable">
                 <thead>
                     <tr>
