@@ -35,7 +35,6 @@
             --w-action: 50px;
         }
 
-        /* Layout Overrides for Unified Look */
         body {
             min-height: 100vh;
         }
@@ -58,11 +57,42 @@
             gap: 12px;
         }
 
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header-right .btn-glass {
+            justify-content: center;
+            white-space: nowrap;
+            line-height: 1.1;
+        }
+
         .app-title {
             font-size: 24px;
             font-weight: 700;
             color: var(--primary-hover);
             cursor: pointer;
+        }
+
+        .theme-toggle {
+            background: rgba(255, 255, 255, 0.4);
+            border: 1px solid var(--primary-color);
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
         }
 
         /* Status Button */
@@ -90,12 +120,7 @@
             border-color: rgba(34, 197, 94, 0.35);
         }
 
-        .status-btn:hover {
-            filter: brightness(0.95);
-            transform: scale(1.02);
-        }
-
-        /* Tab Bar (Scrollable) */
+        /* Tab Bar */
         .tabs-wrapper {
             display: flex;
             align-items: center;
@@ -109,12 +134,10 @@
             padding: 10px 16px;
             border-radius: 12px;
             background: rgba(255, 255, 255, 0.5);
-            backdrop-filter: blur(8px);
             border: 1px solid rgba(255, 255, 255, 0.4);
             cursor: pointer;
             white-space: nowrap;
             color: var(--text-color);
-            transition: all 0.2s;
             font-size: 13px;
             font-weight: 500;
         }
@@ -128,23 +151,13 @@
 
         .tab-add-btn {
             padding: 10px;
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.4);
             border: 1px dashed var(--text-color);
+            border-radius: 12px;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             opacity: 0.6;
         }
 
-        .tab-add-btn:hover {
-            opacity: 1;
-            border-color: var(--primary-color);
-            color: var(--primary-color);
-        }
-
-        /* Metrics & Toolbar */
+        /* Metrics */
         .dashboard-row {
             display: flex;
             gap: 12px;
@@ -160,7 +173,6 @@
             border-radius: 12px;
             border: var(--glass-border);
             text-align: center;
-            box-shadow: var(--shadow-sm);
         }
 
         .metric-val {
@@ -171,25 +183,46 @@
 
         .metric-label {
             font-size: 11px;
-            color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            color: var(--text-muted);
         }
 
-        /* Controls Section */
+        /* Controls Area - Mobile Optimized */
         .controls-card {
             background: var(--card-bg);
             backdrop-filter: blur(12px);
             padding: 16px;
             border-radius: 12px;
             border: var(--glass-border);
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
             box-shadow: var(--shadow-md);
         }
 
-        /* Buttons shared */
+        .main-toolbar {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .action-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .import-area {
+            padding: 6px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            flex: 1;
+            min-width: 200px;
+        }
+
+        /* Common Buttons */
         .btn-glass {
             background: rgba(255, 255, 255, 0.6);
             border: 1px solid rgba(255, 255, 255, 0.5);
@@ -198,48 +231,27 @@
             cursor: pointer;
             font-size: 13px;
             font-weight: 500;
-            transition: all 0.2s;
             display: inline-flex;
             align-items: center;
             gap: 6px;
             color: var(--text-color);
-            text-decoration: none;
+            transition: transform 0.2s;
         }
 
         .btn-glass:hover {
-            background: rgba(255, 255, 255, 0.8);
             transform: translateY(-1px);
         }
 
         .btn-primary {
             background: var(--gradient-primary);
-            color: white;
-            border: none;
-        }
-
-        .btn-primary:hover {
-            opacity: 0.9;
             color: white !important;
+            border: none;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
         .btn-danger {
             color: #dc2626;
             border-color: rgba(220, 38, 38, 0.3);
-        }
-
-        /* Mapping Grid for Excel */
-        .mapping-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 8px;
-        }
-
-        select.map-select {
-            width: 100%;
-            padding: 6px;
-            border-radius: 6px;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            font-size: 12px;
         }
 
         /* Table */
@@ -257,81 +269,111 @@
             font-size: 13px;
         }
 
+        th,
+        td {
+            padding: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            text-align: center;
+            vertical-align: middle;
+        }
+
         th {
             background: rgba(99, 102, 241, 0.08);
+            /* Fallback */
             color: var(--primary-color);
             font-weight: 600;
             text-transform: uppercase;
             font-size: 11px;
-            letter-spacing: 0.5px;
-            padding: 10px;
-            text-align: center;
             white-space: nowrap;
         }
 
-        td {
-            padding: 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-            vertical-align: middle;
-            text-align: center;
-        }
-
-        .col-drag {
-            cursor: grab;
-            color: #94a3b8;
-        }
-
+        input.cell-edit,
         textarea.cell-edit {
             width: 100%;
-            min-height: 32px;
-            padding: 4px;
-            border-radius: 6px;
-            border: 1px solid transparent;
-            background: transparent;
-            font-family: inherit;
-            font-size: 13px;
-            resize: vertical;
+            background: var(--input-bg, rgba(255, 255, 255, 0.6));
+            border: 1px solid var(--input-border, rgba(0, 0, 0, 0.2));
             color: var(--text-color);
+            font-family: inherit;
+            border-radius: 6px;
+            padding: 6px 8px;
+            transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input.cell-edit:hover,
+        textarea.cell-edit:hover {
+            background: var(--input-bg-hover, rgba(255, 255, 255, 0.75));
+            border-color: var(--input-border-hover, rgba(0, 0, 0, 0.3));
+        }
+
+        input.cell-edit:focus,
+        textarea.cell-edit:focus {
+            background: var(--input-bg-focus, rgba(255, 255, 255, 0.95));
+            color: var(--input-text-focus, #0f172a);
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0, 85, 164, 0.2);
         }
 
         input.cell-edit {
-            width: 100%;
-            padding: 4px;
-            border-radius: 6px;
-            border: 1px solid transparent;
-            background: transparent;
-            font-family: inherit;
-            font-size: 14px;
+            text-align: center;
             font-weight: 600;
             color: var(--primary-color);
-            text-align: center;
         }
 
-        textarea.cell-edit:focus,
-        input.cell-edit:focus {
-            background: rgba(255, 255, 255, 0.8);
-            border-color: var(--primary-color);
-            outline: none;
+        textarea.cell-edit {
+            min-height: 32px;
+            resize: vertical;
         }
 
-        /* Mobile Responsive */
+
+        /* Mobile Specifics */
         @media (max-width: 768px) {
-            .page-container {
-                padding: 8px;
+            .app-header {
+                justify-content: space-between;
+                gap: 16px;
             }
 
-            .dashboard-row {
+            .header-right {
+                width: 100%;
+                margin-left: 0;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
                 gap: 8px;
             }
 
-            .metric-card {
-                padding: 8px;
+            .header-right .btn-glass {
+                width: 100%;
             }
 
-            /* Table Compact for Mobile */
+            /* Stack controls nicely */
+            .main-toolbar {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+
+            .action-group {
+                /* Buttons expand to fill width */
+                flex: 1;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                /* Side by side equal width */
+            }
+
+            .import-area {
+                width: 100%;
+            }
+
+            /* Compact table */
             th,
             td {
                 padding: 8px 4px;
+                font-size: 12px;
+            }
+
+            /* Import/Export buttons in header smaller? */
+            .btn-glass {
+                padding: 6px 10px;
                 font-size: 12px;
             }
         }
@@ -342,8 +384,13 @@
     <div class="page-container">
         <!-- Header -->
         <header class="app-header">
-            <div class="app-title" onclick="app.renameTab()">Work Planner</div>
-            <div style="display:flex; gap:8px;">
+            <div class="header-left">
+                <!-- Theme Toggle -->
+                <button class="theme-toggle" onclick="toggleGlobalTheme()" title="Switch Theme">🌙</button>
+                <div class="app-title" onclick="app.renameTab()">Work Planner</div>
+            </div>
+
+            <div class="header-right">
                 <button class="btn-glass" onclick="$('#fileImport').click()" title="Import JSON">⬇ Import</button>
                 <button class="btn-glass" onclick="app.exportTabData()" title="Export JSON">⬆ Export</button>
                 <input type="file" id="fileImport" hidden accept=".json" onchange="app.importUniversal(this)">
@@ -352,7 +399,6 @@
 
         <!-- Tabs -->
         <div class="tabs-wrapper" id="tabsContainer">
-            <!-- Tabs injected by JS -->
             <div class="tab-add-btn" onclick="app.addTab()">+</div>
             <div class="tab-add-btn" onclick="app.deleteTab()" style="border-color:rgba(239,68,68,0.5); color:#ef4444;"
                 title="Hapus Tab Aktif">✕</div>
@@ -376,43 +422,49 @@
 
         <!-- Controls Area -->
         <div class="controls-card">
-            
-            <!-- Main Toolbar -->
-            <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-                <button class="btn-glass btn-primary" onclick="app.addData()">+ Add Data</button>
-                <button class="btn-glass" onclick="app.resetStatus()">↺ Reset Status</button>
-                
-                <!-- ID for Excel file input hidden, triggered by button if needed or just visible -->
-                 <div class="import-area" style="padding:4px 8px; flex:1; min-width:200px; display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.3); border-radius:8px;">
-                    <span class="metric-label">Update Plan from Excel:</span>
-                    <input type="file" id="fileExcel" accept=".xlsx" style="font-size:12px; width:100%; color:var(--text-color);">
+
+            <div class="main-toolbar">
+                <!-- Action Buttons: Side by Side on Mobile -->
+                <div class="action-group">
+                    <button class="btn-glass btn-primary" onclick="app.addData()">+ Add Data</button>
+                    <button class="btn-glass" onclick="app.resetStatus()">↺ Reset Status</button>
+                </div>
+
+                <!-- Update Plan: Full Width on Mobile -->
+                <div class="import-area">
+                    <span class="metric-label" style="white-space:nowrap;">Update Plan:</span>
+                    <input type="file" id="fileExcel" accept=".xlsx"
+                        style="font-size:12px; width:100%; color:var(--text-color);">
                 </div>
             </div>
 
             <!-- Excel Mapping Area (Initially hidden) -->
-            <div id="excelMappingArea" style="display:none; margin-top:8px; padding-top:8px; border-top:1px dashed rgba(0,0,0,0.1);">
-                 <div class="mapping-grid">
+            <div id="excelMappingArea"
+                style="display:none; margin-top:8px; padding-top:8px; border-top:1px dashed rgba(0,0,0,0.1);">
+                <div class="mapping-grid">
                     <div>
                         <div class="metric-label">Kolom WSID (Excel)</div>
                         <select id="mapWSID" class="map-select"></select>
                     </div>
-                     <div>
+                    <div>
                         <div class="metric-label">Kolom Plan (Excel)</div>
                         <select id="mapPlan" class="map-select"></select>
                     </div>
-                     <div style="display:flex; align-items:flex-end;">
-                        <button class="btn-glass btn-primary" onclick="app.processExcel()" style="width:100%;">Update Plan</button>
+                    <div style="display:flex; align-items:flex-end;">
+                        <button class="btn-glass btn-primary" onclick="app.processExcel()" style="width:100%;">Update
+                            Plan</button>
                     </div>
                 </div>
             </div>
 
             <!-- Filter Segment -->
-            <div style="display:flex; gap:4px; margin-top:12px;">
+            <div style="display:flex; gap:4px; margin-top:12px; overflow-x:auto; padding-bottom:4px;">
                 <button class="btn-glass active" data-filter="all" onclick="app.setFilter('all')">All</button>
                 <button class="btn-glass" data-filter="done" onclick="app.setFilter('done')">Done</button>
                 <button class="btn-glass" data-filter="outstanding"
                     onclick="app.setFilter('outstanding')">Outstanding</button>
-                <button class="btn-glass btn-danger" onclick="app.deleteAll()" style="margin-left:auto;">🗑 Delete All</button>
+                <button class="btn-glass btn-danger" onclick="app.deleteAll()" style="margin-left:auto;">🗑
+                    Delete</button>
             </div>
         </div>
 
@@ -423,7 +475,7 @@
                     <tr>
                         <th width="30">::</th>
                         <th width="150">Data / WSID</th>
-                        <th>Catatan (Manual)</th>
+                        <th>Catatan</th>
                         <th width="100">Plan</th>
                         <th width="120">Status</th>
                         <th width="40">Act</th>

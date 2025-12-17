@@ -3,6 +3,12 @@
   --bg-color: #f3f6fa;              /* Latar terang abu kebiruan */
   --card-bg: #f6f6f6f6;               /* Panel putih */
   --border-color: #dbeafe;
+  --input-border: rgba(0, 85, 164, 0.25);
+  --input-border-hover: rgba(0, 85, 164, 0.4);
+  --input-bg: rgba(255, 255, 255, 0.7);
+  --input-bg-hover: rgba(255, 255, 255, 0.85);
+  --input-bg-focus: #ffffff;
+  --input-text-focus: #0f172a;
 
   /* === PRIMARY BCA === */
   --primary-color: #0055a4;         /* Biru BCA utama */
