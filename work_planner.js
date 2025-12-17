@@ -5,14 +5,13 @@
 const $ = s => document.querySelector(s);
 const $$ = s => document.querySelectorAll(s);
 
-const STORAGE_KEY = 'eps_work_planner_v2'; // Bump version for clean slate
+const STORAGE_KEY = 'eps_work_planner_v2';
 
 // Initial State Template
 const createNewTab = (id) => ({
     id: id,
     name: `Tab ${id + 1}`,
-    data: [], // Array of { id, wsid, notes, plan, status, timestamp }
-    // Excel specific config (temporary for current session mainly, but saved for convenience)
+    data: [],
     excelConfig: {
         lastMapWsid: '',
         lastMapPlan: ''
@@ -23,7 +22,7 @@ const app = {
     state: {
         tabs: [],
         currentTabId: 0,
-        filter: 'all', // all | done | outstanding
+        filter: 'all',
         dragItem: null
     },
 
@@ -86,9 +85,8 @@ const app = {
         this.saveState();
         this.renderTabs();
         this.renderUI();
-        // Hide Excel mapping if open
         $('#excelMappingArea').style.display = 'none';
-        $('#fileExcel').value = ''; 
+        $('#fileExcel').value = '';
     },
 
     addTab() {
@@ -142,7 +140,7 @@ const app = {
         }
 
         // Metrics
-        const total = tab.data.length; // Count total real items, not just filtered
+        const total = tab.data.length;
         const done = tab.data.filter(r => r.status === 'done').length;
         const out = total - done;
 
@@ -159,11 +157,11 @@ const app = {
 
             // WSID Input
             const wsidInput = `<input class="cell-edit" value="${row.wsid}" onchange="app.updateField('${row.id}', 'wsid', this.value)">`;
-            
+
             // Notes Textarea
             const notesInput = `<textarea class="cell-edit" onchange="app.updateField('${row.id}', 'notes', this.value)">${row.notes || ''}</textarea>`;
 
-            // Plan (just text or input? let's make it input for manual override if needed)
+            // Plan 
             const planInput = `<input class="cell-edit" value="${row.plan || ''}" placeholder="-" onchange="app.updateField('${row.id}', 'plan', this.value)">`;
 
             // Status Button
@@ -182,7 +180,6 @@ const app = {
                 </td>
             `;
 
-            // Drag Events
             this.attachDragEvents(tr, row);
             tbody.appendChild(tr);
         });
@@ -210,7 +207,6 @@ const app = {
 
     // --- Actions ---
 
-    // Manual Add
     addData() {
         const tab = this.getCurrentTab();
         tab.data.push({
@@ -282,7 +278,6 @@ const app = {
 
     // --- Excel Integration ---
 
-    // 1. Setup Listener for Excel Input
     setupEventListeners() {
         const fileInput = $('#fileExcel');
         if (fileInput) {
@@ -290,25 +285,21 @@ const app = {
                 const f = e.target.files[0];
                 if (!f) return;
                 try {
-                     const buf = await f.arrayBuffer();
-                     const wb = XLSX.read(buf, { type: 'array' });
-                     const ws = wb.Sheets[wb.SheetNames[0]];
-                     const matrix = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '', blankrows: false });
-                     
-                     if (!matrix || matrix.length === 0) return;
+                    const buf = await f.arrayBuffer();
+                    const wb = XLSX.read(buf, { type: 'array' });
+                    const ws = wb.Sheets[wb.SheetNames[0]];
+                    const matrix = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '', blankrows: false });
 
-                     // Show Mapping Area
-                     $('#excelMappingArea').style.display = 'block';
+                    if (!matrix || matrix.length === 0) return;
 
-                     // Detect Header
-                     const headerIdx = this.findHeaderRow(matrix);
-                     const headers = matrix[headerIdx].map(String);
-                     
-                     // Store matrix and header in a temp property on the input element or app state
-                     this.state.tempExcelData = { matrix, headerIdx };
+                    $('#excelMappingArea').style.display = 'block';
 
-                     // Populate Selects
-                     ['mapWSID', 'mapPlan'].forEach(id => {
+                    const headerIdx = this.findHeaderRow(matrix);
+                    const headers = matrix[headerIdx].map(String);
+
+                    this.state.tempExcelData = { matrix, headerIdx };
+
+                    ['mapWSID', 'mapPlan'].forEach(id => {
                         const sel = $('#' + id);
                         sel.innerHTML = '<option value="">-- Pilih --</option>';
                         headers.forEach(h => {
@@ -317,7 +308,7 @@ const app = {
                             opt.textContent = h;
                             sel.appendChild(opt);
                         });
-                     });
+                    });
 
                 } catch (err) { console.error(err); alert("Gagal baca Excel"); }
             });
@@ -325,101 +316,102 @@ const app = {
     },
 
     findHeaderRow(matrix) {
-         // Simple heuristic
-         for (let i = 0; i < Math.min(matrix.length, 20); i++) {
-             const rowStr = matrix[i].join(' ').toLowerCase();
-             if (rowStr.includes('wsid') || rowStr.includes('plan') || rowStr.includes('bulan')) return i;
-         }
-         return 0;
+        for (let i = 0; i < Math.min(matrix.length, 20); i++) {
+            const rowStr = matrix[i].join(' ').toLowerCase();
+            if (rowStr.includes('wsid') || rowStr.includes('plan') || rowStr.includes('bulan')) return i;
+        }
+        return 0;
     },
 
-    // 2. Process Update
     processExcel() {
         if (!this.state.tempExcelData) return;
-        
+
         const mapWSID = $('#mapWSID').value;
         const mapPlan = $('#mapPlan').value;
         if (!mapWSID || !mapPlan) { alert("Pilih kolom WSID dan Plan dulu"); return; }
 
-        const { matrix, headerIdx } = this.state.tempExcelData; // Get detailed data
-        
-        const keyWSID = matrix[headerIdx].indexOf(mapWSID);
-        const keyPlan = matrix[headerIdx].indexOf(mapPlan);
+        const { matrix, headerIdx } = this.state.tempExcelData;
+        const headers = matrix[headerIdx].map(String);
+
+        // Robust Index Finding (Match exact string from options)
+        const keyWSID = headers.indexOf(mapWSID);
+        const keyPlan = headers.indexOf(mapPlan);
+
+        if (keyWSID < 0 || keyPlan < 0) {
+            alert(`Error: Kolom tidak ditemukan internal (Index fail). Coba file lain.`);
+            return;
+        }
 
         const tab = this.getCurrentTab();
         let updateCount = 0;
+        let matchAttempts = 0;
 
-        // Build Map for fast lookup from Excel
+        // Build Map
         const excelMap = new Map();
         for (let i = headerIdx + 1; i < matrix.length; i++) {
             const row = matrix[i];
-            const wsid = String(row[keyWSID] || '').trim();
-            if (!wsid) continue;
-            
+            const rawWSID = row[keyWSID];
+            if (!rawWSID) continue;
+
+            // Normalize
+            const cleanWSID = String(rawWSID).trim().toLowerCase();
+
             let plan = row[keyPlan];
-             // Date parsing
-             if (typeof plan === 'number') {
+            if (typeof plan === 'number') {
                 const d = XLSX.SSF.parse_date_code(plan);
-                if (d) plan = `${d.d}/${d.m}/${d.y}`; // Simplified format or keep raw?
-             }
-             if (plan) excelMap.set(wsid.toLowerCase(), String(plan).trim());
+                if (d) plan = `${d.d}/${d.m}/${d.y}`;
+            }
+            if (plan) excelMap.set(cleanWSID, String(plan).trim());
         }
 
-        // Update Existing items
+        // Update matches
         tab.data.forEach(item => {
-            const matchPlan = excelMap.get(item.wsid.toLowerCase());
-            if (matchPlan) {
-                item.plan = matchPlan;
-                updateCount++;
+            const itemWSID = String(item.wsid).trim().toLowerCase();
+            if (itemWSID) {
+                matchAttempts++;
+                const matchPlan = excelMap.get(itemWSID);
+                if (matchPlan) {
+                    item.plan = matchPlan;
+                    updateCount++;
+                }
             }
         });
 
-        // Do we add new items? Logic says "inputan filter dari inputan wsid yg di input user", meaning 
-        // user inputs WSIDs manually, and Excel only updates their Plan.
-        // So we do NOT add new items from Excel.
+        // Diagnostics
+        if (updateCount === 0 && matchAttempts > 0) {
+            const sampleExcel = Array.from(excelMap.keys()).slice(0, 3).join(', ');
+            const sampleList = tab.data.slice(0, 3).map(r => r.wsid).join(', ');
+            alert(`0 Data terupdate! \nKemungkinan WSID tidak cocok.\n\nContoh di Excel: ${sampleExcel}\nContoh di List: ${sampleList}\n\nPastikan penulisan sama persis.`);
+            return;
+        }
 
-        // Sort by Date (Youngest/Nearest first)
         this.sortDataByDate(tab.data);
-
         this.saveState();
         this.renderTableData();
-        
-        // Cleanup
+
         $('#excelMappingArea').style.display = 'none';
-        $('#fileExcel').value = ''; 
-        alert(`Updated ${updateCount} rows.`);
+        $('#fileExcel').value = '';
+        alert(`Berhasil update ${updateCount} data dari ${excelMap.size} baris Excel.`);
     },
 
     sortDataByDate(data) {
-        // Sort keys: Month-Year logic or simple string compare?
-        // User asked "tanggal DAN Bulan termuda". "Youngest" usually means closest future or most recent past? 
-        // Assuming ascending order of date (Jan, Feb...).
-        
         const parseScore = (str) => {
-           if (!str) return 999999999999;
-           str = str.toLowerCase();
-           
-           // Check for Month Names
-           const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec', 'mei', 'agt', 'okt', 'des'];
-           const mIdx = months.findIndex(m => str.includes(m));
-           
-           if (mIdx >= 0) {
-               // Map indonesian to standard 0-11
-               const realIdx = (mIdx > 11) ? (mIdx === 12 ? 4 : (mIdx === 13 ? 7 : (mIdx === 14 ? 9 : 11))) : mIdx;
-               
-               // If year exists, extract it
-               const yearMatch = str.match(/\d{4}/);
-               const year = yearMatch ? parseInt(yearMatch[0]) : new Date().getFullYear();
-               
-               // Construct comparable value: Year * 100 + Month
-               return (year * 100) + realIdx;
-           }
-           
-           // Try Standard Date Parse
-           const d = new Date(str);
-           if (!isNaN(d.getTime())) return d.getTime();
-           
-           return 999999999999;
+            if (!str) return 999999999999;
+            str = str.toLowerCase();
+
+            const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec', 'mei', 'agt', 'okt', 'des'];
+            const mIdx = months.findIndex(m => str.includes(m));
+
+            if (mIdx >= 0) {
+                const realIdx = (mIdx > 11) ? (mIdx === 12 ? 4 : (mIdx === 13 ? 7 : (mIdx === 14 ? 9 : 11))) : mIdx;
+                const yearMatch = str.match(/\d{4}/);
+                const year = yearMatch ? parseInt(yearMatch[0]) : new Date().getFullYear();
+                return (year * 100) + realIdx;
+            }
+
+            const d = new Date(str);
+            if (!isNaN(d.getTime())) return d.getTime();
+            return 999999999999;
         };
 
         data.sort((a, b) => {
@@ -427,40 +419,15 @@ const app = {
         });
     },
 
-    // --- Import / Export ---
     exportTabData() {
         const tab = this.getCurrentTab();
         const exportData = tab.data.map(r => ({
             machineData: r.wsid,
             notes: r.notes,
-            status: r.status === 'done' ? 'Done' : 'Outstanding', // "tampilan tetap warna sesuai status" implies internal state
-            // Optionally include plan if needed for restore, but valid JSON requirement was specific
-            plan: r.plan 
+            status: r.status === 'done' ? 'Done' : 'Outstanding',
+            plan: r.plan
         }));
-        
-        // Clean format provided by user
-        // { "machineData": "...", "notes": "...", "status": "..." }
-        // I added 'plan' above, but if user strictly wants that format I should verify.
-        // The prompt said "untuk hasil export import dengan format berikut: { machineData, notes, status }".
-        // It didn't explicitly forbid 'plan', but the "filter wsid to show plan" implies plan comes from Excel or is Internal.
-        // However, if we export without Plan, we lose the Plan data on re-import unless we re-import Excel.
-        // I will include 'plan' as 'period' to match old format or just 'plan' to be safe, 
-        // or strictly follow the snippet. The snippet shows:
-        /*
-          {
-            "machineData": "ZAJ4 Jelidro",
-            "notes": "",
-            "status": "Done"
-          }
-        */
-        // It does NOT show plan/period. This is risky. If I export without plan, the user loses the plan info. 
-        // But maybe that's the point? They filter WSID -> Get Plan from Excel. 
-        // I will stick to the requested format but I'll add 'plan' property just in case, unless I shouldn't?
-        // User said: "inputan filter dari inputan wsid yg di input user lalu kolom yg di saring hanya kolom plan saja"
-        // Meaning Plan comes from Excel.
-        // However, if I export and re-import, I want my current view back.
-        // I will add 'plan' to the export object for safety, it likely won't break anything. 
-        
+
         const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
@@ -478,24 +445,19 @@ const app = {
             try {
                 const json = JSON.parse(e.target.result);
                 let list = Array.isArray(json) ? json : (json.data || []);
-                
+
                 if (!Array.isArray(list)) throw new Error("Invalid Format");
 
-                // Confirm overwrite or append?
                 const tab = this.getCurrentTab();
-               
                 if (tab.data.length > 0) {
-                     // Usually full import replaces list or appends?
-                     // "saat import exel tak mengubah catatan" -> This is about Excel.
-                     // For JSON import (restore), let's assume Append or Replace.
-                     if(!confirm(`Import ${list.length} items? This will APPEND to current list.`)) return;
+                    if (!confirm(`Import ${list.length} items? This will APPEND to current list.`)) return;
                 }
 
                 const newData = list.map(item => ({
                     id: 'i_' + Date.now() + Math.random(),
                     wsid: item.machineData || item.wsid || '',
                     notes: item.notes || item.note || '',
-                    plan: item.plan || item.period || '', // Try to recover plan if present
+                    plan: item.plan || item.period || '',
                     status: (item.status && item.status.toLowerCase() === 'done') ? 'done' : 'outstanding',
                     timestamp: Date.now()
                 }));
@@ -511,9 +473,7 @@ const app = {
         reader.readAsText(file);
     },
 
-    loadTheme() {
-        // Theme is CSS only, just ensure init
-    }
+    loadTheme() { }
 };
 
 document.addEventListener('DOMContentLoaded', () => app.init());
