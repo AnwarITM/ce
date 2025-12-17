@@ -150,7 +150,7 @@ const app = {
         $('#emptyState').style.display = total === 0 ? 'block' : 'none';
 
         // Render Rows
-        filtered.forEach((row) => {
+        filtered.forEach((row, index) => {
             const tr = document.createElement('tr');
             tr.draggable = true;
             tr.dataset.id = row.id;
@@ -170,7 +170,7 @@ const app = {
             const statusBtn = `<button class="status-btn ${statusClass}" onclick="app.toggleStatus('${row.id}')">${statusLabel}</button>`;
 
             tr.innerHTML = `
-                <td class="col-drag">⋮⋮</td>
+                <td class="col-order">${index + 1}</td>
                 <td>${wsidInput}</td>
                 <td>${notesInput}</td>
                 <td>${planInput}</td>
