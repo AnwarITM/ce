@@ -27,18 +27,16 @@
     <style>
         :root {
             /* Column widths */
-            --w-handle: 40px;
-            --w-data: 140px;
-            --w-loc: 250px;
-            --w-plan: 110px;
+            --w-handle: 30px;
+            --w-data: 180px;
+            --w-catatan: 250px;
+            --w-plan: 100px;
             --w-status: 120px;
-            --w-note: 200px;
-            --w-action: 80px;
+            --w-action: 50px;
         }
 
         /* Layout Overrides for Unified Look */
         body {
-            /* Background handled by global styles */
             min-height: 100vh;
         }
 
@@ -67,31 +65,34 @@
             cursor: pointer;
         }
 
-        /* Status Colors (shared logic) */
-        select.status-select {
+        /* Status Button */
+        .status-btn {
             width: 100%;
-            background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
+            padding: 8px;
             border-radius: 8px;
-            padding: 6px;
             font-weight: 600;
             font-size: 13px;
             text-align: center;
-            text-align-last: center;
-            color: var(--text-color);
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.2s;
         }
 
-        .status-outstanding {
-            background: rgba(239, 68, 68, 0.15) !important;
-            color: #dc2626 !important;
-            border-color: rgba(239, 68, 68, 0.35) !important;
+        .status-btn.status-outstanding {
+            background: rgba(239, 68, 68, 0.15);
+            color: #dc2626;
+            border-color: rgba(239, 68, 68, 0.35);
         }
 
-        .status-done {
-            background: rgba(34, 197, 94, 0.15) !important;
-            color: #16a34a !important;
-            border-color: rgba(34, 197, 94, 0.35) !important;
+        .status-btn.status-done {
+            background: rgba(34, 197, 94, 0.15);
+            color: #16a34a;
+            border-color: rgba(34, 197, 94, 0.35);
+        }
+
+        .status-btn:hover {
+            filter: brightness(0.95);
+            transform: scale(1.02);
         }
 
         /* Tab Bar (Scrollable) */
@@ -188,21 +189,6 @@
             box-shadow: var(--shadow-md);
         }
 
-        .mode-switch {
-            display: flex;
-            gap: 16px;
-            align-items: center;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .radio-label {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
-        }
-
         /* Buttons shared */
         .btn-glass {
             background: rgba(255, 255, 255, 0.6);
@@ -217,6 +203,7 @@
             align-items: center;
             gap: 6px;
             color: var(--text-color);
+            text-decoration: none;
         }
 
         .btn-glass:hover {
@@ -230,12 +217,9 @@
             border: none;
         }
 
-        .btn-primary:hover,
-        .btn-primary:focus,
-        .btn-primary:active {
-            background: var(--gradient-primary);
-            color: white !important;
+        .btn-primary:hover {
             opacity: 0.9;
+            color: white !important;
         }
 
         .btn-danger {
@@ -243,17 +227,7 @@
             border-color: rgba(220, 38, 38, 0.3);
         }
 
-        /* Import Section Specifics */
-        .import-area {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            padding: 12px;
-            background: rgba(99, 102, 241, 0.05);
-            border-radius: 8px;
-            border: 1px dashed rgba(99, 102, 241, 0.3);
-        }
-
+        /* Mapping Grid for Excel */
         .mapping-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -302,17 +276,12 @@
             text-align: center;
         }
 
-        .cell-left {
-            text-align: left;
-        }
-
         .col-drag {
-            width: 30px;
             cursor: grab;
             color: #94a3b8;
         }
 
-        textarea.cell-note {
+        textarea.cell-edit {
             width: 100%;
             min-height: 32px;
             padding: 4px;
@@ -320,56 +289,29 @@
             border: 1px solid transparent;
             background: transparent;
             font-family: inherit;
-            font-size: 12px;
+            font-size: 13px;
             resize: vertical;
             color: var(--text-color);
         }
 
-        textarea.cell-note:focus {
-            background: rgba(255, 255, 255, 0.8);
-            border-color: var(--primary-color);
-            outline: none;
-        }
-
-        input.cell-edit,
-        select.cell-edit {
+        input.cell-edit {
             width: 100%;
             padding: 4px;
             border-radius: 6px;
             border: 1px solid transparent;
-            background: rgba(255, 255, 255, 0.3);
+            background: transparent;
             font-family: inherit;
-            font-size: 13px;
-            color: var(--text-color);
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary-color);
+            text-align: center;
         }
 
-        input.cell-edit:focus,
-        select.cell-edit:focus {
-            background: rgba(255, 255, 255, 0.9);
+        textarea.cell-edit:focus,
+        input.cell-edit:focus {
+            background: rgba(255, 255, 255, 0.8);
             border-color: var(--primary-color);
             outline: none;
-            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
-        }
-
-        .clickable-wsid {
-            cursor: pointer;
-            color: var(--primary-color);
-            font-weight: 700;
-            border-bottom: 1px dashed var(--primary-color);
-            transition: all 0.2s;
-        }
-
-        .clickable-wsid:hover {
-            opacity: 0.8;
-            border-bottom-style: solid;
-        }
-
-        .cell-wrapped {
-            white-space: pre-wrap;
-            word-break: break-word;
-            /* Ensure nice wrapping */
-            line-height: 1.4;
-            max-width: 250px;
         }
 
         /* Mobile Responsive */
@@ -386,26 +328,12 @@
                 padding: 8px;
             }
 
-            .metric-val {
-                font-size: 16px;
-            }
-
             /* Table Compact for Mobile */
             th,
             td {
                 padding: 8px 4px;
-                font-size: 11px;
+                font-size: 12px;
             }
-
-            .status-select {
-                font-size: 10px;
-                padding: 4px;
-            }
-
-            /* Hide less critical columns on very small screens if needed, 
-               but user wanted "No Horizontal Scroll" previously. 
-               We will trust the table layout auto or use CSS grid for cards if needed.
-               For now, stick to table but keep minimal padding. */
         }
     </style>
 </head>
@@ -416,8 +344,7 @@
         <header class="app-header">
             <div class="app-title" onclick="app.renameTab()">Work Planner</div>
             <div style="display:flex; gap:8px;">
-                <button class="btn-glass" onclick="$('#fileImport').click()" title="Import JSON/Backup">⬇
-                    Import</button>
+                <button class="btn-glass" onclick="$('#fileImport').click()" title="Import JSON">⬇ Import</button>
                 <button class="btn-glass" onclick="app.exportTabData()" title="Export JSON">⬆ Export</button>
                 <input type="file" id="fileImport" hidden accept=".json" onchange="app.importUniversal(this)">
             </div>
@@ -449,59 +376,43 @@
 
         <!-- Controls Area -->
         <div class="controls-card">
-            <div class="mode-switch">
-                <span class="metric-label">Mode:</span>
-                <label class="radio-label">
-                    <input type="radio" name="mode" value="manual" onchange="app.setMode('manual')"> Manual
-                </label>
-                <label class="radio-label">
-                    <input type="radio" name="mode" value="excel" onchange="app.setMode('excel')"> Import Excel
-                </label>
-            </div>
-
-            <!-- Manual Controls -->
-            <div id="manualControls" style="display:none; gap:8px; flex-wrap:wrap;">
-                <button class="btn-glass btn-primary" onclick="app.showDataModal('add')">+ Add Data</button>
+            
+            <!-- Main Toolbar -->
+            <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+                <button class="btn-glass btn-primary" onclick="app.addData()">+ Add Data</button>
                 <button class="btn-glass" onclick="app.resetStatus()">↺ Reset Status</button>
+                
+                <!-- ID for Excel file input hidden, triggered by button if needed or just visible -->
+                 <div class="import-area" style="padding:4px 8px; flex:1; min-width:200px; display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.3); border-radius:8px;">
+                    <span class="metric-label">Update Plan from Excel:</span>
+                    <input type="file" id="fileExcel" accept=".xlsx" style="font-size:12px; width:100%; color:var(--text-color);">
+                </div>
             </div>
 
-            <!-- Excel Controls -->
-            <div id="excelControls" class="import-area" style="display:none;">
-                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-                    <input type="file" id="fileExcel" accept=".xlsx" style="font-size:12px;">
-                </div>
-                <div class="mapping-grid">
+            <!-- Excel Mapping Area (Initially hidden) -->
+            <div id="excelMappingArea" style="display:none; margin-top:8px; padding-top:8px; border-top:1px dashed rgba(0,0,0,0.1);">
+                 <div class="mapping-grid">
                     <div>
-                        <div class="metric-label">Kolom WSID/Data</div>
+                        <div class="metric-label">Kolom WSID (Excel)</div>
                         <select id="mapWSID" class="map-select"></select>
                     </div>
-                    <div>
-                        <div class="metric-label">Kolom Lokasi</div>
-                        <select id="mapLok" class="map-select"></select>
-                    </div>
-                    <div>
-                        <div class="metric-label">Kolom Plan</div>
+                     <div>
+                        <div class="metric-label">Kolom Plan (Excel)</div>
                         <select id="mapPlan" class="map-select"></select>
                     </div>
-                </div>
-                <div>
-                    <div class="metric-label">WSID Peganganku (Filter)</div>
-                    <textarea id="myWsids" class="cell-note" placeholder="Masukkan daftar WSID (pisahkan koma/enter)..."
-                        style="background:rgba(255,255,255,0.5);"></textarea>
-                </div>
-                <div style="text-align:right;">
-                    <button class="btn-glass btn-primary" onclick="app.processExcel()">Proses Excel</button>
+                     <div style="display:flex; align-items:flex-end;">
+                        <button class="btn-glass btn-primary" onclick="app.processExcel()" style="width:100%;">Update Plan</button>
+                    </div>
                 </div>
             </div>
 
             <!-- Filter Segment -->
-            <div style="display:flex; gap:4px; margin-top:4px;">
+            <div style="display:flex; gap:4px; margin-top:12px;">
                 <button class="btn-glass active" data-filter="all" onclick="app.setFilter('all')">All</button>
                 <button class="btn-glass" data-filter="done" onclick="app.setFilter('done')">Done</button>
                 <button class="btn-glass" data-filter="outstanding"
                     onclick="app.setFilter('outstanding')">Outstanding</button>
-                <button class="btn-glass btn-danger" onclick="app.deleteAll()" style="margin-left:auto;">🗑 Delete
-                    All</button>
+                <button class="btn-glass btn-danger" onclick="app.deleteAll()" style="margin-left:auto;">🗑 Delete All</button>
             </div>
         </div>
 
@@ -510,13 +421,12 @@
             <table id="mainTable">
                 <thead>
                     <tr>
-                        <th width="40">::</th>
-                        <th>Data / WSID</th>
-                        <th id="headerLabelDynamic">Catatan</th>
-                        <th>Plan</th>
-                        <th>Status</th>
-                        <th>Notes (Update)</th>
-                        <th width="50">Act</th>
+                        <th width="30">::</th>
+                        <th width="150">Data / WSID</th>
+                        <th>Catatan (Manual)</th>
+                        <th width="100">Plan</th>
+                        <th width="120">Status</th>
+                        <th width="40">Act</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
@@ -524,48 +434,10 @@
                 </tbody>
             </table>
             <div id="emptyState" style="text-align:center; padding:30px; color:#9ca3af; font-size:14px;">
-                Belum ada data. Tambahkan manual atau import Excel.
+                Belum ada data. Tambahkan manual atau Import Excel.
             </div>
         </div>
     </div>
-
-    <!-- Modals -->
-    <dialog id="dataModal"
-        style="border:none; border-radius:12px; padding:20px; box-shadow:0 10px 25px rgba(0,0,0,0.2); backdrop-filter:blur(5px); background:rgba(255,255,255,0.9); width: 90%; max-width: 400px;">
-        <h3 id="modalTitle" style="margin-top:0; color:var(--primary-color);">Data Editor</h3>
-        <input type="hidden" id="inpId">
-
-        <label style="display:block; margin-bottom:4px; font-size:12px; font-weight:600;">Data / WSID</label>
-        <input id="inpData" type="text" placeholder="Data Mesin / WSID"
-            style="width:100%; padding:10px; margin-bottom:12px; border-radius:8px; border:1px solid #ccc;">
-
-        <label style="display:block; margin-bottom:4px; font-size:12px; font-weight:600;">Catatan / Lokasi</label>
-        <textarea id="inpLok" placeholder="Tulis catatan di sini..." rows="3"
-            style="width:100%; padding:10px; margin-bottom:12px; border-radius:8px; border:1px solid #ccc; font-family:inherit; resize:vertical;"></textarea>
-
-        <label style="display:block; margin-bottom:4px; font-size:12px; font-weight:600;">Plan (Bulan)</label>
-        <select id="inpPlan"
-            style="width:100%; padding:10px; margin-bottom:20px; border-radius:8px; border:1px solid #ccc; background:#fff;">
-            <option value="" disabled selected>Pilih Bulan...</option>
-            <option value="Jan">Jan</option>
-            <option value="Feb">Feb</option>
-            <option value="Mar">Mar</option>
-            <option value="Apr">Apr</option>
-            <option value="May">May</option>
-            <option value="Jun">Jun</option>
-            <option value="Jul">Jul</option>
-            <option value="Aug">Aug</option>
-            <option value="Sep">Sep</option>
-            <option value="Oct">Oct</option>
-            <option value="Nov">Nov</option>
-            <option value="Dec">Dec</option>
-        </select>
-
-        <div style="display:flex; justify-content:flex-end; gap:8px;">
-            <button class="btn-glass" onclick="document.getElementById('dataModal').close()">Cancel</button>
-            <button class="btn-glass btn-primary" onclick="app.saveData()">Simpan</button>
-        </div>
-    </dialog>
 
     <!-- Scripts -->
     <script src="theme_manager.js"></script>
