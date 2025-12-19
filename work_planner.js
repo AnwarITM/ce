@@ -56,6 +56,11 @@ const app = {
             tab.data = (tab.data || []).map(row => {
                 if (!row.id) row.id = 'm_' + Date.now() + Math.random();
                 if (!row.status) row.status = 'outstanding';
+                // Backfill legacy field names
+                if (!row.wsid && row.machineData) row.wsid = row.machineData;
+                if (!row.plan && row.period) row.plan = row.period;
+                row.wsidKey = this.getWsidKey(row.wsid);
+
                 const { label, ts } = this.parsePlanValue(row.plan);
                 row.plan = label;
                 row.planTs = row.planTs || ts;
@@ -179,6 +184,7 @@ const app = {
                 <td onclick="app.openModal('${row.id}')"><div class="text-cell plan-text">${row.plan || this.formatPlanTs(row.planTs)}</div></td>
                 <td style="position: relative; overflow: visible;">
                     <button class="status-btn ${statusClass}" onclick="event.stopPropagation(); app.toggleStatus('${row.id}')">${statusLabel}</button>
+                    <button class="desktop-delete-btn" onclick="event.stopPropagation(); app.deleteOne('${row.id}')">Delete</button>
                     <div class="swipe-action-delete" onclick="event.stopPropagation(); app.deleteOne('${row.id}')">Hapus</div>
                 </td>
             `;
@@ -395,12 +401,14 @@ const app = {
 
         if (!wsidVal) { alert("WSID harus diisi"); return; }
         const parsedPlan = this.parsePlanValue(planVal);
+        const wsidKey = this.getWsidKey(wsidVal);
 
         const tab = this.getCurrentTab();
         if (id) {
             // Edit
             const row = tab.data.find(r => r.id === id);
             row.wsid = wsidVal;
+            row.wsidKey = wsidKey;
             row.notes = notesVal;
             row.plan = parsedPlan.label;
             row.planTs = parsedPlan.ts;
@@ -409,6 +417,7 @@ const app = {
             tab.data.push({
                 id: 'm_' + Date.now(),
                 wsid: wsidVal,
+                wsidKey,
                 notes: notesVal,
                 plan: parsedPlan.label,
                 planTs: parsedPlan.ts,
@@ -552,8 +561,9 @@ const app = {
             const rawWSID = row[keyWSID];
             if (!rawWSID) continue;
 
-            // Normalize
-            const cleanWSID = String(rawWSID).trim().toLowerCase();
+            // Normalize WSID with key
+            const cleanWSID = this.getWsidKey(rawWSID);
+            if (!cleanWSID) continue;
 
             let planRaw = row[keyPlan];
             if (typeof planRaw === 'number') {
@@ -565,13 +575,14 @@ const app = {
 
         // Update matches
         tab.data.forEach(item => {
-            const itemWSID = String(item.wsid).trim().toLowerCase();
-            if (itemWSID) {
+            const itemKey = item.wsidKey || this.getWsidKey(item.wsid);
+            if (itemKey) {
                 matchAttempts++;
-                const matchPlan = excelMap.get(itemWSID);
+                const matchPlan = excelMap.get(itemKey);
                 if (matchPlan) {
                     item.plan = matchPlan.label;
                     item.planTs = matchPlan.ts;
+                    item.wsidKey = itemKey;
                     updateCount++;
                 }
             }
@@ -638,9 +649,11 @@ const app = {
 
                 const newData = list.map(item => {
                     const parsedPlan = this.parsePlanValue(item.plan || item.period || '');
+                    const wsidVal = item.machineData || item.wsid || '';
                     return {
                         id: 'i_' + Date.now() + Math.random(),
-                        wsid: item.machineData || item.wsid || '',
+                        wsid: wsidVal,
+                        wsidKey: this.getWsidKey(wsidVal),
                         notes: item.notes || item.note || '',
                         plan: parsedPlan.label,
                         planTs: parsedPlan.ts,
@@ -726,6 +739,15 @@ const app = {
         }
 
         return fail;
+    },
+
+    getWsidKey(raw) {
+        if (!raw) return '';
+        const str = String(raw).trim();
+        if (!str) return '';
+        // Ambil token pertama berisi huruf/angka/strip/underscore
+        const match = str.match(/[A-Za-z0-9_-]+/);
+        return match ? match[0].toLowerCase() : '';
     },
 
     loadTheme() { }
