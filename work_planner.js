@@ -6,6 +6,7 @@ const $ = s => document.querySelector(s);
 const $$ = s => document.querySelectorAll(s);
 
 const STORAGE_KEY = 'eps_work_planner_v2';
+const MAX_TS = 9999999999999;
 
 // Initial State Template
 const createNewTab = (id) => ({
@@ -23,7 +24,8 @@ const app = {
         tabs: [],
         currentTabId: 0,
         filter: 'all',
-        dragItem: null
+        dragItem: null,
+        touchDragging: false
     },
 
     init() {
@@ -48,6 +50,19 @@ const app = {
         if (this.state.tabs.length === 0) {
             this.state.tabs = [createNewTab(0)];
         }
+
+        // Migrate old data: ensure each row has id + status
+        this.state.tabs.forEach(tab => {
+            tab.data = (tab.data || []).map(row => {
+                if (!row.id) row.id = 'm_' + Date.now() + Math.random();
+                if (!row.status) row.status = 'outstanding';
+                const { label, ts } = this.parsePlanValue(row.plan);
+                row.plan = label;
+                row.planTs = row.planTs || ts;
+                return row;
+            });
+        });
+        this.saveState();
     },
 
     saveState() {
@@ -133,13 +148,6 @@ const app = {
         const tbody = $('#tableBody');
         tbody.innerHTML = '';
 
-        // Filter Data
-        let filtered = tab.data;
-        if (this.state.filter !== 'all') {
-            filtered = filtered.filter(row => row.status === this.state.filter);
-        }
-
-        // Metrics
         const total = tab.data.length;
         const done = tab.data.filter(r => r.status === 'done').length;
         const out = total - done;
@@ -149,76 +157,269 @@ const app = {
         $('#mOut').textContent = out;
         $('#emptyState').style.display = total === 0 ? 'block' : 'none';
 
-        // Render Rows
+        let filtered = tab.data;
+        if (this.state.filter !== 'all') {
+            filtered = filtered.filter(row => row.status === this.state.filter);
+        }
+
+        this.sortDataByDate(filtered);
+
         filtered.forEach((row, index) => {
             const tr = document.createElement('tr');
-            tr.draggable = true;
+            tr.className = 'tr-clickable swipe-row';
             tr.dataset.id = row.id;
 
-            // WSID Input
-            const wsidInput = `<input class="cell-edit" value="${row.wsid}" onchange="app.updateField('${row.id}', 'wsid', this.value)">`;
-
-            // Notes Textarea
-            const notesInput = `<textarea class="cell-edit" onchange="app.updateField('${row.id}', 'notes', this.value)">${row.notes || ''}</textarea>`;
-
-            // Plan 
-            const planInput = `<input class="cell-edit" value="${row.plan || ''}" placeholder="-" onchange="app.updateField('${row.id}', 'plan', this.value)">`;
-
-            // Status Button
             const statusClass = row.status === 'done' ? 'status-done' : 'status-outstanding';
             const statusLabel = row.status === 'done' ? 'Done' : 'Outstanding';
-            const statusBtn = `<button class="status-btn ${statusClass}" onclick="app.toggleStatus('${row.id}')">${statusLabel}</button>`;
 
             tr.innerHTML = `
-                <td class="col-order">${index + 1}</td>
-                <td>${wsidInput}</td>
-                <td>${notesInput}</td>
-                <td>${planInput}</td>
-                <td>${statusBtn}</td>
-                <td>
-                    <button class="btn-glass" onclick="app.deleteOne('${row.id}')" style="color:red; padding:4px 8px;">✕</button>
+                <td class="col-order drag-handle" style="cursor: move;" draggable="true">${index + 1}</td>
+                <td onclick="app.openModal('${row.id}')"><div class="text-cell wsid-text">${row.wsid || '-'}</div></td>
+                <td onclick="app.openModal('${row.id}')"><div class="text-cell notes-text text-left">${row.notes || ''}</div></td>
+                <td onclick="app.openModal('${row.id}')"><div class="text-cell plan-text">${row.plan || this.formatPlanTs(row.planTs)}</div></td>
+                <td style="position: relative; overflow: visible;">
+                    <button class="status-btn ${statusClass}" onclick="event.stopPropagation(); app.toggleStatus('${row.id}')">${statusLabel}</button>
+                    <div class="swipe-action-delete" onclick="event.stopPropagation(); app.deleteOne('${row.id}')">Hapus</div>
                 </td>
             `;
 
-            this.attachDragEvents(tr, row);
+            const handle = tr.querySelector('.drag-handle');
+
+            this.attachDragEvents(tr, handle, row);
+            this.attachSwipeEvents(tr, row.id);
+            this.attachTouchReorder(tr, handle, row);
             tbody.appendChild(tr);
         });
     },
 
-    attachDragEvents(tr, row) {
-        tr.addEventListener('dragstart', (e) => {
+    attachDragEvents(tr, handle, row) {
+        if (!handle) return;
+
+        handle.addEventListener('dragstart', (e) => {
+            // Close swipe and ensure row is at 0
+            tr.style.transition = 'none';
+            tr.style.transform = 'translateX(0)';
+
             e.dataTransfer.effectAllowed = 'move';
             e.dataTransfer.setData('text/plain', row.id);
             this.state.dragItem = row;
-            tr.style.opacity = '0.5';
+
+            // Visual feedback
+            setTimeout(() => {
+                tr.style.opacity = '0.3';
+                tr.classList.add('dragging');
+            }, 0);
         });
-        tr.addEventListener('dragend', () => {
-            this.state.dragItem = null;
+
+        handle.addEventListener('dragend', () => {
             tr.style.opacity = '1';
+            tr.classList.remove('dragging');
+            this.state.dragItem = null;
         });
-        tr.addEventListener('dragover', (e) => e.preventDefault());
+
+        tr.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        });
+
         tr.addEventListener('drop', (e) => {
+            e.preventDefault();
             e.stopPropagation();
-            if (this.state.dragItem && this.state.dragItem.id !== row.id) {
-                this.reorderItems(this.state.dragItem.id, row.id);
+            const sourceId = e.dataTransfer.getData('text/plain');
+            if (sourceId && sourceId !== row.id) {
+                this.reorderItems(sourceId, row.id);
             }
+        });
+    },
+
+    attachSwipeEvents(tr, id) {
+        // Skip swipe when touch-based drag-and-drop is active
+        const isTouchDragActive = () => this.state.touchDragging;
+
+        let startX = 0;
+        let startY = 0;
+        let isSwiping = false;
+        let swipeTriggered = false;
+        const MAX_SWIPE = 80;
+
+        tr.addEventListener('touchstart', (e) => {
+            if (e.target.closest('.drag-handle')) return; // don't start swipe on handle
+            // Reset transition for instant response
+            tr.style.transition = 'none';
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+            isSwiping = true;
+            swipeTriggered = false;
+        }, { passive: true });
+
+        tr.addEventListener('touchmove', (e) => {
+            if (isTouchDragActive()) return;
+            if (!isSwiping) return;
+            const x = e.touches[0].clientX;
+            const y = e.touches[0].clientY;
+            const diffX = x - startX;
+            const diffY = y - startY;
+
+            // Strict threshold for horizontal swipe vs vertical scroll
+            if (!swipeTriggered) {
+                if (Math.abs(diffX) > 15 && Math.abs(diffX) > Math.abs(diffY)) {
+                    swipeTriggered = true;
+                } else if (Math.abs(diffY) > 15) {
+                    isSwiping = false; // Vertical scroll takes priority
+                    return;
+                }
+            }
+
+            if (swipeTriggered) {
+                // If it's a swipe, we might want to prevent vertical scrolling
+                // diffX < 0 is swipe left (to delete)
+                const move = diffX < 0 ? Math.max(diffX, -MAX_SWIPE) : 0;
+                tr.style.transform = `translateX(${move}px)`;
+            }
+        }, { passive: true });
+
+        tr.addEventListener('touchend', (e) => {
+            if (!isSwiping) return;
+            isSwiping = false;
+
+            // Clean up: Snap to positions
+            tr.style.transition = 'transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28)';
+
+            const matrix = new WebKitCSSMatrix(window.getComputedStyle(tr).transform);
+            const x = matrix.m41;
+
+            if (x < -40) {
+                tr.style.transform = `translateX(-${MAX_SWIPE}px)`;
+            } else {
+                tr.style.transform = 'translateX(0)';
+            }
+        });
+
+        tr.oncontextmenu = (e) => { e.preventDefault(); }; // Disable long-press delete to avoid accidental data loss
+    },
+
+    attachTouchReorder(tr, handle, row) {
+        if (!handle) return;
+        handle.style.touchAction = 'none';
+
+        let pointerTargetId = null;
+
+        const cleanup = () => {
+            this.state.touchDragging = false;
+            pointerTargetId = null;
+            tr.classList.remove('dragging');
+        };
+
+        handle.addEventListener('pointerdown', (e) => {
+            if (e.pointerType !== 'touch') return; // keep native drag for mouse/trackpad
+            e.preventDefault();
+
+            this.state.touchDragging = true;
+            tr.classList.add('dragging');
+            tr.style.transition = 'none';
+            tr.style.transform = 'translateX(0)';
+
+            const moveHandler = (ev) => {
+                ev.preventDefault();
+                const target = document.elementFromPoint(ev.clientX, ev.clientY);
+                const targetRow = target ? target.closest('tr.swipe-row') : null;
+                pointerTargetId = targetRow ? targetRow.dataset.id : null;
+                // Highlight potential drop target
+                $$('tr.swipe-row').forEach(r => r.classList.toggle('dragging', r.dataset.id === pointerTargetId));
+            };
+
+            const upHandler = () => {
+                if (pointerTargetId && pointerTargetId !== row.id) {
+                    this.reorderItems(row.id, pointerTargetId);
+                }
+                $$('tr.swipe-row').forEach(r => r.classList.remove('dragging'));
+                handle.releasePointerCapture(e.pointerId);
+                document.removeEventListener('pointermove', moveHandler);
+                document.removeEventListener('pointerup', upHandler);
+                document.removeEventListener('pointercancel', upHandler);
+                cleanup();
+            };
+
+            handle.setPointerCapture(e.pointerId);
+            document.addEventListener('pointermove', moveHandler);
+            document.addEventListener('pointerup', upHandler);
+            document.addEventListener('pointercancel', upHandler);
         });
     },
 
     // --- Actions ---
 
     addData() {
+        this.openModal();
+    },
+
+    openModal(id = null) {
+        const modal = $('#dataModal');
+        const title = $('#modalTitle');
+        const editId = $('#editId');
+        const wsid = $('#mInputWsid');
+        const notes = $('#mInputNotes');
+        const plan = $('#mInputPlan');
+
+        if (id) {
+            const row = this.getCurrentTab().data.find(r => r.id === id);
+            title.textContent = "Edit Data";
+            editId.value = id;
+            wsid.value = row.wsid || '';
+            notes.value = row.notes || '';
+            plan.value = row.plan || '';
+        } else {
+            title.textContent = "Add Data";
+            editId.value = "";
+            wsid.value = "";
+            notes.value = "";
+            plan.value = "";
+        }
+
+        modal.style.display = 'flex';
+        wsid.style.color = '#000000'; // Force visibility
+        notes.style.color = '#000000';
+        plan.style.color = '#000000';
+        wsid.focus();
+    },
+
+    closeModal() {
+        $('#dataModal').style.display = 'none';
+    },
+
+    saveModalData() {
+        const id = $('#editId').value;
+        const wsidVal = $('#mInputWsid').value;
+        const notesVal = $('#mInputNotes').value;
+        const planVal = $('#mInputPlan').value;
+
+        if (!wsidVal) { alert("WSID harus diisi"); return; }
+        const parsedPlan = this.parsePlanValue(planVal);
+
         const tab = this.getCurrentTab();
-        tab.data.push({
-            id: 'm_' + Date.now(),
-            wsid: '',
-            notes: '',
-            plan: '',
-            status: 'outstanding',
-            timestamp: Date.now()
-        });
+        if (id) {
+            // Edit
+            const row = tab.data.find(r => r.id === id);
+            row.wsid = wsidVal;
+            row.notes = notesVal;
+            row.plan = parsedPlan.label;
+            row.planTs = parsedPlan.ts;
+        } else {
+            // Add
+            tab.data.push({
+                id: 'm_' + Date.now(),
+                wsid: wsidVal,
+                notes: notesVal,
+                plan: parsedPlan.label,
+                planTs: parsedPlan.ts,
+                status: 'outstanding',
+                timestamp: Date.now()
+            });
+        }
+
         this.saveState();
         this.renderTableData();
+        this.closeModal();
     },
 
     updateField(id, field, val) {
@@ -239,12 +440,10 @@ const app = {
     },
 
     deleteOne(id) {
-        if (confirm("Delete item?")) {
-            const tab = this.getCurrentTab();
-            tab.data = tab.data.filter(r => r.id !== id);
-            this.saveState();
-            this.renderTableData();
-        }
+        const tab = this.getCurrentTab();
+        tab.data = tab.data.filter(r => r.id !== id);
+        this.saveState();
+        this.renderTableData();
     },
 
     deleteAll() {
@@ -356,12 +555,12 @@ const app = {
             // Normalize
             const cleanWSID = String(rawWSID).trim().toLowerCase();
 
-            let plan = row[keyPlan];
-            if (typeof plan === 'number') {
-                const d = XLSX.SSF.parse_date_code(plan);
-                if (d) plan = `${d.d}/${d.m}/${d.y}`;
+            let planRaw = row[keyPlan];
+            if (typeof planRaw === 'number') {
+                planRaw = this.fromExcelSerial(planRaw);
             }
-            if (plan) excelMap.set(cleanWSID, String(plan).trim());
+            const { label, ts } = this.parsePlanValue(planRaw);
+            if (label) excelMap.set(cleanWSID, { label, ts });
         }
 
         // Update matches
@@ -371,7 +570,8 @@ const app = {
                 matchAttempts++;
                 const matchPlan = excelMap.get(itemWSID);
                 if (matchPlan) {
-                    item.plan = matchPlan;
+                    item.plan = matchPlan.label;
+                    item.planTs = matchPlan.ts;
                     updateCount++;
                 }
             }
@@ -395,27 +595,10 @@ const app = {
     },
 
     sortDataByDate(data) {
-        const parseScore = (str) => {
-            if (!str) return 999999999999;
-            str = str.toLowerCase();
-
-            const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec', 'mei', 'agt', 'okt', 'des'];
-            const mIdx = months.findIndex(m => str.includes(m));
-
-            if (mIdx >= 0) {
-                const realIdx = (mIdx > 11) ? (mIdx === 12 ? 4 : (mIdx === 13 ? 7 : (mIdx === 14 ? 9 : 11))) : mIdx;
-                const yearMatch = str.match(/\d{4}/);
-                const year = yearMatch ? parseInt(yearMatch[0]) : new Date().getFullYear();
-                return (year * 100) + realIdx;
-            }
-
-            const d = new Date(str);
-            if (!isNaN(d.getTime())) return d.getTime();
-            return 999999999999;
-        };
-
         data.sort((a, b) => {
-            return parseScore(a.plan) - parseScore(b.plan);
+            const aTs = a.planTs ?? this.parsePlanValue(a.plan).ts;
+            const bTs = b.planTs ?? this.parsePlanValue(b.plan).ts;
+            return aTs - bTs;
         });
     },
 
@@ -453,14 +636,18 @@ const app = {
                     if (!confirm(`Import ${list.length} items? This will APPEND to current list.`)) return;
                 }
 
-                const newData = list.map(item => ({
-                    id: 'i_' + Date.now() + Math.random(),
-                    wsid: item.machineData || item.wsid || '',
-                    notes: item.notes || item.note || '',
-                    plan: item.plan || item.period || '',
-                    status: (item.status && item.status.toLowerCase() === 'done') ? 'done' : 'outstanding',
-                    timestamp: Date.now()
-                }));
+                const newData = list.map(item => {
+                    const parsedPlan = this.parsePlanValue(item.plan || item.period || '');
+                    return {
+                        id: 'i_' + Date.now() + Math.random(),
+                        wsid: item.machineData || item.wsid || '',
+                        notes: item.notes || item.note || '',
+                        plan: parsedPlan.label,
+                        planTs: parsedPlan.ts,
+                        status: (item.status && item.status.toLowerCase() === 'done') ? 'done' : 'outstanding',
+                        timestamp: Date.now()
+                    };
+                });
 
                 tab.data = [...tab.data, ...newData];
                 this.saveState();
@@ -471,6 +658,74 @@ const app = {
             input.value = '';
         };
         reader.readAsText(file);
+    },
+
+    formatPlanTs(ts) {
+        if (!ts || ts === MAX_TS) return '';
+        const d = new Date(ts);
+        if (isNaN(d.getTime())) return '';
+        const dd = String(d.getDate()).padStart(2, '0');
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const yy = String(d.getFullYear()).slice(-2);
+        return `${dd}/${mm}/${yy}`;
+    },
+
+    fromExcelSerial(serial) {
+        if (typeof serial !== 'number' || isNaN(serial)) return null;
+        const excelEpoch = Date.UTC(1899, 11, 30);
+        return new Date(excelEpoch + serial * 86400000);
+    },
+
+    parsePlanValue(raw) {
+        const fail = { label: (raw || '').toString().trim(), ts: MAX_TS };
+        if (!raw && raw !== 0) return { label: '', ts: MAX_TS };
+
+        // Excel serial number
+        if (typeof raw === 'number') {
+            const d = this.fromExcelSerial(raw);
+            if (d && !isNaN(d.getTime())) {
+                return { label: this.formatPlanTs(d.getTime()), ts: d.getTime() };
+            }
+        }
+
+        // Date object
+        if (raw instanceof Date && !isNaN(raw.getTime())) {
+            return { label: this.formatPlanTs(raw.getTime()), ts: raw.getTime() };
+        }
+
+        let str = String(raw).trim();
+        if (!str) return fail;
+
+        // DD/MM[/YY]
+        const dm = str.match(/^(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{2,4}))?$/);
+        if (dm) {
+            const d = parseInt(dm[1], 10);
+            const m = parseInt(dm[2], 10) - 1;
+            const y = dm[3] ? (dm[3].length === 2 ? 2000 + parseInt(dm[3], 10) : parseInt(dm[3], 10)) : new Date().getFullYear();
+            const date = new Date(y, m, d);
+            if (!isNaN(date.getTime())) {
+                return { label: this.formatPlanTs(date.getTime()), ts: date.getTime() };
+            }
+        }
+
+        // MM/YY (assume day 1)
+        const my = str.match(/^(\d{1,2})[\/\-](\d{2,4})$/);
+        if (my) {
+            const m = parseInt(my[1], 10) - 1;
+            const y = my[2].length === 2 ? 2000 + parseInt(my[2], 10) : parseInt(my[2], 10);
+            const date = new Date(y, m, 1);
+            if (!isNaN(date.getTime())) {
+                return { label: this.formatPlanTs(date.getTime()), ts: date.getTime() };
+            }
+        }
+
+        // Month name fallback
+        const dateGuess = new Date(str);
+        if (!isNaN(dateGuess.getTime())) {
+            return { label: this.formatPlanTs(dateGuess.getTime()), ts: dateGuess.getTime() };
+        }
+
+        return fail;
     },
 
     loadTheme() { }

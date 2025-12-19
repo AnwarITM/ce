@@ -101,13 +101,16 @@
     };
   }
 
-  function desiredFlakeCount(layer) {
-    const base = Math.floor((layer.w * layer.h) / 7000);
-    return Math.max(30, Math.min(160, base));
+  function desiredFlakeCount() {
+    const base = Math.floor((state.w * state.h) / 15000); // Reduced density (was 7000)
+    return Math.max(20, Math.min(80, base)); // Lowered max count (was 160)
   }
 
-  function syncFlakes(layer) {
-    const count = desiredFlakeCount(layer);
+  function syncFlakes() {
+    const count = desiredFlakeCount();
+    const layer = state.fullSnowLayer;
+    if (!layer) return;
+
     if (layer.flakes.length > count) {
       layer.flakes.length = count;
     } else {
@@ -158,23 +161,32 @@
     return layer;
   }
 
-  function setupSnowLayers() {
-    const targets = Array.from(document.querySelectorAll('.seasonal-snow-target'));
-    state.layers = targets.map(createSnowLayer).filter(Boolean);
-    window.addEventListener('resize', () => {
-      state.layers.forEach((layer) => layer.resize());
-    });
-  }
+  function startSnow() {
+    setupFullCanvas();
+    state.fullSnowLayer = {
+      w: state.w,
+      h: state.h,
+      flakes: [],
+      ctx: state.ctx
+    };
 
-  function animateSnow() {
-    if (state.paused) {
-      state.animationId = requestAnimationFrame(animateSnow);
-      return;
-    }
+    // Initial flakes
+    syncFlakes();
 
-    for (const layer of state.layers) {
-      if (!layer.w || !layer.h) continue;
-      const ctx = layer.ctx;
+    const animateSnow = () => {
+      if (state.paused) {
+        state.animationId = requestAnimationFrame(animateSnow);
+        return;
+      }
+
+      const layer = state.fullSnowLayer;
+      const ctx = state.ctx;
+
+      // Update dimensions if window resized
+      layer.w = state.w;
+      layer.h = state.h;
+      syncFlakes();
+
       ctx.clearRect(0, 0, layer.w, layer.h);
       ctx.fillStyle = '#ffffff';
 
@@ -196,14 +208,9 @@
       }
 
       ctx.globalAlpha = 1;
-    }
+      state.animationId = requestAnimationFrame(animateSnow);
+    };
 
-    state.animationId = requestAnimationFrame(animateSnow);
-  }
-
-  function startSnow() {
-    setupSnowLayers();
-    if (state.layers.length === 0) return;
     animateSnow();
   }
 

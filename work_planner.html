@@ -328,6 +328,396 @@
         }
 
 
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            width: 100%;
+            max-width: 450px;
+            background: var(--card-bg);
+            border: var(--glass-border);
+            border-radius: 16px;
+            box-shadow: var(--shadow-xl);
+            padding: 24px;
+            animation: slideUp 0.3s ease;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .btn-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--text-muted);
+            padding: 0;
+            box-shadow: none;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .input-group input,
+        .input-group textarea {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            padding: 12px;
+            color: var(--text-color);
+            font-family: inherit;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .input-group input:focus,
+        .input-group textarea:focus {
+            background: white;
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        /* Swipe to Delete Styles */
+        .swipe-row {
+            position: relative;
+            overflow: hidden;
+            background: transparent;
+            touch-action: pan-y;
+        }
+
+        .swipe-content {
+            position: relative;
+            z-index: 2;
+            background: transparent;
+            transition: transform 0.2s ease-out;
+            display: flex;
+            width: 100%;
+            align-items: center;
+        }
+
+        .swipe-action-delete {
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 100%;
+            width: 80px;
+            background: #ef4444;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            z-index: 1;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            user-select: none;
+        }
+
+        .tr-clickable {
+            cursor: pointer;
+            transition: background 0.2s;
+            position: relative;
+            /* Added for absolute delete button */
+        }
+
+        .tr-clickable:hover {
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .text-cell {
+            padding: 8px;
+            border-radius: 6px;
+            min-height: 20px;
+            word-break: break-all;
+        }
+
+        .wsid-text {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            width: 100%;
+            max-width: 450px;
+            background: var(--card-bg);
+            border: var(--glass-border);
+            border-radius: 16px;
+            box-shadow: var(--shadow-xl);
+            padding: 24px;
+            animation: slideUp 0.3s ease;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .btn-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--text-muted);
+            padding: 0;
+            box-shadow: none;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-group input,
+        .input-group textarea {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            border-radius: 10px;
+            padding: 12px;
+            color: #1e293b;
+            /* Dark slate for high visibility */
+            font-family: inherit;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .input-group input:focus,
+        .input-group textarea:focus {
+            background: #ffffff;
+            border-color: var(--primary-color);
+            color: #000000;
+            outline: none;
+            box-shadow: 0 0 0 3px var(--accent-color);
+        }
+
+        .dragging {
+            border: 2px dashed var(--primary-color) !important;
+            background: rgba(99, 102, 241, 0.1) !important;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        /* Swipe to Delete Styles */
+        .swipe-container {
+            position: relative;
+            overflow: hidden;
+            background: transparent;
+            width: 100%;
+            touch-action: pan-x;
+        }
+
+        .swipe-content {
+            position: relative;
+            z-index: 2;
+            background: transparent;
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            width: 100%;
+            align-items: center;
+        }
+
+        .swipe-action-delete {
+            position: absolute;
+            right: -80px;
+            /* Initially off-screen relative to the container */
+            top: 0;
+            height: 100%;
+            width: 80px;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 13px;
+            z-index: 10;
+            cursor: pointer;
+            border-radius: 0 8px 8px 0;
+            box-shadow: inset 2px 0 5px rgba(0, 0, 0, 0.2);
+            user-select: none;
+        }
+
+        .swipe-row {
+            position: relative;
+            will-change: transform;
+        }
+
+        .table-responsive {
+            overflow-x: hidden;
+            /* Prevent page-level horizontal scroll from the table */
+            border-radius: 12px;
+        }
+
+        .tr-clickable {
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .tr-clickable:hover {
+            background: rgba(99, 102, 241, 0.05) !important;
+        }
+
+        .text-cell {
+            padding: 8px;
+            border-radius: 6px;
+            min-height: 20px;
+            word-break: break-all;
+            text-align: center;
+        }
+
+        .text-left {
+            text-align: left;
+        }
+
+        .wsid-text {
+            font-weight: 700;
+            color: var(--primary-color);
+            font-size: 14px;
+            word-break: break-word;
+            /* Allow long IDs to break */
+            line-height: 1.2;
+            display: block;
+        }
+
+        .notes-text {
+            color: var(--text-color);
+            font-size: 13px;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .plan-text {
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
         /* Mobile Specifics */
         @media (max-width: 768px) {
             .app-header {
@@ -385,7 +775,7 @@
 <body>
     <div class="page-container">
         <!-- Header -->
-        <header class="app-header seasonal-snow-target">
+        <header class="app-header">
             <div class="header-left">
                 <!-- Theme Toggle -->
                 <button class="theme-toggle" onclick="toggleGlobalTheme()" title="Switch Theme">🌙</button>
@@ -399,6 +789,65 @@
             </div>
         </header>
 
+        <!-- Modal Overlay -->
+        <div id="dataModal" class="modal-overlay" style="display:none;"
+            onclick="if(event.target==this)app.closeModal()">
+            <div class="modal-content glass-card">
+                <div class="modal-header">
+                    <h3 id="modalTitle">Add Data</h3>
+                    <button class="btn-close" onclick="app.closeModal()">✕</button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="editId">
+                    <div class="input-group">
+                        <label>Data / WSID</label>
+                        <input type="text" id="mInputWsid" placeholder="Masukkan ID...">
+                    </div>
+                    <div class="input-group">
+                        <label>Catatan</label>
+                        <textarea id="mInputNotes" placeholder="Tambahkan catatan..." rows="3"></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label>Plan</label>
+                        <input type="text" id="mInputPlan" placeholder="Contoh: Jan 2024">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-glass" onclick="app.closeModal()">Batal</button>
+                    <button class="btn-glass btn-primary" onclick="app.saveModalData()">Simpan Data</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Overlay -->
+        <div id="dataModal" class="modal-overlay" style="display:none;">
+            <div class="modal-content glass-card">
+                <div class="modal-header">
+                    <h3 id="modalTitle">Add Data</h3>
+                    <button class="btn-close" onclick="app.closeModal()">✕</button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="editId">
+                    <div class="input-group">
+                        <label>Data / WSID</label>
+                        <input type="text" id="mInputWsid" placeholder="Masukkan ID...">
+                    </div>
+                    <div class="input-group">
+                        <label>Catatan</label>
+                        <textarea id="mInputNotes" placeholder="Tambahkan catatan..."></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label>Plan</label>
+                        <input type="text" id="mInputPlan" placeholder="Contoh: Jan 2024">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-glass" onclick="app.closeModal()">Batal</button>
+                    <button class="btn-glass btn-primary" onclick="app.saveModalData()">Simpan Data</button>
+                </div>
+            </div>
+        </div>
+
         <!-- Tabs -->
         <div class="tabs-wrapper" id="tabsContainer">
             <div class="tab-add-btn" onclick="app.addTab()">+</div>
@@ -408,22 +857,22 @@
 
         <!-- Metric Cards -->
         <div class="dashboard-row">
-            <div class="metric-card seasonal-snow-target">
+            <div class="metric-card">
                 <div class="metric-val" id="mTotal">0</div>
                 <div class="metric-label">Total</div>
             </div>
-            <div class="metric-card seasonal-snow-target">
+            <div class="metric-card">
                 <div class="metric-val" id="mDone">0</div>
                 <div class="metric-label">Done</div>
             </div>
-            <div class="metric-card seasonal-snow-target">
+            <div class="metric-card">
                 <div class="metric-val" id="mOut">0</div>
                 <div class="metric-label">Outstanding</div>
             </div>
         </div>
 
         <!-- Controls Area -->
-        <div class="controls-card seasonal-snow-target">
+        <div class="controls-card">
 
             <div class="main-toolbar">
                 <!-- Action Buttons: Side by Side on Mobile -->
@@ -471,16 +920,15 @@
         </div>
 
         <!-- Table -->
-        <div class="table-responsive seasonal-snow-target">
+        <div class="table-responsive">
             <table id="mainTable">
                 <thead>
                     <tr>
                         <th width="40">No</th>
-                        <th width="150">Data / WSID</th>
+                        <th width="180">Data / WSID</th>
                         <th>Catatan</th>
-                        <th width="100">Plan</th>
+                        <th width="120">Plan</th>
                         <th width="120">Status</th>
-                        <th width="40">Act</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
