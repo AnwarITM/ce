@@ -13,6 +13,7 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#4f46e5">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="description" content="Unified Task & WSID Planner">
 
     <!-- Icons -->
@@ -1450,6 +1451,12 @@
             // Load sekali saja (bukan real-time listener)
             db.ref('work_planner/' + userId).once('value', (snapshot) => {
                 const data = snapshot.val();
+                
+                // Initialize app.state if not exists
+                if (!app.state) {
+                    app.state = { tabs: [], currentTabId: 0 };
+                }
+                
                 if (data && data.tabs) {
                     // Sync dari Firebase ke app state
                     app.state.tabs = Object.values(data.tabs || {});

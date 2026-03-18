@@ -87,6 +87,11 @@ const app = {
     },
 
     saveState() {
+        // Ensure state is initialized
+        if (!this.state) {
+            this.state = { tabs: [], currentTabId: 0 };
+        }
+        
         localStorage.setItem(STORAGE_KEY, JSON.stringify({
             tabs: this.state.tabs,
             currentTabId: this.state.currentTabId
