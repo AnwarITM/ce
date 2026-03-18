@@ -4,6 +4,9 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <title>Work Planner • EPS</title>
 
     <!-- PWA Manifest -->
@@ -17,14 +20,14 @@
     <link rel="icon" type="image/png" sizes="32x32" href="icon-32x32.png">
 
     <!-- Styles -->
-    <link rel="stylesheet" href="design-tokens.css">
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="seasonal-effects.css">
-    <link id="theme-link" rel="stylesheet" href="theme-light.css">
+    <link rel="stylesheet" href="design-tokens.css?v=20260110">
+    <link rel="stylesheet" href="styles.css?v=20260110">
+    <link rel="stylesheet" href="seasonal-effects.css?v=20260110">
+    <link id="theme-link" rel="stylesheet" href="theme-light.css?v=20260110">
 
     <!-- Excel Parser -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-    <script src="seasonal-effects.js" defer></script>
+    <script src="seasonal-effects.js?v=20260110" defer></script>
 
     <style>
         :root {
@@ -35,6 +38,166 @@
             --w-plan: 100px;
             --w-status: 120px;
             --w-action: 50px;
+        }
+
+        /* Login Overlay Styles */
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 40px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.25);
+            text-align: center;
+        }
+
+        .login-logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+        }
+
+        .login-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: #1e293b;
+            margin: 0 0 8px;
+        }
+
+        .login-subtitle {
+            font-size: 14px;
+            color: #64748b;
+            margin: 0 0 24px;
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 16px;
+            transition: all 0.2s;
+            box-sizing: border-box;
+        }
+
+        .login-input:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 12px 30px rgba(99, 102, 241, 0.3);
+            transition: all 0.2s;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 16px 40px rgba(99, 102, 241, 0.4);
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        .login-footer {
+            margin-top: 20px;
+            font-size: 13px;
+            color: #94a3b8;
+        }
+
+        .login-footer a {
+            color: #6366f1;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .login-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .user-info-bar {
+            display: none;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+
+        .user-info-bar.show {
+            display: flex;
+        }
+
+        .user-avatar-small {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .user-info-text {
+            flex: 1;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .logout-btn {
+            padding: 8px 16px;
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
         }
 
         body {
@@ -305,6 +468,17 @@
             vertical-align: middle;
         }
 
+        thead th:nth-child(1),
+        tbody td:nth-child(1) {
+            width: var(--w-handle);
+            min-width: var(--w-handle);
+        }
+
+        thead th:nth-child(4),
+        tbody td:nth-child(4) {
+            min-width: var(--w-plan);
+        }
+
         th {
             background: rgba(99, 102, 241, 0.08);
             /* Fallback */
@@ -446,12 +620,50 @@
             margin-top: 24px;
         }
 
+        .sort-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .sort-toggle {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .btn-compact {
+            padding: 6px 10px;
+            font-size: 12px;
+            line-height: 1.2;
+        }
+
+        .sort-hint {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
         /* Swipe to Delete Styles */
         .swipe-row {
             position: relative;
             overflow: hidden;
             background: transparent;
-            touch-action: pan-y;
+            touch-action: auto; /* Allow all touch actions, JS will handle specific behaviors */
+            transition: transform 0.18s cubic-bezier(0.33, 1, 0.68, 1),
+                background 0.18s ease,
+                box-shadow 0.2s ease,
+                opacity 0.16s ease;
+        }
+
+        /* Drag Handle - must allow touch drag */
+        .drag-handle {
+            touch-action: none; /* Disable default touch to allow pointer events */
+            user-select: none;
+            -webkit-user-select: none;
+            cursor: move;
         }
 
         .swipe-content {
@@ -616,9 +828,119 @@
             box-shadow: 0 0 0 3px var(--accent-color);
         }
 
-        .dragging {
+        .dragging-source {
             border: 2px dashed var(--primary-color) !important;
-            background: rgba(99, 102, 241, 0.1) !important;
+            background: rgba(99, 102, 241, 0.12) !important;
+            box-shadow: 0 10px 25px rgba(79, 70, 229, 0.25);
+            transform: translate3d(0, 0, 0) scale(1.015);
+            opacity: 0.5;
+            filter: saturate(1.05);
+            animation: dragPulse 0.9s ease-in-out infinite alternate;
+        }
+
+        .dragging-clone {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22), 0 0 0 2px rgba(255, 255, 255, 0.6);
+            pointer-events: none;
+            transition: box-shadow 0.2s ease, opacity 0.18s ease;
+            transform: translateZ(0) scale(1.02);
+            opacity: 0.95;
+            filter: drop-shadow(0 16px 42px rgba(0, 0, 0, 0.25));
+            animation: none;
+        }
+
+        .drop-target {
+            position: relative;
+            border: 2px solid rgba(79, 70, 229, 0.5);
+            box-shadow: 0 12px 30px rgba(79, 70, 229, 0.28), inset 0 0 0 2px rgba(255, 255, 255, 0.85);
+            animation: dropHint 0.65s ease-in-out infinite alternate;
+            transform: translateY(6px);
+            background: linear-gradient(90deg, rgba(99, 102, 241, 0.16), rgba(14, 165, 233, 0.12));
+            isolation: isolate;
+        }
+
+        .drop-target::after {
+            content: 'Lepas di sini';
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            color: var(--primary-color);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.16);
+            pointer-events: none;
+            animation: dropHintText 0.8s ease-in-out infinite alternate;
+        }
+
+        .drop-target::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: 10px;
+            background: linear-gradient(90deg, rgba(79, 70, 229, 0.14), rgba(59, 130, 246, 0.1));
+            z-index: -1;
+        }
+
+        @keyframes dragPulse {
+            from {
+                box-shadow: 0 6px 14px rgba(79, 70, 229, 0.18);
+            }
+
+            to {
+                box-shadow: 0 14px 32px rgba(79, 70, 229, 0.28);
+            }
+        }
+
+        @keyframes dropHint {
+            from {
+                box-shadow: 0 10px 22px rgba(79, 70, 229, 0.12);
+            }
+
+            to {
+                box-shadow: 0 14px 30px rgba(79, 70, 229, 0.22);
+            }
+        }
+
+        @keyframes dropHintText {
+            from {
+                transform: translate(-50%, -50%) scale(0.98);
+                opacity: 0.85;
+            }
+
+            to {
+                transform: translate(-50%, -50%) scale(1.02);
+                opacity: 1;
+            }
+        }
+
+        @keyframes dragFloat {
+            from {
+                transform: translateZ(0) scale(1.03) translateY(-2px);
+                opacity: 0.9;
+            }
+
+            to {
+                transform: translateZ(0) scale(1.05) translateY(2px);
+                opacity: 0.98;
+            }
+        }
+
+        .row-flash {
+            animation: rowFlash 0.45s ease;
+        }
+
+        @keyframes rowFlash {
+            from {
+                background: rgba(99, 102, 241, 0.2);
+            }
+
+            to {
+                background: transparent;
+            }
         }
 
         .modal-footer {
@@ -720,6 +1042,8 @@
         .plan-text {
             font-weight: 600;
             color: var(--text-muted);
+            white-space: nowrap;
+            word-break: keep-all;
         }
 
         @keyframes fadeIn {
@@ -789,6 +1113,20 @@
                 font-size: 12px;
             }
 
+            :root {
+                --w-handle: 26px;
+                --w-plan: 140px;
+            }
+
+            thead th:nth-child(4),
+            tbody td:nth-child(4) {
+                min-width: var(--w-plan);
+            }
+
+            .plan-text {
+                font-size: 14px;
+            }
+
             /* Import/Export buttons in header smaller? */
             .btn-glass {
                 padding: 6px 10px;
@@ -812,6 +1150,31 @@
                 <input type="file" id="fileImport" hidden accept=".json" onchange="app.importUniversal(this)">
             </div>
         </header>
+
+        <!-- Login Overlay -->
+        <div id="loginOverlay" class="login-overlay">
+            <div class="login-card">
+                <div class="login-logo">📋</div>
+                <h1 class="login-title">Work Planner</h1>
+                <p class="login-subtitle">Masukkan User ID untuk melanjutkan</p>
+                
+                <input type="text" id="loginUserId" class="login-input" placeholder="User ID (contoh: 1033)" 
+                    onkeypress="if(event.key==='Enter')login()">
+                
+                <button class="login-btn" onclick="login()">Login</button>
+                
+                <div class="login-footer">
+                    <p>Belum punya User ID? <a href="admin_notes.html">Hubungi Admin</a></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Info Bar -->
+        <div id="userInfoBar" class="user-info-bar">
+            <div class="user-avatar-small" id="userAvatar">👤</div>
+            <div class="user-info-text" id="userInfoText">Welcome, User</div>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
 
         <!-- Modal Overlay -->
         <div id="dataModal" class="modal-overlay" style="display:none;"
@@ -932,6 +1295,17 @@
                 </div>
             </div>
 
+            <div class="sort-row">
+                <span class="metric-label" style="white-space:nowrap;">Urutan:</span>
+                <div class="sort-toggle">
+                    <button class="btn-glass btn-compact" data-sort-mode="date"
+                        onclick="app.setSortMode('date')">Urut Plan</button>
+                    <button class="btn-glass btn-compact" data-sort-mode="manual"
+                        onclick="app.setSortMode('manual')">Urut Manual</button>
+                    <span class="sort-hint">Drag otomatis pindah ke urutan manual</span>
+                </div>
+            </div>
+
             <!-- Filter Segment -->
             <div style="display:flex; gap:4px; margin-top:12px; overflow-x:auto; padding-bottom:4px;">
                 <button class="btn-glass active" data-filter="all" onclick="app.setFilter('all')">All</button>
@@ -965,9 +1339,241 @@
         </div>
     </div>
 
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
     <!-- Scripts -->
-    <script src="theme_manager.js"></script>
-    <script src="work_planner.js"></script>
+    <script src="theme_manager.js?v=20260110"></script>
+    <script src="work_planner.js?v=20260110"></script>
+    <script>
+        // ============================================
+        // FIREBASE CONFIG & LOGIN SYSTEM
+        // ============================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyAqqwSS1KTnAjfGcqvV_-TRHMYXJlTjtlI",
+            authDomain: "catatan-troubleshoot-atm-2b5a4.firebaseapp.com",
+            databaseURL: "https://catatan-troubleshoot-atm-2b5a4-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "catatan-troubleshoot-atm-2b5a4",
+            storageBucket: "catatan-troubleshoot-atm-2b5a4.firebasestorage.app",
+            messagingSenderId: "441198643571",
+            appId: "1:441198643571:web:7ee3c056d933acb3515d06"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // Login state
+        let currentUserId = null;
+        let isFirebaseSynced = false;
+        let saveTimeout = null; // Debounce timer
+
+        // Check auth on load
+        function checkAuth() {
+            const savedUserId = sessionStorage.getItem('userId');
+            if (savedUserId) {
+                validateUserAndLoad(savedUserId);
+            } else {
+                showLoginOverlay();
+            }
+        }
+
+        function showLoginOverlay() {
+            const overlay = document.getElementById('loginOverlay');
+            if (overlay) overlay.style.display = 'flex';
+        }
+
+        function hideLoginOverlay() {
+            const overlay = document.getElementById('loginOverlay');
+            if (overlay) overlay.style.display = 'none';
+            
+            // Show user info bar
+            const userInfoBar = document.getElementById('userInfoBar');
+            const userAvatar = document.getElementById('userAvatar');
+            const userInfoText = document.getElementById('userInfoText');
+            
+            if (userInfoBar) {
+                userInfoBar.classList.add('show');
+                const userName = sessionStorage.getItem('userName') || currentUserId;
+                userAvatar.textContent = (userName || '👤').charAt(0).toUpperCase();
+                userInfoText.textContent = `Welcome, ${userName}`;
+            }
+        }
+
+        async function validateUserAndLoad(userId) {
+            try {
+                const snapshot = await db.ref('users/' + userId).once('value');
+                const user = snapshot.val();
+                
+                if (user) {
+                    currentUserId = userId;
+                    sessionStorage.setItem('userId', userId);
+                    sessionStorage.setItem('userName', user.name || userId);
+                    hideLoginOverlay();
+                    
+                    // Load from Firebase (start fresh, no migration)
+                    loadWorkPlannerFromFirebase(userId);
+                } else {
+                    alert('User ID tidak ditemukan! Silakan hubungi admin untuk membuat user.');
+                    sessionStorage.removeItem('userId');
+                    showLoginOverlay();
+                }
+            } catch (error) {
+                console.error('Error validating user:', error);
+                alert('Gagal koneksi ke database. Cek koneksi internet.');
+                showLoginOverlay();
+            }
+        }
+
+        function login() {
+            const userIdInput = document.getElementById('loginUserId').value.trim();
+            if (!userIdInput) {
+                alert('User ID wajib diisi!');
+                return;
+            }
+            validateUserAndLoad(userIdInput);
+        }
+
+        function logout() {
+            if (confirm('Logout dari Work Planner?')) {
+                sessionStorage.removeItem('userId');
+                sessionStorage.removeItem('userName');
+                // Redirect ke index.html
+                window.location.href = 'index.html';
+            }
+        }
+
+        // ============================================
+        // FIREBASE SYNC FUNCTIONS
+        // ============================================
+        function loadWorkPlannerFromFirebase(userId) {
+            // Load sekali saja (bukan real-time listener)
+            db.ref('work_planner/' + userId).once('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data && data.tabs) {
+                    // Sync dari Firebase ke app state
+                    app.state.tabs = Object.values(data.tabs || {});
+                    app.state.currentTabId = data.currentTabId || 0;
+                    
+                    // Ensure each tab has proper structure
+                    app.state.tabs.forEach(tab => {
+                        if (!tab.data) tab.data = [];
+                        tab.data.forEach(row => {
+                            if (!row.id) row.id = 'row_' + Date.now() + Math.random();
+                            if (!row.status) row.status = 'outstanding';
+                            if (typeof row.sortOrder !== 'number') row.sortOrder = 0;
+                            // Backfill legacy field names
+                            if (!row.wsid && row.machineData) row.wsid = row.machineData;
+                            if (!row.plan && row.period) row.plan = row.period;
+                            // Compute wsidKey if missing
+                            if (!row.wsidKey && row.wsid) row.wsidKey = app.getWsidKey(row.wsid);
+                            // Compute planTs if missing
+                            if (!row.planTs && row.plan) {
+                                const { ts } = app.parsePlanValue(row.plan);
+                                row.planTs = ts;
+                            }
+                        });
+                        if (!tab.sortMode) tab.sortMode = 'date';
+                        if (!tab.excelConfig) tab.excelConfig = {};
+                    });
+                    
+                    app.saveState();
+                    app.renderTabs();
+                    app.renderUI();
+                    isFirebaseSynced = true;
+                } else {
+                    // No data in Firebase, start fresh
+                    app.state.tabs = [];
+                    app.state.currentTabId = 0;
+                    app.saveState();
+                    app.renderTabs();
+                    app.renderUI();
+                    isFirebaseSynced = true;
+                }
+            }, (error) => {
+                console.error('Error loading data from Firebase:', error);
+            });
+        }
+
+        function saveWorkPlannerToFirebase(userId) {
+            if (!userId || !isFirebaseSynced) return;
+            
+            // Clear pending save if exists
+            if (saveTimeout) clearTimeout(saveTimeout);
+            
+            // Debounce 1.5 detik untuk menghindari write berlebihan
+            saveTimeout = setTimeout(() => {
+                // Batch write semua updates dalam 1x request
+                db.ref('work_planner/' + userId).update({
+                    currentTabId: app.state.currentTabId,
+                    tabs: app.state.tabs.reduce((acc, tab) => {
+                        acc[tab.id] = {
+                            name: tab.name,
+                            sortMode: tab.sortMode || 'date',
+                            excelConfig: tab.excelConfig || {},
+                            data: tab.data || []
+                        };
+                        return acc;
+                    }, {})
+                }, (error) => {
+                    if (error) {
+                        console.error('Firebase save error:', error);
+                    }
+                });
+            }, 1500); // Save 1.5 detik setelah user berhenti edit
+        }
+
+        // Override app.saveState to sync with Firebase
+        const originalSaveState = app.saveState;
+        app.saveState = function() {
+            originalSaveState(); // Keep local storage as backup
+            if (currentUserId && isFirebaseSynced) {
+                saveWorkPlannerToFirebase(currentUserId);
+            }
+        };
+
+        // Initialize auth check after app init
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(checkAuth, 500); // Wait for app to initialize
+        });
+
+        // Disable ServiceWorker for file:// protocol (testing only)
+        if (window.location.protocol === 'file:') {
+            console.warn('Running on file:// protocol - ServiceWorker disabled. Use local server for full functionality.');
+        } else {
+            const APP_VERSION = '20260110';
+            const SW_URL = `./sw.js?v=${APP_VERSION}`;
+            const SW_SCRIPT_URL = new URL(SW_URL, location.href).href;
+
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then((regs) => {
+                    regs.forEach((reg) => {
+                        if (reg.active && reg.active.scriptURL !== SW_SCRIPT_URL) {
+                            reg.unregister();
+                        }
+                    });
+                });
+
+                navigator.serviceWorker.register(SW_URL, { updateViaCache: 'none' })
+                    .then((reg) => {
+                        reg.update();
+                    })
+                    .catch((err) => {
+                        console.error('SW registration failed', err);
+                    });
+
+                let refreshing = false;
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    if (refreshing) return;
+                    refreshing = true;
+                    window.location.reload();
+                });
+            }
+        }
+    </script>
 </body>
 
 </html>
+
+
+

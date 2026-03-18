@@ -16,24 +16,38 @@ const createNewTab = (id) => ({
     excelConfig: {
         lastMapWsid: '',
         lastMapPlan: ''
-    }
+    },
+    sortMode: 'date' // 'date' | 'manual'
 });
 
 const app = {
+    platform: {
+        isAndroid: false,
+        prefersTouch: false
+    },
     state: {
         tabs: [],
         currentTabId: 0,
         filter: 'all',
-        dragItem: null,
         touchDragging: false
     },
 
     init() {
+        this.detectPlatform();
         this.loadState();
         this.renderTabs();
         this.renderUI();
         this.setupEventListeners();
         this.loadTheme();
+    },
+
+    detectPlatform() {
+        const ua = navigator.userAgent || '';
+        this.platform.isAndroid = /Android/i.test(ua);
+        this.platform.prefersTouch =
+            (navigator.maxTouchPoints && navigator.maxTouchPoints > 0) ||
+            (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) ||
+            ('ontouchstart' in window);
     },
 
     // --- State Management ---
@@ -53,9 +67,10 @@ const app = {
 
         // Migrate old data: ensure each row has id + status
         this.state.tabs.forEach(tab => {
-            tab.data = (tab.data || []).map(row => {
+            tab.data = (tab.data || []).map((row, idx) => {
                 if (!row.id) row.id = 'm_' + Date.now() + Math.random();
                 if (!row.status) row.status = 'outstanding';
+                if (typeof row.sortOrder !== 'number') row.sortOrder = idx;
                 // Backfill legacy field names
                 if (!row.wsid && row.machineData) row.wsid = row.machineData;
                 if (!row.plan && row.period) row.plan = row.period;
@@ -66,6 +81,7 @@ const app = {
                 row.planTs = row.planTs || ts;
                 return row;
             });
+            tab.sortMode = tab.sortMode || 'date';
         });
         this.saveState();
     },
@@ -142,10 +158,59 @@ const app = {
         this.renderTableData();
     },
 
+    highlightRow(id) {
+        const rowEl = document.querySelector(`tr.swipe-row[data-id="${id}"]`);
+        if (!rowEl) return;
+        rowEl.classList.remove('row-flash');
+        void rowEl.offsetWidth; // restart animation
+        rowEl.classList.add('row-flash');
+        setTimeout(() => rowEl.classList.remove('row-flash'), 450);
+    },
+
     setFilter(f) {
         this.state.filter = f;
         $$('[data-filter]').forEach(b => b.classList.toggle('active', b.dataset.filter === f));
         this.renderTableData();
+    },
+
+    syncSortButtons() {
+        const tab = this.getCurrentTab();
+        const mode = (tab && tab.sortMode) ? tab.sortMode : 'date';
+        $$('[data-sort-mode]').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.sortMode === mode);
+        });
+    },
+
+    ensureManualOrder(tab) {
+        (tab?.data || []).forEach((r, idx) => {
+            if (typeof r.sortOrder !== 'number') r.sortOrder = idx;
+        });
+    },
+
+    setSortMode(mode, opts = {}) {
+        const tab = this.getCurrentTab();
+        if (!tab) return;
+        const current = tab.sortMode || 'date';
+        const force = opts.force === true;
+        if (!force && current === mode) {
+            this.syncSortButtons();
+            return;
+        }
+
+        tab.sortMode = mode;
+        if (mode === 'date') {
+            this.sortDataByDate(tab.data);
+            tab.data.forEach((r, idx) => r.sortOrder = idx);
+        } else {
+            this.ensureManualOrder(tab);
+        }
+
+        this.saveState();
+        if (!opts.skipRender) {
+            this.renderTableData();
+        } else {
+            this.syncSortButtons();
+        }
     },
 
     renderTableData() {
@@ -157,19 +222,25 @@ const app = {
         const done = tab.data.filter(r => r.status === 'done').length;
         const out = total - done;
 
+        this.syncSortButtons();
+
         $('#mTotal').textContent = total;
         $('#mDone').textContent = done;
         $('#mOut').textContent = out;
         $('#emptyState').style.display = total === 0 ? 'block' : 'none';
+
+        if (tab.sortMode === 'date') this.sortDataByDate(tab.data);
 
         let filtered = tab.data;
         if (this.state.filter !== 'all') {
             filtered = filtered.filter(row => row.status === this.state.filter);
         }
 
-        this.sortDataByDate(filtered);
+        const displayRows = (tab.sortMode === 'manual')
+            ? [...filtered].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
+            : filtered;
 
-        filtered.forEach((row, index) => {
+        displayRows.forEach((row, index) => {
             const tr = document.createElement('tr');
             tr.className = 'tr-clickable swipe-row';
             tr.dataset.id = row.id;
@@ -178,7 +249,7 @@ const app = {
             const statusLabel = row.status === 'done' ? 'Done' : 'Outstanding';
 
             tr.innerHTML = `
-                <td class="col-order drag-handle" style="cursor: move;" draggable="true">${index + 1}</td>
+                <td class="col-order drag-handle" style="cursor: move;" draggable="false">${index + 1}</td>
                 <td onclick="app.openModal('${row.id}')"><div class="text-cell wsid-text">${row.wsid || '-'}</div></td>
                 <td onclick="app.openModal('${row.id}')"><div class="text-cell notes-text text-left">${row.notes || ''}</div></td>
                 <td onclick="app.openModal('${row.id}')"><div class="text-cell plan-text">${row.plan || this.formatPlanTs(row.planTs)}</div></td>
@@ -191,50 +262,9 @@ const app = {
 
             const handle = tr.querySelector('.drag-handle');
 
-            this.attachDragEvents(tr, handle, row);
             this.attachSwipeEvents(tr, row.id);
             this.attachTouchReorder(tr, handle, row);
             tbody.appendChild(tr);
-        });
-    },
-
-    attachDragEvents(tr, handle, row) {
-        if (!handle) return;
-
-        handle.addEventListener('dragstart', (e) => {
-            // Close swipe and ensure row is at 0
-            tr.style.transition = 'none';
-            tr.style.transform = 'translateX(0)';
-
-            e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('text/plain', row.id);
-            this.state.dragItem = row;
-
-            // Visual feedback
-            setTimeout(() => {
-                tr.style.opacity = '0.3';
-                tr.classList.add('dragging');
-            }, 0);
-        });
-
-        handle.addEventListener('dragend', () => {
-            tr.style.opacity = '1';
-            tr.classList.remove('dragging');
-            this.state.dragItem = null;
-        });
-
-        tr.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            e.dataTransfer.dropEffect = 'move';
-        });
-
-        tr.addEventListener('drop', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            const sourceId = e.dataTransfer.getData('text/plain');
-            if (sourceId && sourceId !== row.id) {
-                this.reorderItems(sourceId, row.id);
-            }
         });
     },
 
@@ -306,39 +336,106 @@ const app = {
 
     attachTouchReorder(tr, handle, row) {
         if (!handle) return;
-        handle.style.touchAction = 'none';
 
         let pointerTargetId = null;
+        let dragClone = null;
+        let dragOffsetX = 0;
+        let dragOffsetY = 0;
+
+        const clearDropTargets = () => {
+            $$('tr.swipe-row').forEach(r => r.classList.remove('drop-target'));
+        };
 
         const cleanup = () => {
             this.state.touchDragging = false;
             pointerTargetId = null;
-            tr.classList.remove('dragging');
+            tr.classList.remove('dragging-source');
+            tr.style.opacity = '1';
+            clearDropTargets();
+            if (dragClone && dragClone.parentNode) dragClone.parentNode.removeChild(dragClone);
+            dragClone = null;
+        };
+
+        const findTargetRow = (clientX, clientY) => {
+            const hit = document.elementFromPoint(clientX, clientY);
+            if (hit) {
+                const directRow = hit.closest('tr.swipe-row');
+                if (directRow) return directRow;
+            }
+            // Fallback to nearest row by vertical distance so drops still register
+            let nearest = null;
+            let best = Infinity;
+            $$('tr.swipe-row').forEach(r => {
+                const rect = r.getBoundingClientRect();
+                const dist = Math.abs((rect.top + rect.height / 2) - clientY);
+                if (dist < best) {
+                    best = dist;
+                    nearest = r;
+                }
+            });
+            return nearest;
         };
 
         handle.addEventListener('pointerdown', (e) => {
-            if (e.pointerType !== 'touch') return; // keep native drag for mouse/trackpad
+            // Let desktop/mouse keep the native drag flow
+            if (e.pointerType === 'mouse') return;
+            if (e.button !== 0) return;
+
             e.preventDefault();
+            // Force manual mode so the drag result is not overridden by date sorting
+            this.setSortMode('manual', { skipRender: true, force: true });
+            this.ensureManualOrder(this.getCurrentTab());
+            this.saveState();
+            this.syncSortButtons();
+
+            const rect = tr.getBoundingClientRect();
+            dragOffsetX = e.clientX - rect.left;
+            dragOffsetY = e.clientY - rect.top;
 
             this.state.touchDragging = true;
-            tr.classList.add('dragging');
-            tr.style.transition = 'none';
-            tr.style.transform = 'translateX(0)';
+            tr.classList.add('dragging-source');
+            tr.style.opacity = '0.5';
+
+            // Lightweight floating clone so users see the drag position
+            dragClone = tr.cloneNode(true);
+            dragClone.classList.add('dragging-clone');
+            Object.assign(dragClone.style, {
+                position: 'fixed',
+                left: `${rect.left}px`,
+                top: `${rect.top}px`,
+                width: `${rect.width}px`,
+                pointerEvents: 'none',
+                zIndex: '1200',
+                opacity: '0.9',
+                transform: 'translateZ(0)',
+                transition: 'none'
+            });
+            document.body.appendChild(dragClone);
+
+            if (navigator.vibrate) navigator.vibrate(30);
 
             const moveHandler = (ev) => {
+                if (!this.state.touchDragging) return;
                 ev.preventDefault();
-                const target = document.elementFromPoint(ev.clientX, ev.clientY);
-                const targetRow = target ? target.closest('tr.swipe-row') : null;
+                const targetRow = findTargetRow(ev.clientX, ev.clientY);
                 pointerTargetId = targetRow ? targetRow.dataset.id : null;
-                // Highlight potential drop target
-                $$('tr.swipe-row').forEach(r => r.classList.toggle('dragging', r.dataset.id === pointerTargetId));
+
+                $$('tr.swipe-row').forEach(r => {
+                    const isTarget = targetRow && r.dataset.id === pointerTargetId && r.dataset.id !== row.id;
+                    r.classList.toggle('drop-target', isTarget);
+                });
+
+                if (dragClone) {
+                    dragClone.style.left = `${ev.clientX - dragOffsetX}px`;
+                    dragClone.style.top = `${ev.clientY - dragOffsetY}px`;
+                }
             };
 
-            const upHandler = () => {
+            const upHandler = (ev) => {
+                if (ev) ev.preventDefault();
                 if (pointerTargetId && pointerTargetId !== row.id) {
                     this.reorderItems(row.id, pointerTargetId);
                 }
-                $$('tr.swipe-row').forEach(r => r.classList.remove('dragging'));
                 handle.releasePointerCapture(e.pointerId);
                 document.removeEventListener('pointermove', moveHandler);
                 document.removeEventListener('pointerup', upHandler);
@@ -347,9 +444,9 @@ const app = {
             };
 
             handle.setPointerCapture(e.pointerId);
-            document.addEventListener('pointermove', moveHandler);
-            document.addEventListener('pointerup', upHandler);
-            document.addEventListener('pointercancel', upHandler);
+            document.addEventListener('pointermove', moveHandler, { passive: false });
+            document.addEventListener('pointerup', upHandler, { passive: false });
+            document.addEventListener('pointercancel', upHandler, { passive: false });
         });
     },
 
@@ -422,7 +519,8 @@ const app = {
                 plan: parsedPlan.label,
                 planTs: parsedPlan.ts,
                 status: 'outstanding',
-                timestamp: Date.now()
+                timestamp: Date.now(),
+                sortOrder: tab.data.length
             });
         }
 
@@ -479,8 +577,11 @@ const app = {
         if (srcIdx >= 0 && tgtIdx >= 0) {
             const item = tab.data.splice(srcIdx, 1)[0];
             tab.data.splice(tgtIdx, 0, item);
+            tab.data.forEach((r, idx) => r.sortOrder = idx);
+            this.setSortMode('manual', { skipRender: true, force: true });
             this.saveState();
             this.renderTableData();
+            this.highlightRow(targetId);
         }
     },
 
@@ -647,7 +748,8 @@ const app = {
                     if (!confirm(`Import ${list.length} items? This will APPEND to current list.`)) return;
                 }
 
-                const newData = list.map(item => {
+                const baseOrder = tab.data.length;
+                const newData = list.map((item, idx) => {
                     const parsedPlan = this.parsePlanValue(item.plan || item.period || '');
                     const wsidVal = item.machineData || item.wsid || '';
                     return {
@@ -658,7 +760,8 @@ const app = {
                         plan: parsedPlan.label,
                         planTs: parsedPlan.ts,
                         status: (item.status && item.status.toLowerCase() === 'done') ? 'done' : 'outstanding',
-                        timestamp: Date.now()
+                        timestamp: Date.now(),
+                        sortOrder: baseOrder + idx
                     };
                 });
 

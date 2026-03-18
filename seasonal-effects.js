@@ -4,15 +4,40 @@
   const now = new Date();
   const month = now.getMonth();
   const day = now.getDate();
+  const year = now.getFullYear();
+  const today = new Date(year, month, day);
   const isSnow = month === 11 && day <= 30;
   const isFireworks = (month === 11 && day >= 31) || (month === 0 && day <= 2);
+  const isRamadan = isWithinRange(1, 18, 2, 17);
+  const isEid = isWithinRange(2, 18, 2, 26);
 
-  if (!EFFECTS_ENABLED || (!isSnow && !isFireworks)) {
+  function isWithinRange(startMonth, startDay, endMonth, endDay) {
+    const start = new Date(year, startMonth, startDay);
+    const end = new Date(year, endMonth, endDay);
+    return today >= start && today <= end;
+  }
+
+  const mode = selectMode();
+
+  if (!EFFECTS_ENABLED || !mode) {
     return;
   }
 
-  const mode = isFireworks ? 'fireworks' : 'snow';
-  const icon = mode === 'fireworks' ? '🎆' : '❄';
+  function selectMode() {
+    if (isRamadan) return 'ramadan';
+    if (isEid) return 'eid';
+    if (isFireworks) return 'fireworks';
+    if (isSnow) return 'snow';
+    return null;
+  }
+
+  const titleTag = {
+    snow: 'SNOW',
+    fireworks: 'NY',
+    ramadan: 'RAM',
+    eid: 'EID'
+  };
+  const icon = titleTag[mode] || 'SEASON';
 
   const state = {
     mode,
@@ -35,16 +60,26 @@
       setVar('--primary-hover', '#379ad8');
       setVar('--gradient-primary', 'linear-gradient(135deg, #b7f3ff 0%, #6bb8ff 100%)');
       setVar('--accent-color', '#e0f2fe');
-    } else {
+    } else if (mode === 'fireworks') {
       setVar('--primary-color', '#f59e0b');
       setVar('--primary-hover', '#d97706');
       setVar('--gradient-primary', 'linear-gradient(135deg, #fde047 0%, #f59e0b 100%)');
       setVar('--accent-color', '#f97316');
+    } else if (mode === 'ramadan') {
+      setVar('--primary-color', '#1f7a6b');
+      setVar('--primary-hover', '#115e4f');
+      setVar('--gradient-primary', 'linear-gradient(135deg, #0f4c5c 0%, #1f7a6b 100%)');
+      setVar('--accent-color', '#f3c969');
+    } else if (mode === 'eid') {
+      setVar('--primary-color', '#2f855a');
+      setVar('--primary-hover', '#276749');
+      setVar('--gradient-primary', 'linear-gradient(135deg, #34d399 0%, #2f855a 100%)');
+      setVar('--accent-color', '#fef3c7');
     }
   }
 
   function applySeasonalTitles() {
-    const baseTitle = document.title.replace(/^[❄🎆]\s+/, '');
+    const baseTitle = document.title.replace(/^(SNOW|NY|RAM|EID|SEASON)\s+/, '');
     document.title = `${icon} ${baseTitle}`;
 
     document.querySelectorAll('[data-seasonal-title]').forEach((el) => {
@@ -57,10 +92,17 @@
   }
 
   function applyFooterTip() {
-    if (mode !== 'fireworks') return;
     const tip = document.createElement('div');
     tip.className = 'seasonal-footer-tip';
-    tip.textContent = 'Happy New Year';
+    if (mode === 'fireworks') {
+      tip.textContent = 'Happy New Year';
+    } else if (mode === 'ramadan') {
+      tip.textContent = 'Ramadan Kareem';
+    } else if (mode === 'eid') {
+      tip.textContent = 'Selamat Idul Fitri';
+    } else {
+      return;
+    }
     document.body.appendChild(tip);
   }
 
@@ -68,11 +110,28 @@
     state.paused = document.hidden;
   }
 
+  function ensureContentLayer() {
+    const body = document.body;
+    let wrapper = body.querySelector('.seasonal-content-layer');
+    if (wrapper) return wrapper;
+
+    wrapper = document.createElement('div');
+    wrapper.className = 'seasonal-content-layer';
+
+    while (body.firstChild) {
+      wrapper.appendChild(body.firstChild);
+    }
+
+    body.appendChild(wrapper);
+    return wrapper;
+  }
+
   function setupFullCanvas() {
+    const contentLayer = ensureContentLayer();
     const canvas = document.createElement('canvas');
     canvas.className = 'seasonal-effects-canvas';
     canvas.setAttribute('aria-hidden', 'true');
-    document.body.appendChild(canvas);
+    document.body.insertBefore(canvas, contentLayer);
     state.canvas = canvas;
     state.ctx = canvas.getContext('2d');
     resizeFullCanvas();
@@ -102,8 +161,8 @@
   }
 
   function desiredFlakeCount() {
-    const base = Math.floor((state.w * state.h) / 15000); // Reduced density (was 7000)
-    return Math.max(20, Math.min(80, base)); // Lowered max count (was 160)
+    const base = Math.floor((state.w * state.h) / 15000);
+    return Math.max(20, Math.min(80, base));
   }
 
   function syncFlakes() {
@@ -170,7 +229,6 @@
       ctx: state.ctx
     };
 
-    // Initial flakes
     syncFlakes();
 
     const animateSnow = () => {
@@ -182,7 +240,6 @@
       const layer = state.fullSnowLayer;
       const ctx = state.ctx;
 
-      // Update dimensions if window resized
       layer.w = state.w;
       layer.h = state.h;
       syncFlakes();
@@ -289,6 +346,244 @@
     animate(0);
   }
 
+  function startRamadan() {
+    setupFullCanvas();
+    const stars = [];
+    const crescents = [];
+    const baseCount = Math.max(35, Math.floor((state.w * state.h) / 22000));
+    const crescentCount = Math.max(6, Math.floor((state.w * state.h) / 120000));
+    const crescentImg = new Image();
+    crescentImg.decoding = 'async';
+    crescentImg.src = 'bulan bintang.svg';
+
+    function makeStar() {
+      return {
+        x: Math.random() * state.w,
+        y: Math.random() * state.h,
+        r: 0.8 + Math.random() * 1.6,
+        twinkle: 0.4 + Math.random() * 0.8,
+        speed: 0.03 + Math.random() * 0.12,
+        drift: -0.12 + Math.random() * 0.24,
+        phase: Math.random() * Math.PI * 2
+      };
+    }
+
+    function makeCrescent() {
+      return {
+        x: Math.random() * state.w,
+        y: Math.random() * state.h,
+        r: 12 + Math.random() * 18,
+        thickness: 6 + Math.random() * 6,
+        speed: 0.02 + Math.random() * 0.08,
+        drift: -0.08 + Math.random() * 0.16,
+        angle: Math.random() * Math.PI * 2
+      };
+    }
+
+    for (let i = 0; i < baseCount; i++) {
+      stars.push(makeStar());
+    }
+    for (let i = 0; i < crescentCount; i++) {
+      crescents.push(makeCrescent());
+    }
+
+    const glow = 'rgba(243, 201, 105, 0.9)';
+
+    function drawCrescent(ctx, c) {
+      if (!crescentImg.complete) return;
+      const size = c.r * 2.2;
+      ctx.save();
+      ctx.translate(c.x, c.y);
+      ctx.rotate(c.angle);
+      ctx.globalAlpha = 0.9;
+      ctx.drawImage(crescentImg, -size / 2, -size / 2, size, size);
+      ctx.restore();
+    }
+
+    function animate() {
+      if (state.paused) {
+        state.animationId = requestAnimationFrame(animate);
+        return;
+      }
+
+      const ctx = state.ctx;
+      ctx.clearRect(0, 0, state.w, state.h);
+
+      for (const c of crescents) {
+        c.y -= c.speed;
+        c.x += c.drift * 0.2;
+        c.angle += 0.002;
+        if (c.y < -30) c.y = state.h + 30;
+        if (c.x > state.w + 30) c.x = -30;
+        if (c.x < -30) c.x = state.w + 30;
+        drawCrescent(ctx, c);
+      }
+
+      for (const s of stars) {
+        s.phase += s.twinkle * 0.03;
+        s.y -= s.speed;
+        s.x += s.drift * 0.2;
+        if (s.y < -5) s.y = state.h + 5;
+        if (s.x > state.w + 5) s.x = -5;
+        if (s.x < -5) s.x = state.w + 5;
+
+        const alpha = 0.3 + Math.abs(Math.sin(s.phase)) * 0.6;
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.globalAlpha = 1;
+      state.animationId = requestAnimationFrame(animate);
+    }
+
+    animate();
+  }
+
+  function startEid() {
+    setupFullCanvas();
+    const ketupat = [];
+    const stars = [];
+    const crescents = [];
+    const ketupatCount = Math.max(40, Math.floor((state.w * state.h) / 25000));
+    const starCount = Math.max(30, Math.floor((state.w * state.h) / 26000));
+    const crescentCount = Math.max(5, Math.floor((state.w * state.h) / 140000));
+
+    const ketupatImg = new Image();
+    ketupatImg.decoding = 'async';
+    ketupatImg.src = 'ketupat.png';
+    const crescentImg = new Image();
+    crescentImg.decoding = 'async';
+    crescentImg.src = 'bulan bintang.svg';
+
+    function makeKetupat() {
+      return {
+        x: Math.random() * state.w,
+        y: -20 - Math.random() * state.h,
+        size: 10 + Math.random() * 16,
+        speed: 0.4 + Math.random() * 1.1,
+        drift: -0.6 + Math.random() * 1.2,
+        rotation: Math.random() * Math.PI,
+        spin: -0.02 + Math.random() * 0.04
+      };
+    }
+
+    function makeStar() {
+      return {
+        x: Math.random() * state.w,
+        y: Math.random() * state.h,
+        r: 0.7 + Math.random() * 1.4,
+        twinkle: 0.4 + Math.random() * 0.8,
+        speed: 0.02 + Math.random() * 0.1,
+        drift: -0.1 + Math.random() * 0.2,
+        phase: Math.random() * Math.PI * 2
+      };
+    }
+
+    function makeCrescent() {
+      return {
+        x: Math.random() * state.w,
+        y: Math.random() * state.h,
+        r: 10 + Math.random() * 16,
+        thickness: 5 + Math.random() * 5,
+        speed: 0.02 + Math.random() * 0.07,
+        drift: -0.06 + Math.random() * 0.12,
+        angle: Math.random() * Math.PI * 2
+      };
+    }
+
+    for (let i = 0; i < ketupatCount; i++) {
+      ketupat.push(makeKetupat());
+    }
+    for (let i = 0; i < starCount; i++) {
+      stars.push(makeStar());
+    }
+    for (let i = 0; i < crescentCount; i++) {
+      crescents.push(makeCrescent());
+    }
+
+    const starGlow = 'rgba(255, 244, 214, 0.9)';
+    function drawCrescent(ctx, c) {
+      if (!crescentImg.complete) return;
+      const size = c.r * 2.2;
+      ctx.save();
+      ctx.translate(c.x, c.y);
+      ctx.rotate(c.angle);
+      ctx.globalAlpha = 0.9;
+      ctx.drawImage(crescentImg, -size / 2, -size / 2, size, size);
+      ctx.restore();
+    }
+
+    function drawKetupat(ctx, p) {
+      const size = p.size * 2.6;
+      if (!ketupatImg.complete) return;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rotation);
+      ctx.globalAlpha = 0.95;
+      ctx.drawImage(ketupatImg, -size, -size, size * 2, size * 2.2);
+      ctx.restore();
+    }
+
+    function animate() {
+      if (state.paused) {
+        state.animationId = requestAnimationFrame(animate);
+        return;
+      }
+
+      const ctx = state.ctx;
+      ctx.clearRect(0, 0, state.w, state.h);
+
+      for (const c of crescents) {
+        c.y -= c.speed;
+        c.x += c.drift * 0.2;
+        c.angle += 0.002;
+        if (c.y < -30) c.y = state.h + 30;
+        if (c.x > state.w + 30) c.x = -30;
+        if (c.x < -30) c.x = state.w + 30;
+        drawCrescent(ctx, c);
+      }
+
+      for (const s of stars) {
+        s.phase += s.twinkle * 0.03;
+        s.y -= s.speed;
+        s.x += s.drift * 0.2;
+        if (s.y < -5) s.y = state.h + 5;
+        if (s.x > state.w + 5) s.x = -5;
+        if (s.x < -5) s.x = state.w + 5;
+
+        const alpha = 0.25 + Math.abs(Math.sin(s.phase)) * 0.6;
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = starGlow;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      for (const p of ketupat) {
+        p.y += p.speed;
+        p.x += p.drift * 0.2;
+        p.rotation += p.spin;
+
+        if (p.y > state.h + 20) {
+          p.y = -20;
+          p.x = Math.random() * state.w;
+        }
+        if (p.x > state.w + 20) p.x = -20;
+        if (p.x < -20) p.x = state.w + 20;
+
+        drawKetupat(ctx, p);
+      }
+
+      ctx.globalAlpha = 1;
+      state.animationId = requestAnimationFrame(animate);
+    }
+
+    animate();
+  }
+
   function init() {
     applySeasonalTheme();
     applySeasonalTitles();
@@ -297,6 +592,10 @@
 
     if (state.mode === 'fireworks') {
       startFireworks();
+    } else if (state.mode === 'ramadan') {
+      startRamadan();
+    } else if (state.mode === 'eid') {
+      startEid();
     } else {
       startSnow();
     }

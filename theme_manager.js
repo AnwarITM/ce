@@ -4,6 +4,9 @@
  */
 
 const THEME_KEY = 'eps_theme_pref';
+const THEME_VERSION = '20260110';
+const LIGHT_THEME = `theme-light.css?v=${THEME_VERSION}`;
+const DARK_THEME = `theme-dark.css?v=${THEME_VERSION}`;
 
 // Function to update icon visibility
 function updateThemeIcon(themeFile) {
@@ -17,23 +20,25 @@ function updateThemeIcon(themeFile) {
 
 // Function to immediately apply theme (can be called in head)
 function applyTheme() {
-    const saved = localStorage.getItem(THEME_KEY) || 'theme-light.css';
+    const saved = localStorage.getItem(THEME_KEY) || LIGHT_THEME;
+    const normalized = saved.includes('theme-dark') ? DARK_THEME : LIGHT_THEME;
     const link = document.getElementById('theme-link');
     if (link) {
-        link.setAttribute('href', saved);
+        link.setAttribute('href', normalized);
     }
     // Defer icon update slightly to ensure DOM is ready if script runs in head
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => updateThemeIcon(saved));
+        document.addEventListener('DOMContentLoaded', () => updateThemeIcon(normalized));
     } else {
-        updateThemeIcon(saved);
+        updateThemeIcon(normalized);
     }
+    localStorage.setItem(THEME_KEY, normalized);
 }
 
 // Function to toggle theme
 function toggleGlobalTheme() {
-    const saved = localStorage.getItem(THEME_KEY) || 'theme-light.css';
-    const next = saved.includes('light') ? 'theme-dark.css' : 'theme-light.css';
+    const saved = localStorage.getItem(THEME_KEY) || LIGHT_THEME;
+    const next = saved.includes('light') ? DARK_THEME : LIGHT_THEME;
 
     const link = document.getElementById('theme-link');
     if (link) {

@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cek Lembur</title>
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link rel="stylesheet" href="../design-tokens.css?v=20260110">
+  <link rel="stylesheet" href="../styles.css?v=20260110">
+  <link rel="stylesheet" href="../seasonal-effects.css?v=20260110">
+  <link id="theme-link" rel="stylesheet" href="../theme-light.css?v=20260110">
+  <script src="../theme_manager.js?v=20260110" defer></script>
+  <script src="../seasonal-effects.js?v=20260110" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script>
+    const APP_VERSION = '20260110';
+    const SW_URL = `../sw.js?v=${APP_VERSION}`;
+    const SW_SCRIPT_URL = new URL(SW_URL, location.href).href;
+
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.getRegistrations().then((regs) => {
+        regs.forEach((reg) => {
+          if (reg.active && reg.active.scriptURL !== SW_SCRIPT_URL) {
+            reg.unregister();
+          }
+        });
+      });
+
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register(SW_URL, { updateViaCache: 'none' }).then((reg) => {
+          reg.update();
+        }).catch((err) => {
+          console.error("SW registration failed", err);
+        });
+      });
+
+      let refreshing = false;
+      navigator.serviceWorker.addEventListener("controllerchange", () => {
+        if (refreshing) return;
+        refreshing = true;
+        window.location.reload();
+      });
+    }
+  </script>
+  <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      min-height: 100vh;
+    }
+
+    .page-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .header-inline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 999px;
+      font-size: 12px;
+      color: var(--text-color);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .filters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+    }
+
+    label {
+      font-size: 13px;
+      color: var(--text-secondary);
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      background: rgba(255, 255, 255, 0.8);
+      color: #0f172a;
+      font-size: 14px;
+      transition: all 0.2s ease;
+    }
+
+    .input-field:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.2);
+      background: #fff;
+    }
+
+    textarea.input-field {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    button.secondary {
+      background: rgba(255, 255, 255, 0.75);
+      color: var(--text-color);
+      border: 1px solid rgba(0, 0, 0, 0.06);
+    }
+
+    .status {
+      margin-top: 10px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .error {
+      color: var(--danger-color);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      backdrop-filter: blur(6px);
+    }
+
+    .lock-card {
+      background: var(--card-bg);
+      padding: 22px;
+      border-radius: 14px;
+      border: var(--glass-border);
+      width: min(340px, 92vw);
+      box-shadow: var(--shadow-lg);
+    }
+  </style>
+</head>
+
+<body class="seasonal-snow-target">
+  <div class="overlay" id="lockOverlay">
+    <div class="lock-card">
+      <h2 style="margin:0 0 6px;">Cek Lembur</h2>
+      <p style="margin:0 0 14px; color:var(--text-secondary);">Halaman terkunci.</p>
+      <label for="passInput">Password</label>
+      <input type="password" id="passInput" class="input-field" placeholder="" autocomplete="current-password" />
+      <div class="actions" style="margin-top:12px; justify-content: flex-end;">
+        <button id="unlockBtn" type="button">Masuk</button>
+      </div>
+      <div id="lockError" class="error" style="min-height:18px;"></div>
+    </div>
+  </div>
+
+  <div class="container hidden" id="app">
+    <div class="page-wrap">
+      <div class="header">
+        <div>
+          <p class="badge">Cek Lembur • HR Safe</p>
+          <h1 style="margin:0;">Cek Lembur</h1>
+        </div>
+        <div class="badge" id="fileStatus">Belum ada file</div>
+      </div>
+
+      <div class="card">
+        <div class="filters-grid">
+          <div>
+            <label for="fileInput">Upload file Excel (.xlsx)</label>
+            <input type="file" id="fileInput" class="input-field" accept=".xlsx" />
+          </div>
+          <div>
+            <label for="engineerSelect">Filter Engineer (opsional)</label>
+            <select id="engineerSelect" class="input-field">
+              <option value="">Semua Engineer</option>
+            </select>
+          </div>
+          <div>
+            <label for="holidayInput">Tanggal Merah (ddmmyyyy, satu per baris)</label>
+            <textarea id="holidayInput" class="input-field" placeholder="25122025&#10;31122025"></textarea>
+          </div>
+        </div>
+        <div class="actions">
+          <button id="calcBtn">Hitung</button>
+          <button id="topBtn" class="secondary">Top 5 Lembur</button>
+        </div>
+        <div class="status" id="statusText">Menunggu file diupload.</div>
+      </div>
+
+      <div class="card table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Nama</th>
+              <th>Weekday (Rp)</th>
+              <th>Weekend (Rp)</th>
+              <th>Total (Rp)</th>
+            </tr>
+          </thead>
+          <tbody id="resultBody">
+            <tr><td colspan="4" style="text-align:center; color:var(--text-secondary);">Belum ada data.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- Helpers ---
+    const rupiah = new Intl.NumberFormat('id-ID', { maximumFractionDigits: 0 });
+    const excelEpoch = Date.UTC(1899, 11, 30);
+
+    const parseDate = (val) => {
+      if (val === null || val === undefined || val === '') return null;
+      if (typeof val === 'number' && !Number.isNaN(val)) {
+        return new Date(excelEpoch + val * 86400000);
+      }
+      if (val instanceof Date && !Number.isNaN(val.getTime())) return val;
+      const str = String(val).trim();
+      if (!str) return null;
+      const d = new Date(str);
+      return Number.isNaN(d.getTime()) ? null : d;
+    };
+
+    const formatDateYYYYMMDD = (d) => {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    };
+
+    const isFilled = (v) => v !== null && v !== undefined && String(v).trim() !== '';
+
+    const sameDay = (a, b) => a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+
+    const hashText = async (text) => {
+      const enc = new TextEncoder().encode(text);
+      const buf = await crypto.subtle.digest('SHA-256', enc);
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    };
+
+    const readHolidaySet = () => {
+      const raw = document.getElementById('holidayInput').value.split('\n').map(s => s.trim()).filter(Boolean);
+      const set = new Set();
+      raw.forEach(line => {
+        const m = line.match(/^(\d{2})(\d{2})(\d{4})$/);
+        if (m) {
+          const key = `${m[3]}-${m[2]}-${m[1]}`; // yyyy-mm-dd
+          set.add(key);
+        }
+      });
+      return set;
+    };
+
+    const renderRows = (rows) => {
+      const body = document.getElementById('resultBody');
+      body.innerHTML = '';
+      if (!rows.length) {
+        body.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-secondary);">Tidak ada data untuk ditampilkan.</td></tr>`;
+        return;
+      }
+      rows.forEach(r => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${r.name || '-'}</td>
+          <td>${rupiah.format(r.weekday)}</td>
+          <td>${rupiah.format(r.weekend)}</td>
+          <td><strong>${rupiah.format(r.total)}</strong></td>
+        `;
+        body.appendChild(tr);
+      });
+    };
+
+    const state = {
+      rows: [],
+      fileName: ''
+    };
+
+    const buildEngineerOptions = () => {
+      const select = document.getElementById('engineerSelect');
+      const names = new Set();
+      state.rows.forEach(row => {
+        const engineerRaw = row['ENGINEER'] ?? row['Technical Support'] ?? '';
+        const name = String(engineerRaw || '').trim();
+        if (name) names.add(name);
+      });
+      const sorted = Array.from(names).sort((a, b) => a.localeCompare(b, 'id', { sensitivity: 'base' }));
+      select.innerHTML = '<option value=\"\">Semua Engineer</option>';
+      sorted.forEach(name => {
+        const opt = document.createElement('option');
+        opt.value = name;
+        opt.textContent = name;
+        select.appendChild(opt);
+      });
+    };
+
+    // --- Password gate ---
+    const lockOverlay = document.getElementById('lockOverlay');
+    const app = document.getElementById('app');
+    const passInput = document.getElementById('passInput');
+    const lockError = document.getElementById('lockError');
+
+    const PASS_SALT = 'eps-lembur-v1';
+    const PASS_HASH = 'eba5984e33c9275acd448eaae8bee6f3b815d6420444930af638307a46e7fecf'; // sha256(salt+password)
+
+    const unlock = async () => {
+      const val = passInput.value.trim();
+      const candidate = await hashText(PASS_SALT + val);
+      if (candidate === PASS_HASH) {
+        lockOverlay.classList.add('hidden');
+        app.classList.remove('hidden');
+        lockError.textContent = '';
+      } else {
+        lockError.textContent = 'Password salah.';
+      }
+    };
+
+    document.getElementById('unlockBtn').addEventListener('click', unlock);
+    passInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') unlock();
+    });
+
+    // --- File handling ---
+    document.getElementById('fileInput').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      try {
+        const buf = await file.arrayBuffer();
+        const wb = XLSX.read(buf, { type: 'array' });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        // defval keeps empty cells as '' so eliminasi WAITING lebih mudah
+        const json = XLSX.utils.sheet_to_json(ws, { defval: '', raw: true });
+        state.rows = json;
+        state.fileName = file.name;
+        document.getElementById('fileStatus').textContent = `File: ${file.name} (${json.length} baris)`;
+        document.getElementById('statusText').textContent = 'File siap diproses. Klik Hitung.';
+        buildEngineerOptions();
+      } catch (err) {
+        console.error(err);
+        document.getElementById('statusText').innerHTML = `<span class="error">Gagal membaca file: ${err.message}</span>`;
+      }
+    });
+
+    // --- Core calculation ---
+    const calculate = (opts = {}) => {
+      if (!state.rows.length) {
+        document.getElementById('statusText').innerHTML = '<span class="error">Upload file Excel dulu.</span>';
+        renderRows([]);
+        return;
+      }
+
+      const engineerFilter = document.getElementById('engineerSelect').value.trim().toLowerCase();
+      const holidayDates = readHolidaySet();
+      const holidayAwarded = new Set(); // ENGINEER|YYYY-MM-DD -> 250k only once
+
+      const rekap = new Map();
+      let processed = 0;
+      let discarded = 0;
+
+      const addValue = (name, weekdayAdd, weekendAdd) => {
+        const key = name || '(Tanpa Nama)';
+        if (!rekap.has(key)) rekap.set(key, { name: key, weekday: 0, weekend: 0 });
+        const r = rekap.get(key);
+        r.weekday += weekdayAdd;
+        r.weekend += weekendAdd;
+      };
+
+      for (const row of state.rows) {
+        const engineerRaw = row['ENGINEER'] ?? row['Technical Support'] ?? '';
+        const engineer = String(engineerRaw || '').trim();
+        const waiting = row['WAITING'];
+        const pending = row['PENDING'];
+        const start2Raw = row['START-2'];
+        const startRaw = row['START'];
+        const stopRaw = row['STOP'];
+
+        // A) Eliminasi WAITING: jika terisi, buang baris
+        if (isFilled(waiting)) { discarded++; continue; }
+
+        // B) START efektif: pakai START-2 jika pending terisi dan START-2 valid
+        const start2Date = parseDate(start2Raw);
+        const startDate = parseDate(startRaw);
+        const startEff = (isFilled(pending) && start2Date) ? start2Date : startDate;
+        const stopDate = parseDate(stopRaw);
+
+        // C) Validasi waktu
+        if (!startEff || !stopDate) { discarded++; continue; }
+        const hoursRaw = (stopDate - startEff) / 3600000;
+        if (hoursRaw <= 0) { discarded++; continue; }
+
+        // D) Eliminasi anomali lintas hari
+        const differentDay = !sameDay(startEff, stopDate);
+        if (!isFilled(pending) && !isFilled(waiting) && hoursRaw > 10 && differentDay) {
+          discarded++; continue;
+        }
+
+        processed++;
+        const dayKey = formatDateYYYYMMDD(startEff);
+        const isWeekend = [0, 6].includes(startEff.getDay());
+
+        // F) Aturan tanggal merah (flat 250k per engineer per hari)
+        if (holidayDates.size && holidayDates.has(dayKey)) {
+          const grantKey = `${engineer}|${dayKey}`;
+          if (!holidayAwarded.has(grantKey)) {
+            holidayAwarded.add(grantKey);
+            const amount = 250000;
+            if (isWeekend) addValue(engineer, 0, amount); else addValue(engineer, amount, 0);
+          }
+          // Baris lain di tanggal merah yang sama memberi 0
+          continue;
+        }
+
+        // G) Aturan HR normal
+        const hoursHr = Math.floor(hoursRaw);
+        if (hoursHr < 2) { discarded++; continue; }
+        const rate = isWeekend ? 25000 : 20000;
+        const rupiahRow = hoursHr * rate;
+        if (isWeekend) addValue(engineer, 0, rupiahRow); else addValue(engineer, rupiahRow, 0);
+      }
+
+      let resultArr = Array.from(rekap.values()).map(r => ({
+        ...r,
+        total: r.weekday + r.weekend
+      }));
+
+      // H) Filter Engineer (opsional)
+      if (engineerFilter) {
+        resultArr = resultArr.filter(r => r.name.toLowerCase() === engineerFilter);
+      }
+
+      // Top 5 jika diminta, urut total desc
+      resultArr.sort((a, b) => b.total - a.total);
+      if (opts.top5) resultArr = resultArr.slice(0, 5);
+
+      renderRows(resultArr);
+      const modeText = opts.top5 ? 'Top 5' : 'Semua';
+      document.getElementById('statusText').innerHTML =
+        `${modeText} | Diproses: ${processed} baris, Dibuang: ${discarded} baris.`;
+    };
+
+    document.getElementById('calcBtn').addEventListener('click', () => calculate({ top5: false }));
+    document.getElementById('topBtn').addEventListener('click', () => calculate({ top5: true }));
+
+    // Fokus ke password saat load
+    window.addEventListener('DOMContentLoaded', () => passInput.focus());
+  </script>
+</body>
+
+</html>
+
+
+
+

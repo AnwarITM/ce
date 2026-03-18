@@ -1,20 +1,28 @@
-const CACHE_NAME = 'eps-work-planner-v2';
+const CACHE_VERSION = '20260110';
+const CACHE_NAME = `eps-work-planner-v${CACHE_VERSION}`;
+
+const v = (url) => `${url}?v=${CACHE_VERSION}`;
+
 const urlsToCache = [
   './',
-  './index.html',
-  './work_planner.html',
-  './notes_viewer.html',
-  './styles.css',
-  './design-tokens.css',
-  './theme-light.css',
-  './theme-dark.css',
+  v('./index.html'),
+  v('./work_planner.html'),
+  v('./notes_viewer.html'),
+  v('./cek_lembur/index.html'),
+  v('./styles.css'),
+  v('./design-tokens.css'),
+  v('./seasonal-effects.css'),
+  v('./theme-light.css'),
+  v('./theme-dark.css'),
   './manifest.json',
   './icon-16x16.png',
   './icon-32x32.png',
   './icon-192x192.png',
   './icon-512x512.png',
-  './work_planner.js',
-  './theme_manager.js'
+  v('./work_planner.js'),
+  v('./theme_manager.js'),
+  v('./seasonal-effects.js'),
+  './cek_lembur/'
 ];
 
 self.addEventListener('install', (event) => {
@@ -23,12 +31,32 @@ self.addEventListener('install', (event) => {
       return cache.addAll(urlsToCache.map(url => new Request(url, { cache: 'reload' })));
     })
   );
+  self.skipWaiting(); // Activate new SW immediately
 });
 
 self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request).then((response) => response || fetch(event.request))
-  );
+  const { request } = event;
+  if (request.method !== 'GET') return;
+
+  const isHTML =
+    request.mode === 'navigate' ||
+    (request.headers.get('accept') || '').includes('text/html');
+
+  // For HTML, force a fresh fetch when online to avoid stale pages
+  const networkFirst = fetch(request, { cache: 'no-store' })
+    .then((response) => response)
+    .catch(() => caches.match(request));
+
+  // For other assets, keep the network-first approach with cache fallback
+  const generic = fetch(request, { cache: 'no-store' })
+    .then((response) => {
+      const respClone = response.clone();
+      caches.open(CACHE_NAME).then((cache) => cache.put(request, respClone));
+      return response;
+    })
+    .catch(() => caches.match(request));
+
+  event.respondWith(isHTML ? networkFirst : generic);
 });
 
 self.addEventListener('activate', (event) => {
@@ -43,4 +71,5 @@ self.addEventListener('activate', (event) => {
       );
     })
   );
+  self.clients.claim(); // Take control without requiring reload
 });
