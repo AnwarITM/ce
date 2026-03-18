@@ -1371,7 +1371,7 @@
 
     <!-- Scripts -->
     <script src="theme_manager.js?v=20260110"></script>
-    <script src="work_planner.js?v=20260110"></script>
+    <script src="work_planner.js?v=20260318"></script>
     <script>
         // ============================================
         // FIREBASE CONFIG & LOGIN SYSTEM
@@ -1477,48 +1477,61 @@
         }
 
         // ============================================
-        // FIREBASE SYNC FUNCTIONS
+        // FIREBASE SYNC FUNCTIONS (REAL-TIME)
         // ============================================
+        let isLocalChange = false; // Flag to prevent infinite loops
+
         function loadWorkPlannerFromFirebase(userId) {
-            // Load sekali saja (bukan real-time listener)
-            db.ref('work_planner/' + userId).once('value', (snapshot) => {
+            // Use real-time listener for instant sync across devices
+            db.ref('work_planner/' + userId).on('value', (snapshot) => {
                 const data = snapshot.val();
-                
+
                 // Initialize app.state if not exists
                 if (!app.state) {
                     app.state = { tabs: [], currentTabId: 0 };
                 }
-                
+
                 if (data && data.tabs) {
                     // Sync dari Firebase ke app state
-                    app.state.tabs = Object.values(data.tabs || {});
-                    app.state.currentTabId = data.currentTabId || 0;
-                    
-                    // Ensure each tab has proper structure
-                    app.state.tabs.forEach(tab => {
-                        if (!tab.data) tab.data = [];
-                        tab.data.forEach(row => {
-                            if (!row.id) row.id = 'row_' + Date.now() + Math.random();
-                            if (!row.status) row.status = 'outstanding';
-                            if (typeof row.sortOrder !== 'number') row.sortOrder = 0;
-                            // Backfill legacy field names
-                            if (!row.wsid && row.machineData) row.wsid = row.machineData;
-                            if (!row.plan && row.period) row.plan = row.period;
-                            // Compute wsidKey if missing
-                            if (!row.wsidKey && row.wsid) row.wsidKey = app.getWsidKey(row.wsid);
-                            // Compute planTs if missing
-                            if (!row.planTs && row.plan) {
-                                const { ts } = app.parsePlanValue(row.plan);
-                                row.planTs = ts;
-                            }
+                    const firebaseTabs = Object.values(data.tabs || {});
+                    const firebaseCurrentTabId = data.currentTabId || 0;
+
+                    // Check if data actually changed (to avoid re-rendering local changes)
+                    const hasChanges = JSON.stringify(app.state.tabs) !== JSON.stringify(firebaseTabs) ||
+                                      app.state.currentTabId !== firebaseCurrentTabId;
+
+                    if (hasChanges) {
+                        // Only update if data is different
+                        app.state.tabs = firebaseTabs;
+                        app.state.currentTabId = firebaseCurrentTabId;
+
+                        // Ensure each tab has proper structure
+                        app.state.tabs.forEach(tab => {
+                            if (!tab.data) tab.data = [];
+                            tab.data.forEach(row => {
+                                if (!row.id) row.id = 'row_' + Date.now() + Math.random();
+                                if (!row.status) row.status = 'outstanding';
+                                if (typeof row.sortOrder !== 'number') row.sortOrder = 0;
+                                // Backfill legacy field names
+                                if (!row.wsid && row.machineData) row.wsid = row.machineData;
+                                if (!row.plan && row.period) row.plan = row.period;
+                                // Compute wsidKey if missing
+                                if (!row.wsidKey && row.wsid) row.wsidKey = app.getWsidKey(row.wsid);
+                                // Compute planTs if missing
+                                if (!row.planTs && row.plan) {
+                                    const { ts } = app.parsePlanValue(row.plan);
+                                    row.planTs = ts;
+                                }
+                            });
+                            if (!tab.sortMode) tab.sortMode = 'date';
+                            if (!tab.excelConfig) tab.excelConfig = {};
                         });
-                        if (!tab.sortMode) tab.sortMode = 'date';
-                        if (!tab.excelConfig) tab.excelConfig = {};
-                    });
-                    
-                    app.saveState();
-                    app.renderTabs();
-                    app.renderUI();
+
+                        app.saveState();
+                        app.renderTabs();
+                        app.renderUI();
+                        console.log('🔄 Data synced from Firebase (remote change detected)');
+                    }
                     isFirebaseSynced = true;
                 } else {
                     // No data in Firebase, start fresh
@@ -1530,18 +1543,20 @@
                     isFirebaseSynced = true;
                 }
             }, (error) => {
-                console.error('Error loading data from Firebase:', error);
+                console.error('Error listening to Firebase:', error);
             });
         }
 
         function saveWorkPlannerToFirebase(userId) {
             if (!userId || !isFirebaseSynced) return;
-            
+
             // Clear pending save if exists
             if (saveTimeout) clearTimeout(saveTimeout);
-            
-            // Debounce 1.5 detik untuk menghindari write berlebihan
+
+            // Debounce 500ms for faster real-time sync
             saveTimeout = setTimeout(() => {
+                isLocalChange = true; // Mark as local change to avoid re-trigger
+                
                 // Batch write semua updates dalam 1x request
                 db.ref('work_planner/' + userId).update({
                     currentTabId: app.state.currentTabId,
@@ -1557,9 +1572,12 @@
                 }, (error) => {
                     if (error) {
                         console.error('Firebase save error:', error);
+                    } else {
+                        console.log('✅ Data saved to Firebase');
                     }
+                    setTimeout(() => { isLocalChange = false; }, 100);
                 });
-            }, 1500); // Save 1.5 detik setelah user berhenti edit
+            }, 500); // Save 500ms after user stops editing
         }
 
         // Override app.saveState to sync with Firebase
