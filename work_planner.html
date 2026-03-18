@@ -181,8 +181,11 @@
         .user-info-text {
             flex: 1;
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 700;
             color: #1e293b;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .logout-btn {
@@ -195,6 +198,7 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
+            white-space: nowrap;
         }
 
         .logout-btn:hover {
@@ -1131,6 +1135,27 @@
             /* Import/Export buttons in header smaller? */
             .btn-glass {
                 padding: 6px 10px;
+                font-size: 12px;
+            }
+
+            /* User info bar mobile optimization */
+            .user-info-bar {
+                padding: 8px 12px;
+                gap: 8px;
+            }
+
+            .user-avatar-small {
+                width: 32px;
+                height: 32px;
+                font-size: 12px;
+            }
+
+            .user-info-text {
+                font-size: 13px;
+            }
+
+            .logout-btn {
+                padding: 6px 12px;
                 font-size: 12px;
             }
         }
