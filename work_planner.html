@@ -145,35 +145,38 @@
         }
 
         .login-btn:hover {
+            background: var(--gradient-primary);
+            color: var(--button-primary-text);
             transform: translateY(-2px);
             box-shadow: 0 16px 40px rgba(8, 145, 178, 0.4);
+            filter: brightness(1.03);
         }
 
         .login-btn:active {
+            background: var(--gradient-primary);
+            color: var(--button-primary-text);
             transform: translateY(0);
+            filter: brightness(0.99);
         }
 
         .login-btn:focus {
             outline: none;
+            background: var(--gradient-primary);
+            color: var(--button-primary-text);
             box-shadow: 0 16px 40px rgba(8, 145, 178, 0.4), 0 0 0 3px rgba(8, 145, 178, 0.15);
         }
 
-        .login-footer {
-            margin-top: 20px;
+        .login-error {
+            min-height: 20px;
+            margin-top: 12px;
             font-size: 13px;
-            color: var(--text-muted, #94a3b8);
-        }
-
-        .login-footer a {
-            color: var(--primary-color, #0891b2);
-            text-decoration: none;
+            line-height: 1.5;
             font-weight: 600;
-            transition: all var(--transition-base);
+            color: var(--status-danger-text);
         }
 
-        .login-footer a:hover {
-            text-decoration: underline;
-            color: var(--primary-hover, #0e7490);
+        .login-error:empty {
+            display: none;
         }
 
         .user-info-bar {
@@ -1215,10 +1218,7 @@
                     onkeypress="if(event.key==='Enter')login()">
                 
                 <button class="login-btn" onclick="login()">Login</button>
-                
-                <div class="login-footer">
-                    <p>Belum punya User ID? <a href="admin_notes.html">Hubungi Admin</a></p>
-                </div>
+                <div id="loginError" class="login-error" aria-live="polite"></div>
             </div>
         </div>
 
@@ -1447,6 +1447,11 @@
             document.body.classList.add(state);
         }
 
+        function setLoginError(message = '') {
+            const errorEl = document.getElementById('loginError');
+            if (errorEl) errorEl.textContent = message;
+        }
+
         // Check auth on load
         function checkAuth() {
             const savedUserId = sessionStorage.getItem('userId');
@@ -1463,6 +1468,7 @@
             if (overlay) {
                 setAuthViewState('auth-login-required');
                 overlay.style.display = 'flex';
+                setLoginError('');
                 // Focus on input for better UX
                 setTimeout(() => {
                     const input = document.getElementById('loginUserId');
@@ -1474,6 +1480,7 @@
         function hideLoginOverlay() {
             const overlay = document.getElementById('loginOverlay');
             if (overlay) overlay.style.display = 'none';
+            setLoginError('');
             setAuthViewState('auth-ready');
             
             // Show user info bar
@@ -1503,13 +1510,13 @@
                     // Load from Firebase (start fresh, no migration)
                     loadWorkPlannerFromFirebase(userId);
                 } else {
-                    alert('User ID tidak ditemukan! Silakan hubungi admin untuk membuat user.');
+                    setLoginError('User ID tidak ditemukan.');
                     sessionStorage.removeItem('userId');
                     showLoginOverlay();
                 }
             } catch (error) {
                 console.error('Error validating user:', error);
-                alert('Gagal koneksi ke database. Cek koneksi internet.');
+                setLoginError('Gagal koneksi ke database. Cek koneksi internet.');
                 showLoginOverlay();
             }
         }
@@ -1517,9 +1524,10 @@
         function login() {
             const userIdInput = document.getElementById('loginUserId').value.trim();
             if (!userIdInput) {
-                alert('User ID wajib diisi!');
+                setLoginError('User ID wajib diisi.');
                 return;
             }
+            setLoginError('');
             validateUserAndLoad(userIdInput);
         }
 
