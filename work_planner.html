@@ -237,6 +237,15 @@
             min-height: 100vh;
         }
 
+        body.auth-pending .page-container,
+        body.auth-login-required .page-container {
+            visibility: hidden;
+        }
+
+        body.auth-ready .page-container {
+            visibility: visible;
+        }
+
         .page-container {
             max-width: 1200px;
             margin: 0 auto;
@@ -1190,7 +1199,7 @@
     </style>
 </head>
 
-<body>
+<body class="auth-pending">
     <div class="page-container">
         <!-- Header -->
         <header class="app-header">
@@ -1428,10 +1437,16 @@
         let isFirebaseSynced = false;
         let saveTimeout = null; // Debounce timer
 
+        function setAuthViewState(state) {
+            document.body.classList.remove('auth-pending', 'auth-login-required', 'auth-ready');
+            document.body.classList.add(state);
+        }
+
         // Check auth on load
         function checkAuth() {
             const savedUserId = sessionStorage.getItem('userId');
             if (savedUserId) {
+                setAuthViewState('auth-pending');
                 validateUserAndLoad(savedUserId);
             } else {
                 showLoginOverlay();
@@ -1441,6 +1456,7 @@
         function showLoginOverlay() {
             const overlay = document.getElementById('loginOverlay');
             if (overlay) {
+                setAuthViewState('auth-login-required');
                 overlay.style.display = 'flex';
                 // Focus on input for better UX
                 setTimeout(() => {
@@ -1453,6 +1469,7 @@
         function hideLoginOverlay() {
             const overlay = document.getElementById('loginOverlay');
             if (overlay) overlay.style.display = 'none';
+            setAuthViewState('auth-ready');
             
             // Show user info bar
             const userInfoBar = document.getElementById('userInfoBar');
@@ -1625,7 +1642,7 @@
 
         // Initialize auth check after app init
         document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(checkAuth, 500); // Wait for app to initialize
+            checkAuth();
         });
 
         // Disable ServiceWorker for file:// protocol (testing only)
@@ -1665,4 +1682,3 @@
 </body>
 
 </html>
-
