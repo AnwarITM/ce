@@ -39,7 +39,7 @@ body {
     background: var(--card-bg);
     backdrop-filter: blur(20px);
     border: var(--glass-border);
-    border-radius: var(--border-radius);
+    border-radius: var(--border-radius-lg);
     box-shadow: var(--shadow-md);
 }
 
@@ -52,18 +52,27 @@ body {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    transition: all var(--transition-base);
 }
 
-/* Base Button Style */
+.header h1:hover {
+    transform: scale(1.02);
+}
+
+.header h1:focus {
+    outline: 2px solid var(--outline-color);
+    outline-offset: 2px;
+}
+
+/* Base Button Style - Improved for Accessibility */
 button {
     padding: clamp(10px, 1.5vw, 12px) clamp(16px, 2vw, 20px);
     border: none;
-    border-radius: 8px;
+    border-radius: var(--border-radius-sm);
     cursor: pointer;
     background: var(--card-bg);
     color: var(--text-color);
-    /* Default text color (Dark in light mode) */
-    transition: all 0.3s ease;
+    transition: all var(--transition-base);
     font-size: clamp(13px, 1.8vw, 14px);
     font-weight: 600;
     font-family: inherit;
@@ -74,38 +83,112 @@ button {
     align-items: center;
     justify-content: center;
     gap: 6px;
+    line-height: 1.1;
+    text-align: center;
 }
 
-button:hover {
+button:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
-    opacity: 0.95;
+    background: rgba(255, 255, 255, 0.75);
 }
 
-/* Primary / Filled Buttons (White Text) */
+button:focus {
+    outline: none;
+    box-shadow: var(--shadow-md), var(--shadow-focus);
+}
+
+button:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Primary / Filled Buttons (Best for CTAs) */
 .btn-primary,
 button[onclick*="addData"] {
     background: var(--gradient-primary);
     color: white !important;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(8, 145, 178, 0.25);
+}
+
+.btn-primary:hover:not(:disabled) {
+    box-shadow: 0 6px 16px rgba(8, 145, 178, 0.35);
+    transform: translateY(-2px);
+}
+
+.btn-primary:focus {
+    box-shadow: 0 6px 16px rgba(8, 145, 178, 0.35), var(--shadow-focus);
 }
 
 /* "Add Data" Specific Override */
 button[onclick*="addData"] {
-    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
+    background: linear-gradient(135deg, var(--success-color) 0%, var(--success-dark) 100%);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+button[onclick*="addData"]:hover:not(:disabled) {
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+}
+
+/* Secondary/Glass Buttons */
+.btn-glass {
+    background: rgba(255, 255, 255, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    color: var(--text-color);
+    box-shadow: var(--shadow-sm);
+    padding: 8px 14px;
+    font-size: 13px;
+}
+
+.btn-glass:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.8);
+    border-color: rgba(8, 145, 178, 0.3);
+    transform: translateY(-1px);
+}
+
+.btn-glass:focus {
+    outline: none;
+    box-shadow: var(--shadow-sm), var(--shadow-focus);
 }
 
 /* Danger Button */
 .btn-danger {
-    color: #dc2626 !important;
-    border: 1px solid rgba(220, 38, 38, 0.3);
+    color: var(--danger-color) !important;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    background: rgba(239, 68, 68, 0.08);
+}
+
+.btn-danger:hover:not(:disabled) {
+    background: rgba(239, 68, 68, 0.12);
+    border-color: rgba(239, 68, 68, 0.5);
+}
+
+.btn-danger:focus {
+    outline: none;
+    box-shadow: var(--shadow-sm), 0 0 0 3px rgba(239, 68, 68, 0.15);
+}
+
+/* Success Button */
+.btn-success {
+    background: linear-gradient(135deg, var(--success-color) 0%, var(--success-dark) 100%);
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+}
+
+.btn-success:hover:not(:disabled) {
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35);
 }
 
 /* Active State */
 button.active {
     background: var(--gradient-primary);
     color: white !important;
+    box-shadow: 0 4px 12px rgba(8, 145, 178, 0.3);
 }
 
 /* Glass Cards */
@@ -115,7 +198,7 @@ button.active {
     background: var(--card-bg);
     backdrop-filter: blur(20px);
     border: var(--glass-border);
-    border-radius: var(--border-radius);
+    border-radius: var(--border-radius-lg);
     box-shadow: var(--shadow-md);
 }
 
@@ -142,32 +225,31 @@ td {
 
 th {
     background: rgba(255, 255, 255, 0.4);
-    backdrop-filter: blur(5px);
-    font-weight: 600;
+    backdrop-filter: blur(8px);
+    font-weight: 700;
     color: var(--primary-color);
     text-transform: uppercase;
     font-size: 11px;
+    letter-spacing: 0.5px;
     position: sticky;
     top: 0;
     z-index: 10;
+    vertical-align: middle;
 }
 
-/* Editable Inputs (Fix visibility) */
+/* Editable Inputs - Improved Visibility & Focus */
 input.cell-edit,
 textarea.cell-edit {
     width: 100%;
-    padding: 8px 10px;
-    border-radius: 6px;
-    border: 1px solid rgba(128, 128, 128, 0.3);
-    /* Visible subtle border */
-    background: rgba(255, 255, 255, 0.15);
-    /* Visible background */
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 2px solid var(--neutral-300);
+    background: rgba(255, 255, 255, 0.9);
     font-family: inherit;
     font-size: 13px;
-    transition: all 0.2s;
+    transition: all var(--transition-base);
     color: var(--text-color);
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
-    /* Inner shadow for depth */
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02);
 }
 
 input.cell-edit {
@@ -176,48 +258,65 @@ input.cell-edit {
 }
 
 textarea.cell-edit {
-    min-height: 40px;
+    min-height: 60px;
     resize: vertical;
     text-align: left;
-    line-height: 1.4;
+    line-height: 1.5;
 }
 
-/* Hover & Focus */
+/* Input Hover State */
 input.cell-edit:hover,
 textarea.cell-edit:hover {
-    background: rgba(255, 255, 255, 0.25);
-    border-color: rgba(128, 128, 128, 0.5);
+    background: rgba(255, 255, 255, 1);
+    border-color: var(--primary-light);
 }
 
+/* Input Focus State - WCAG AA Compliant */
 input.cell-edit:focus,
 textarea.cell-edit:focus {
-    background: rgba(255, 255, 255, 0.95);
-    /* Bright on focus */
-    color: #1e293b;
-    /* Contrast text on bright bg */
-    border-color: var(--primary-color);
     outline: none;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    background: rgba(255, 255, 255, 1);
+    color: var(--text-color);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.15);
 }
 
-/* Placeholder visibility */
+/* Placeholder visibility with better contrast */
 ::placeholder {
-    color: var(--text-color);
-    opacity: 0.4;
+    color: var(--text-muted);
+    opacity: 0.7;
+}
+
+/* Input validation states */
+input.cell-edit:invalid,
+textarea.cell-edit:invalid {
+    border-color: var(--danger-color);
+}
+
+input.cell-edit:valid,
+textarea.cell-edit:valid:not(:placeholder-shown) {
+    border-color: var(--success-color);
 }
 
 
 /* Table Row Styles */
 tr {
-    transition: transform 0.2s ease-out;
+    transition: all var(--transition-base);
 }
 
 .tr-clickable {
     cursor: pointer;
+    user-select: none;
 }
 
 .tr-clickable:hover {
-    background: rgba(99, 102, 241, 0.05) !important;
+    background: rgba(8, 145, 178, 0.06) !important;
+}
+
+.tr-clickable:focus-within {
+    background: rgba(8, 145, 178, 0.1) !important;
+    outline: 2px solid var(--outline-color);
+    outline-offset: -2px;
 }
 
 .ready-to-delete {
@@ -229,11 +328,13 @@ tr {
 th:nth-child(1),
 td:nth-child(1) {
     width: 60px;
+    text-align: center;
 }
 
 th:nth-child(2),
 td:nth-child(2) {
     width: 25%;
+    font-weight: 500;
 }
 
 th:nth-child(3),
@@ -244,30 +345,98 @@ td:nth-child(3) {
 th:nth-child(4),
 td:nth-child(4) {
     width: 15%;
+    text-align: center;
 }
 
 th:nth-child(5),
 td:nth-child(5) {
     width: 15%;
+    text-align: center;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-
     th,
     td {
-        padding: 8px 4px;
+        padding: 12px 8px;
         font-size: 12px;
     }
 
     button {
-        width: 100%;
-        justify-content: center;
+        min-width: auto;
+        padding: 10px 16px;
     }
 
     /* Ensure inputs are touch-friendly size */
     input.cell-edit,
     textarea.cell-edit {
-        padding: 8px;
+        padding: 12px;
+        font-size: 16px;
     }
+
+    .header {
+        padding: 16px 20px;
+    }
+
+    .header h1 {
+        font-size: clamp(20px, 4vw, 24px);
+    }
+}
+
+/* ===== EMPTY STATES ===== */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+}
+
+.empty-state-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.6;
+}
+
+.empty-state-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+}
+
+.empty-state-description {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.empty-state-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* ===== ACCESSIBILITY & KEYBOARD NAVIGATION ===== */
+*:focus-visible {
+    outline: 2px solid var(--outline-color);
+    outline-offset: 2px;
+}
+
+/* Skip to main content link */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: var(--primary-color);
+    color: white;
+    padding: 8px;
+    text-decoration: none;
+    z-index: 100;
+}
+
+.skip-link:focus {
+    top: 0;
 }

@@ -11,11 +11,17 @@ const DARK_THEME = `theme-dark.css?v=${THEME_VERSION}`;
 // Function to update icon visibility
 function updateThemeIcon(themeFile) {
     const isDark = themeFile.includes('dark');
-    const icon = isDark ? '☀️' : '🌙'; // If dark, show sun to switch to light. If light, show moon.
+    const label = isDark ? 'Mode Terang' : 'Mode Gelap';
+    const nextMode = isDark ? 'light' : 'dark';
 
     // Update all theme buttons on the page
     const btns = document.querySelectorAll('[onclick="toggleGlobalTheme()"]');
-    btns.forEach(btn => btn.textContent = icon);
+    btns.forEach((btn) => {
+        btn.textContent = label;
+        btn.setAttribute('aria-label', label);
+        btn.setAttribute('title', label);
+        btn.dataset.themeTarget = nextMode;
+    });
 }
 
 // Function to immediately apply theme (can be called in head)

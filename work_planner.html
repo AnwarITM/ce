@@ -9,12 +9,20 @@
     <meta http-equiv="Expires" content="0" />
     <title>Work Planner • EPS</title>
 
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="manifest.json">
+    <!-- PWA -->
     <meta name="theme-color" content="#4f46e5">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="description" content="Unified Task & WSID Planner">
+    <script>
+        const CAN_LOAD_MANIFEST = location.protocol === 'http:' || location.protocol === 'https:';
+        if (CAN_LOAD_MANIFEST) {
+            const manifestLink = document.createElement('link');
+            manifestLink.rel = 'manifest';
+            manifestLink.href = 'manifest.json';
+            document.head.appendChild(manifestLink);
+        }
+    </script>
 
     <!-- Icons -->
     <link rel="icon" type="image/png" sizes="16x16" href="icon-16x16.png">
@@ -48,7 +56,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 55%, var(--primary-hover) 100%);
             display: none; /* Hidden by default to prevent flicker on refresh */
             align-items: center;
             justify-content: center;
@@ -57,98 +65,115 @@
         }
 
         .login-card {
-            background: rgba(255, 255, 255, 0.95);
+            background: var(--surface-strong);
             backdrop-filter: blur(20px);
             border-radius: 24px;
             padding: 40px;
             width: 100%;
             max-width: 420px;
-            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.25);
+            box-shadow: var(--hero-card-shadow);
             text-align: center;
+            border: 1px solid var(--surface-border);
         }
 
         .login-logo {
             width: 80px;
             height: 80px;
             margin: 0 auto 20px;
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            background: var(--gradient-primary);
             border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 36px;
-            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+            box-shadow: 0 10px 30px rgba(8, 145, 178, 0.3);
+            transition: all var(--transition-base);
+        }
+
+        .login-logo:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 40px rgba(8, 145, 178, 0.4);
         }
 
         .login-title {
             font-size: 24px;
             font-weight: 800;
-            color: #1e293b;
+            color: var(--text-color);
             margin: 0 0 8px;
         }
 
         .login-subtitle {
             font-size: 14px;
-            color: #64748b;
+            color: var(--text-secondary);
             margin: 0 0 24px;
         }
 
         .login-input {
             width: 100%;
             padding: 16px 20px;
-            border: 2px solid #e2e8f0;
+            border: 2px solid var(--neutral-300, #e2e8f0);
             border-radius: 14px;
             font-size: 16px;
             font-weight: 600;
             text-align: center;
             margin-bottom: 16px;
-            transition: all 0.2s;
+            transition: all var(--transition-base);
             box-sizing: border-box;
+            background: var(--surface-strong);
+            color: var(--text-color, #1e293b);
         }
 
         .login-input:focus {
             outline: none;
-            border-color: #6366f1;
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+            border-color: var(--primary-color, #0891b2);
+            box-shadow: var(--shadow-focus);
+            background: var(--surface-strong);
         }
 
         .login-btn {
             width: 100%;
             padding: 16px;
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
-            color: white;
+            background: var(--gradient-primary);
+            color: var(--button-primary-text);
             border: none;
             border-radius: 14px;
             font-size: 16px;
             font-weight: 700;
             cursor: pointer;
-            box-shadow: 0 12px 30px rgba(99, 102, 241, 0.3);
-            transition: all 0.2s;
+            box-shadow: 0 12px 30px rgba(8, 145, 178, 0.3);
+            transition: all var(--transition-base);
         }
 
         .login-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 16px 40px rgba(99, 102, 241, 0.4);
+            box-shadow: 0 16px 40px rgba(8, 145, 178, 0.4);
         }
 
         .login-btn:active {
             transform: translateY(0);
         }
 
+        .login-btn:focus {
+            outline: none;
+            box-shadow: 0 16px 40px rgba(8, 145, 178, 0.4), 0 0 0 3px rgba(8, 145, 178, 0.15);
+        }
+
         .login-footer {
             margin-top: 20px;
             font-size: 13px;
-            color: #94a3b8;
+            color: var(--text-muted, #94a3b8);
         }
 
         .login-footer a {
-            color: #6366f1;
+            color: var(--primary-color, #0891b2);
             text-decoration: none;
             font-weight: 600;
+            transition: all var(--transition-base);
         }
 
         .login-footer a:hover {
             text-decoration: underline;
+            color: var(--primary-hover, #0e7490);
         }
 
         .user-info-bar {
@@ -156,7 +181,8 @@
             align-items: center;
             gap: 12px;
             padding: 10px 16px;
-            background: rgba(99, 102, 241, 0.1);
+            background: var(--surface-muted);
+            border: 1px solid var(--surface-border);
             border-radius: 12px;
             margin-bottom: 16px;
         }
@@ -169,20 +195,22 @@
             width: 36px;
             height: 36px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            background: var(--gradient-primary);
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-weight: 700;
             font-size: 14px;
+            box-shadow: var(--shadow-sm);
+            flex-shrink: 0;
         }
 
         .user-info-text {
             flex: 1;
             font-size: 14px;
             font-weight: 700;
-            color: #1e293b;
+            color: var(--text-color);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -190,9 +218,9 @@
 
         .logout-btn {
             padding: 8px 16px;
-            background: rgba(239, 68, 68, 0.1);
-            color: #dc2626;
-            border: 1px solid rgba(239, 68, 68, 0.3);
+            background: var(--status-danger-bg);
+            color: var(--status-danger-text);
+            border: 1px solid var(--status-danger-border);
             border-radius: 10px;
             font-size: 13px;
             font-weight: 600;
@@ -202,7 +230,7 @@
         }
 
         .logout-btn:hover {
-            background: rgba(239, 68, 68, 0.2);
+            filter: brightness(1.05);
         }
 
         body {
@@ -279,15 +307,15 @@
         }
 
         .status-btn.status-outstanding {
-            background: rgba(239, 68, 68, 0.15);
-            color: #dc2626;
-            border-color: rgba(239, 68, 68, 0.35);
+            background: var(--status-danger-bg);
+            color: var(--status-danger-text);
+            border-color: var(--status-danger-border);
         }
 
         .status-btn.status-done {
-            background: rgba(34, 197, 94, 0.15);
-            color: #16a34a;
-            border-color: rgba(34, 197, 94, 0.35);
+            background: var(--status-success-bg);
+            color: var(--status-success-text);
+            border-color: var(--status-success-border);
         }
 
         .desktop-delete-btn {
@@ -297,9 +325,9 @@
             padding: 6px 8px;
             border-radius: 6px;
             font-size: 12px;
-            border: 1px solid rgba(220, 38, 38, 0.35);
-            color: #dc2626;
-            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid var(--status-danger-border);
+            color: var(--status-danger-text);
+            background: var(--status-danger-bg);
             cursor: pointer;
             transition: opacity 0.2s;
         }
@@ -329,8 +357,8 @@
         .tab-item {
             padding: 10px 16px;
             border-radius: 12px;
-            background: rgba(255, 255, 255, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.4);
+            background: var(--surface-soft);
+            border: 1px solid var(--surface-border);
             cursor: pointer;
             white-space: nowrap;
             color: var(--text-color);
@@ -339,7 +367,7 @@
         }
 
         .tab-item.active {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2));
+            background: var(--tab-active-bg);
             color: var(--primary-color);
             border-color: var(--primary-color);
             font-weight: 600;
@@ -1359,8 +1387,14 @@
                     <!-- Rows injected by JS -->
                 </tbody>
             </table>
-            <div id="emptyState" style="text-align:center; padding:30px; color:#9ca3af; font-size:14px;">
-                Belum ada data. Tambahkan manual atau Import Excel.
+            <div id="emptyState" class="empty-state" style="display:none;">
+                <div class="empty-state-icon">📋</div>
+                <div class="empty-state-title">Belum ada data</div>
+                <div class="empty-state-description">Mulai dengan menambahkan task secara manual atau import dari file Excel</div>
+                <div class="empty-state-actions">
+                    <button class="btn-glass btn-primary" onclick="app.addData()" style="margin:0;">+ Tambah Manual</button>
+                    <button class="btn-glass" onclick="$('#fileImport').click()" style="margin:0;">⬇ Import Excel</button>
+                </div>
             </div>
         </div>
     </div>
@@ -1631,6 +1665,4 @@
 </body>
 
 </html>
-
-
 
