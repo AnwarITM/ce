@@ -237,12 +237,12 @@
             min-height: 100vh;
         }
 
-        body.auth-pending .page-container,
-        body.auth-login-required .page-container {
+        body.auth-pending .app-shell,
+        body.auth-login-required .app-shell {
             visibility: hidden;
         }
 
-        body.auth-ready .page-container {
+        body.auth-ready .app-shell {
             visibility: visible;
         }
 
@@ -250,6 +250,9 @@
             max-width: 1200px;
             margin: 0 auto;
             padding: 16px;
+        }
+
+        .app-shell {
             display: flex;
             flex-direction: column;
             gap: 16px;
@@ -1201,19 +1204,6 @@
 
 <body class="auth-pending">
     <div class="page-container">
-        <!-- Header -->
-        <header class="app-header">
-            <div class="header-left">
-                <div class="app-title" onclick="app.renameTab()" data-seasonal-title>Work Planner</div>
-            </div>
-
-            <div class="header-right">
-                <button class="btn-glass" onclick="$('#fileImport').click()" title="Import JSON">⬇ Import</button>
-                <button class="btn-glass" onclick="app.exportTabData()" title="Export JSON">⬆ Export</button>
-                <input type="file" id="fileImport" hidden accept=".json" onchange="app.importUniversal(this)">
-            </div>
-        </header>
-
         <!-- Login Overlay -->
         <div id="loginOverlay" class="login-overlay">
             <div class="login-card">
@@ -1231,6 +1221,20 @@
                 </div>
             </div>
         </div>
+
+        <div class="app-shell">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <div class="app-title" onclick="app.renameTab()" data-seasonal-title>Work Planner</div>
+            </div>
+
+            <div class="header-right">
+                <button class="btn-glass" onclick="$('#fileImport').click()" title="Import JSON">⬇ Import</button>
+                <button class="btn-glass" onclick="app.exportTabData()" title="Export JSON">⬆ Export</button>
+                <input type="file" id="fileImport" hidden accept=".json" onchange="app.importUniversal(this)">
+            </div>
+        </header>
 
         <!-- User Info Bar -->
         <div id="userInfoBar" class="user-info-bar">
@@ -1405,6 +1409,7 @@
                     <button class="btn-glass" onclick="$('#fileImport').click()" style="margin:0;">⬇ Import Excel</button>
                 </div>
             </div>
+        </div>
         </div>
     </div>
 
