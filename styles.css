@@ -35,28 +35,24 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 24px;
-    padding: 20px 24px;
-    background: var(--card-bg);
-    backdrop-filter: blur(20px);
-    border: var(--glass-border);
-    border-radius: var(--border-radius-lg);
-    box-shadow: var(--shadow-md);
+    padding: 16px 24px;
+    background: var(--surface-strong);
+    border-bottom: 1px solid var(--surface-border);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-sm);
 }
 
 .header h1 {
     cursor: pointer;
     margin: 0;
-    font-size: clamp(24px, 4vw, 32px);
-    font-weight: 700;
-    background: var(--gradient-primary);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--primary-color);
     transition: all var(--transition-base);
 }
 
 .header h1:hover {
-    transform: scale(1.02);
+    color: var(--primary-hover);
 }
 
 .header h1:focus {
@@ -66,40 +62,35 @@ body {
 
 /* Base Button Style - Improved for Accessibility */
 button {
-    padding: clamp(10px, 1.5vw, 12px) clamp(16px, 2vw, 20px);
-    border: none;
-    border-radius: var(--border-radius-sm);
+    padding: 8px 16px;
+    border: 1px solid var(--neutral-300);
+    border-radius: var(--border-radius);
     cursor: pointer;
-    background: var(--card-bg);
+    background: var(--surface-strong);
     color: var(--text-color);
-    transition: all var(--transition-base);
-    font-size: clamp(13px, 1.8vw, 14px);
+    transition: all var(--transition-fast);
+    font-size: 0.8125rem;
     font-weight: 600;
     font-family: inherit;
-    position: relative;
-    overflow: hidden;
-    box-shadow: var(--shadow-sm);
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 6px;
-    line-height: 1.1;
-    text-align: center;
+    line-height: 1;
 }
 
 button:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-    background: rgba(255, 255, 255, 0.75);
+    background: var(--secondary-color);
+    border-color: var(--neutral-400);
 }
 
 button:focus {
     outline: none;
-    box-shadow: var(--shadow-md), var(--shadow-focus);
+    box-shadow: var(--shadow-focus);
 }
 
 button:active:not(:disabled) {
-    transform: translateY(0);
+    transform: translateY(1px);
 }
 
 button:disabled {
@@ -110,131 +101,72 @@ button:disabled {
 /* Primary / Filled Buttons (Best for CTAs) */
 .btn-primary,
 button[onclick*="addData"] {
-    background: var(--gradient-primary);
+    background: var(--primary-color);
     color: white !important;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-    box-shadow: 0 4px 12px rgba(8, 145, 178, 0.25);
+    border: none;
+    box-shadow: var(--shadow-sm);
 }
 
-.btn-primary:hover:not(:disabled) {
-    box-shadow: 0 6px 16px rgba(8, 145, 178, 0.35);
-    transform: translateY(-2px);
-}
-
-.btn-primary:focus {
-    box-shadow: 0 6px 16px rgba(8, 145, 178, 0.35), var(--shadow-focus);
-}
-
-/* "Add Data" Specific Override */
-button[onclick*="addData"] {
-    background: linear-gradient(135deg, var(--success-color) 0%, var(--success-dark) 100%);
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-}
-
+.btn-primary:hover:not(:disabled),
 button[onclick*="addData"]:hover:not(:disabled) {
-    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+    background: var(--primary-hover);
+    box-shadow: var(--shadow-md);
 }
 
 /* Secondary/Glass Buttons */
 .btn-glass {
-    background: rgba(255, 255, 255, 0.65);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    color: var(--text-color);
-    box-shadow: var(--shadow-sm);
-    padding: 8px 14px;
-    font-size: 13px;
+    background: var(--surface-strong);
+    border: 1px solid var(--neutral-200);
+    color: var(--text-secondary);
 }
 
 .btn-glass:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.8);
-    border-color: rgba(8, 145, 178, 0.3);
-    transform: translateY(-1px);
-}
-
-.btn-glass:focus {
-    outline: none;
-    box-shadow: var(--shadow-sm), var(--shadow-focus);
+    background: var(--secondary-color);
+    color: var(--text-color);
 }
 
 /* Danger Button */
 .btn-danger {
     color: var(--danger-color) !important;
-    border: 1px solid rgba(239, 68, 68, 0.3);
-    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid var(--danger-color);
+    background: transparent;
 }
 
 .btn-danger:hover:not(:disabled) {
-    background: rgba(239, 68, 68, 0.12);
-    border-color: rgba(239, 68, 68, 0.5);
-}
-
-.btn-danger:focus {
-    outline: none;
-    box-shadow: var(--shadow-sm), 0 0 0 3px rgba(239, 68, 68, 0.15);
-}
-
-/* Success Button */
-.btn-success {
-    background: linear-gradient(135deg, var(--success-color) 0%, var(--success-dark) 100%);
-    color: white !important;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
-}
-
-.btn-success:hover:not(:disabled) {
-    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35);
-}
-
-/* Active State */
-button.active {
-    background: var(--gradient-primary);
-    color: white !important;
-    box-shadow: 0 4px 12px rgba(8, 145, 178, 0.3);
-}
-
-/* Glass Cards */
-.card,
-.controls-card,
-.table-container {
-    background: var(--card-bg);
-    backdrop-filter: blur(20px);
-    border: var(--glass-border);
-    border-radius: var(--border-radius-lg);
-    box-shadow: var(--shadow-md);
+    background: var(--status-outstanding-bg);
 }
 
 /* Table container */
 .table-container {
-    padding: 0;
+    background: var(--surface-strong);
+    border: 1px solid var(--surface-border);
+    border-radius: var(--border-radius);
     overflow: hidden;
+    box-shadow: var(--shadow-sm);
 }
 
 table {
     width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    table-layout: fixed;
+    border-collapse: collapse;
 }
 
 th,
 td {
-    padding: 14px 12px;
+    padding: 12px 16px;
     text-align: left;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-    overflow: hidden;
+    border-bottom: 1px solid var(--surface-border);
 }
 
 th {
-    background: rgba(255, 255, 255, 0.4);
-    backdrop-filter: blur(8px);
+    background: var(--surface-muted);
     font-weight: 700;
-    color: var(--primary-color);
+    color: var(--text-secondary);
     text-transform: uppercase;
-    font-size: 11px;
-    letter-spacing: 0.5px;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
     position: sticky;
     top: 0;
     z-index: 10;
-    vertical-align: middle;
 }
 
 /* Editable Inputs - Improved Visibility & Focus */

@@ -162,9 +162,62 @@ const app = {
         $('#fileExcel').value = '';
     },
 
+    // --- Professional Dialogs ---
+    showConfirm(options) {
+        const overlay = $('#confirmModal');
+        const titleEl = $('#confirmTitle');
+        const msgEl = $('#confirmMessage');
+        const confirmBtn = $('#confirmBtn');
+        const cancelBtn = $('#cancelBtn');
+
+        titleEl.textContent = options.title || 'Konfirmasi';
+        msgEl.textContent = options.message || '';
+        confirmBtn.textContent = options.confirmText || 'Ya, Hapus';
+        cancelBtn.textContent = options.cancelText || 'Batal';
+
+        confirmBtn.className = `btn-glass ${options.isDanger ? 'btn-danger' : 'btn-primary'}`;
+        
+        overlay.style.display = 'flex';
+
+        return new Promise((resolve) => {
+            const handleConfirm = () => {
+                overlay.style.display = 'none';
+                confirmBtn.removeEventListener('click', handleConfirm);
+                cancelBtn.removeEventListener('click', handleCancel);
+                resolve(true);
+            };
+            const handleCancel = () => {
+                overlay.style.display = 'none';
+                confirmBtn.removeEventListener('click', handleConfirm);
+                cancelBtn.removeEventListener('click', handleCancel);
+                resolve(false);
+            };
+            confirmBtn.onclick = handleConfirm;
+            cancelBtn.onclick = handleCancel;
+        });
+    },
+
+    showAlert(message, title = 'Informasi') {
+        const overlay = $('#confirmModal');
+        $('#confirmTitle').textContent = title;
+        $('#confirmMessage').textContent = message;
+        const confirmBtn = $('#confirmBtn');
+        const cancelBtn = $('#cancelBtn');
+        
+        confirmBtn.textContent = 'OK';
+        confirmBtn.className = 'btn-glass btn-primary';
+        cancelBtn.style.display = 'none';
+        overlay.style.display = 'flex';
+
+        confirmBtn.onclick = () => {
+            overlay.style.display = 'none';
+            cancelBtn.style.display = 'inline-flex';
+        };
+    },
+
     addTab() {
         if (this.state.tabs.length >= 4) {
-            alert("Maksimal 4 tab diperbolehkan.");
+            this.showAlert("Maksimal 4 tab diperbolehkan.", "Limit Tab");
             return;
         }
         this.normalizeState();
@@ -174,18 +227,15 @@ const app = {
         this.switchTab(newId);
     },
 
-    renameTab() {
+    async deleteTab() {
         const tab = this.getCurrentTab();
-        const newName = prompt("Rename Tab:", tab.name);
-        if (newName) {
-            tab.name = newName;
-            this.saveState();
-            this.renderTabs();
-        }
-    },
+        const confirmed = await this.showConfirm({
+            title: 'Hapus Tab',
+            message: `Hapus tab "${tab.name}" dan semua datanya?`,
+            isDanger: true
+        });
 
-    deleteTab() {
-        if (confirm("Delete this tab and all its data?")) {
+        if (confirmed) {
             const idx = this.state.tabs.findIndex(t => t.id === this.state.currentTabId);
             this.state.tabs.splice(idx, 1);
             if (this.state.tabs.length === 0) this.state.tabs.push(createNewTab(0));
@@ -289,16 +339,16 @@ const app = {
             tr.dataset.id = row.id;
 
             const statusClass = row.status === 'done' ? 'status-done' : 'status-outstanding';
-            const statusLabel = row.status === 'done' ? 'Done' : 'Outstanding';
+            const statusLabel = row.status === 'done' ? 'DONE' : 'OUTSTANDING';
 
             tr.innerHTML = `
-                <td class="col-order drag-handle" style="cursor: move;" draggable="false">${index + 1}</td>
-                <td onclick="app.openModal('${row.id}')"><div class="text-cell wsid-text">${row.wsid || '-'}</div></td>
-                <td onclick="app.openModal('${row.id}')"><div class="text-cell notes-text text-left">${row.notes || ''}</div></td>
-                <td onclick="app.openModal('${row.id}')"><div class="text-cell plan-text">${row.plan || this.formatPlanTs(row.planTs)}</div></td>
-                <td style="position: relative; overflow: visible;">
+                <td class="col-order drag-handle" style="cursor: move;">${index + 1}</td>
+                <td onclick="app.openModal('${row.id}')"><div class="wsid-text">${row.wsid || '-'}</div></td>
+                <td onclick="app.openModal('${row.id}')"><div class="notes-text">${row.notes || ''}</div></td>
+                <td onclick="app.openModal('${row.id}')"><div>${row.plan || this.formatPlanTs(row.planTs)}</div></td>
+                <td style="position: relative;">
                     <button class="status-btn ${statusClass}" onclick="event.stopPropagation(); app.toggleStatus('${row.id}')">${statusLabel}</button>
-                    <button class="desktop-delete-btn" onclick="event.stopPropagation(); app.deleteOne('${row.id}')">Delete</button>
+                    <button class="desktop-delete-btn" onclick="event.stopPropagation(); app.deleteOne('${row.id}')">Hapus</button>
                     <div class="swipe-action-delete" onclick="event.stopPropagation(); app.deleteOne('${row.id}')">Hapus</div>
                 </td>
             `;
@@ -539,7 +589,7 @@ const app = {
         const notesVal = $('#mInputNotes').value;
         const planVal = $('#mInputPlan').value;
 
-        if (!wsidVal) { alert("WSID harus diisi"); return; }
+        if (!wsidVal) { this.showAlert("WSID harus diisi", "Input Kurang"); return; }
         const parsedPlan = this.parsePlanValue(planVal);
         const wsidKey = this.getWsidKey(wsidVal);
 
@@ -589,23 +639,44 @@ const app = {
         }
     },
 
-    deleteOne(id) {
-        const tab = this.getCurrentTab();
-        tab.data = tab.data.filter(r => r.id !== id);
-        this.saveState();
-        this.renderTableData();
+    async deleteOne(id) {
+        const row = this.getCurrentTab().data.find(r => r.id === id);
+        const confirmed = await this.showConfirm({
+            title: 'Hapus Data',
+            message: `Hapus data "${row.wsid || 'tanpa ID'}"?`,
+            isDanger: true
+        });
+
+        if (confirmed) {
+            const tab = this.getCurrentTab();
+            tab.data = tab.data.filter(r => r.id !== id);
+            this.saveState();
+            this.renderTableData();
+        }
     },
 
-    deleteAll() {
-        if (confirm("Delete ALL items in this tab?")) {
+    async deleteAll() {
+        const confirmed = await this.showConfirm({
+            title: 'Hapus Semua',
+            message: 'Hapus SEMUA data di tab ini? Tindakan ini tidak bisa dibatalkan.',
+            isDanger: true
+        });
+
+        if (confirmed) {
             this.getCurrentTab().data = [];
             this.saveState();
             this.renderTableData();
         }
     },
 
-    resetStatus() {
-        if (confirm("Reset all status to Outstanding?")) {
+    async resetStatus() {
+        const confirmed = await this.showConfirm({
+            title: 'Reset Status',
+            message: 'Kembalikan semua status ke OUTSTANDING?',
+            confirmText: 'Ya, Reset'
+        });
+
+        if (confirmed) {
             this.getCurrentTab().data.forEach(r => r.status = 'outstanding');
             this.saveState();
             this.renderTableData();
@@ -662,7 +733,7 @@ const app = {
                         });
                     });
 
-                } catch (err) { console.error(err); alert("Gagal baca Excel"); }
+                } catch (err) { console.error(err); this.showAlert("Gagal baca Excel", "Error"); }
             });
         }
     },
@@ -680,7 +751,7 @@ const app = {
 
         const mapWSID = $('#mapWSID').value;
         const mapPlan = $('#mapPlan').value;
-        if (!mapWSID || !mapPlan) { alert("Pilih kolom WSID dan Plan dulu"); return; }
+        if (!mapWSID || !mapPlan) { this.showAlert("Pilih kolom WSID dan Plan dulu", "Input Kurang"); return; }
 
         const { matrix, headerIdx } = this.state.tempExcelData;
         const headers = matrix[headerIdx].map(String);
@@ -736,7 +807,7 @@ const app = {
         if (updateCount === 0 && matchAttempts > 0) {
             const sampleExcel = Array.from(excelMap.keys()).slice(0, 3).join(', ');
             const sampleList = tab.data.slice(0, 3).map(r => r.wsid).join(', ');
-            alert(`0 Data terupdate! \nKemungkinan WSID tidak cocok.\n\nContoh di Excel: ${sampleExcel}\nContoh di List: ${sampleList}\n\nPastikan penulisan sama persis.`);
+            this.showAlert(`0 Data terupdate! \nKemungkinan WSID tidak cocok.\n\nContoh di Excel: ${sampleExcel}\nContoh di List: ${sampleList}\n\nPastikan penulisan sama persis.`, "Update Fail");
             return;
         }
 
@@ -746,7 +817,7 @@ const app = {
 
         $('#excelMappingArea').style.display = 'none';
         $('#fileExcel').value = '';
-        alert(`Berhasil update ${updateCount} data dari ${excelMap.size} baris Excel.`);
+        this.showAlert(`Berhasil update ${updateCount} data dari ${excelMap.size} baris Excel.`, "Success");
     },
 
     sortDataByDate(data) {
@@ -775,20 +846,25 @@ const app = {
         document.body.removeChild(a);
     },
 
-    importUniversal(input) {
+    async importUniversal(input) {
         const file = input.files[0];
         if (!file) return;
         const reader = new FileReader();
-        reader.onload = (e) => {
+        reader.onload = async (e) => {
             try {
                 const json = JSON.parse(e.target.result);
                 let list = Array.isArray(json) ? json : (json.data || []);
 
-                if (!Array.isArray(list)) throw new Error("Invalid Format");
+                if (!Array.isArray(list)) throw new Error("Format tidak valid");
 
                 const tab = this.getCurrentTab();
                 if (tab.data.length > 0) {
-                    if (!confirm(`Import ${list.length} items? This will APPEND to current list.`)) return;
+                    const confirmed = await this.showConfirm({
+                        title: 'Import Data',
+                        message: `Import ${list.length} data? Data baru akan ditambahkan ke daftar yang sudah ada.`,
+                        confirmText: 'Ya, Import'
+                    });
+                    if (!confirmed) return;
                 }
 
                 const baseOrder = tab.data.length;
@@ -811,9 +887,9 @@ const app = {
                 tab.data = [...tab.data, ...newData];
                 this.saveState();
                 this.renderTableData();
-                alert("Import Successful");
+                this.showAlert("Berhasil mengimpor data.", "Import Sukses");
 
-            } catch (err) { alert("Error: " + err.message); }
+            } catch (err) { this.showAlert("Gagal: " + err.message, "Error Import"); }
             input.value = '';
         };
         reader.readAsText(file);
