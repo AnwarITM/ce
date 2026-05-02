@@ -1,0 +1,64 @@
+:root {
+  /* Canvas & Text */
+  --bg-color: #ffffff;
+  --text-color: #000000;
+  --text-secondary: #666666;
+  --text-muted: #888888;
+  
+  /* Accents - Vercel Black */
+  --primary-color: #000000;
+  --primary-hover: #333333;
+  --primary-text: #ffffff;
+  
+  /* Surfaces - Clean White */
+  --surface-1: #ffffff;
+  --surface-2: #fafafa;
+  --surface-3: #eaeaea;
+  --surface-muted: #fafafa;
+  --surface-soft: #ffffff;
+  --surface-strong: #ffffff;
+  --surface-elevated: #ffffff;
+  
+  /* Gradients - None (Vercel is flat) */
+  --gradient-primary: linear-gradient(180deg, #000 0%, #333 100%);
+  --gradient-bg: #ffffff;
+  
+  /* Borders */
+  --border-subtle: rgba(0, 0, 0, 0.08);
+  --border-shadow: 0 0 0 1px var(--border-subtle);
+  --surface-border: var(--border-subtle);
+  
+  /* Shadows */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 5px 10px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.12);
+  --shadow-focus: 0 0 0 2px rgba(0, 0, 0, 0.1);
+  
+  /* Status */
+  --success-color: #0070f3;
+  --danger-color: #ee0000;
+  --warning-color: #f5a623;
+  
+  --status-done-bg: rgba(0, 112, 243, 0.1);
+  --status-done-text: #0070f3;
+  --status-done-border: rgba(0, 112, 243, 0.2);
+  --status-outstanding-bg: rgba(238, 0, 0, 0.1);
+  --status-outstanding-text: #ee0000;
+  --status-outstanding-border: rgba(238, 0, 0, 0.2);
+
+  /* Specifics */
+  --theme-toggle-bg: #ffffff;
+  --theme-toggle-border: #000000;
+  --button-primary-text: #ffffff;
+  --outline-color: #000000;
+  
+  /* Vercel Specific Overrides */
+  --radius-md: 6px;
+  --radius-lg: 8px;
+}
+
+body {
+  background: var(--bg-color);
+  background-attachment: fixed;
+  color: var(--text-color);
+}

@@ -1,0 +1,60 @@
+:root {
+  /* Canvas & Text */
+  --bg-color: #f8f9fa;
+  --text-color: #1a1a1a;
+  --text-secondary: #4a4a4a;
+  --text-muted: #717171;
+  
+  /* Accents - High Energy Red */
+  --primary-color: #FF0036;
+  --primary-hover: #D6002E;
+  --primary-text: #ffffff;
+  
+  /* Surfaces - Clean white for contrast */
+  --surface-1: #ffffff;
+  --surface-2: #f1f5f9;
+  --surface-3: #e2e8f0;
+  --surface-muted: #f8fafc;
+  --surface-soft: #ffffff;
+  --surface-strong: #ffffff;
+  --surface-elevated: #ffffff;
+  
+  /* Gradients - Light subtle gradient */
+  --gradient-primary: linear-gradient(135deg, #FF0036 0%, #ff4d6d 100%);
+  --gradient-bg: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
+  
+  /* Borders */
+  --border-subtle: rgba(0, 0, 0, 0.08);
+  --border-shadow: 0 0 0 1px var(--border-subtle);
+  --surface-border: var(--border-subtle);
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-focus: 0 0 0 4px rgba(255, 0, 54, 0.2);
+  
+  /* Status */
+  --success-color: #10b981;
+  --danger-color: #ef4444;
+  --warning-color: #f5a623;
+  
+  --status-done-bg: #ecfdf5;
+  --status-done-text: #059669;
+  --status-done-border: #d1fae5;
+  --status-outstanding-bg: #fef2f2;
+  --status-outstanding-text: #ef4444;
+  --status-outstanding-border: #fee2e2;
+
+  /* Specifics */
+  --theme-toggle-bg: #ffffff;
+  --theme-toggle-border: #FF0036;
+  --button-primary-text: #ffffff;
+  --outline-color: #FF0036;
+}
+
+body {
+  background: var(--gradient-bg);
+  background-attachment: fixed;
+  color: var(--text-color);
+}

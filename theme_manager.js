@@ -1,16 +1,24 @@
 /**
  * EPS Theme Manager
- * Handles Dark/Light mode persistence across all pages.
+ * Handles multi-theme persistence across all pages.
  */
 
 const THEME_KEY = 'eps_theme_pref';
 const THEME_VERSION = '20260110';
-const LIGHT_THEME = `theme-light.css?v=${THEME_VERSION}`;
-const DARK_THEME = `theme-dark.css?v=${THEME_VERSION}`;
 
-// Function to update icon visibility
-function updateThemeIcon(themeFile) {
-    const isDark = themeFile.includes('dark');
+const THEME_MANIFEST = {
+    'default': `theme-default.css?v=${THEME_VERSION}`,
+    'linear': `theme-linear.css?v=${THEME_VERSION}`,
+    'vercel': `theme-vercel.css?v=${THEME_VERSION}`,
+    'apple': `theme-apple.css?v=${THEME_VERSION}`,
+    'supabase': `theme-supabase.css?v=${THEME_VERSION}`
+};
+
+const DARK_THEMES = ['linear', 'supabase'];
+
+// Function to update UI state based on theme
+function updateThemeUI(themeId) {
+    const isDark = DARK_THEMES.includes(themeId);
     
     // Update the new toggle switch if it exists
     const toggleCheckbox = document.getElementById('themeToggleCheckbox');
@@ -20,7 +28,6 @@ function updateThemeIcon(themeFile) {
 
     // Update old theme buttons for compatibility
     const label = isDark ? 'Mode Terang' : 'Mode Gelap';
-    const nextMode = isDark ? 'light' : 'dark';
     const btns = document.querySelectorAll('[onclick="toggleGlobalTheme()"]');
     btns.forEach((btn) => {
         if (btn.tagName !== 'INPUT') {
@@ -28,38 +35,60 @@ function updateThemeIcon(themeFile) {
         }
         btn.setAttribute('aria-label', label);
         btn.setAttribute('title', label);
-        btn.dataset.themeTarget = nextMode;
     });
 }
 
 // Function to immediately apply theme (can be called in head)
 function applyTheme() {
-    const saved = localStorage.getItem(THEME_KEY) || LIGHT_THEME;
-    const normalized = saved.includes('theme-dark') ? DARK_THEME : LIGHT_THEME;
+    let saved = localStorage.getItem(THEME_KEY) || 'default';
+    
+    // Migration logic: if saved value contains '.css', map it to an ID or reset
+    if (saved.includes('.css')) {
+        if (saved.includes('theme-dark')) {
+            saved = 'linear';
+        } else {
+            saved = 'default';
+        }
+    }
+
+    // Ensure the ID is valid
+    if (!THEME_MANIFEST[saved]) {
+        saved = 'default';
+    }
+
+    // Set the theme immediately
+    const themeFile = THEME_MANIFEST[saved];
     const link = document.getElementById('theme-link');
     if (link) {
-        link.setAttribute('href', normalized);
+        link.setAttribute('href', themeFile);
     }
-    // Defer icon update slightly to ensure DOM is ready if script runs in head
+
+    // Defer UI update slightly to ensure DOM is ready if script runs in head
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => updateThemeIcon(normalized));
+        document.addEventListener('DOMContentLoaded', () => updateThemeUI(saved));
     } else {
-        updateThemeIcon(normalized);
+        updateThemeUI(saved);
     }
-    localStorage.setItem(THEME_KEY, normalized);
+    
+    localStorage.setItem(THEME_KEY, saved);
 }
 
-// Function to toggle theme
-function toggleGlobalTheme() {
-    const saved = localStorage.getItem(THEME_KEY) || LIGHT_THEME;
-    const next = saved.includes('light') ? DARK_THEME : LIGHT_THEME;
-
+// Function to set a specific theme
+function setGlobalTheme(themeId) {
+    const themeFile = THEME_MANIFEST[themeId] || THEME_MANIFEST['default'];
     const link = document.getElementById('theme-link');
     if (link) {
-        link.setAttribute('href', next);
+        link.setAttribute('href', themeFile);
     }
-    localStorage.setItem(THEME_KEY, next);
-    updateThemeIcon(next);
+    localStorage.setItem(THEME_KEY, themeId);
+    updateThemeUI(themeId);
+}
+
+// Function to toggle between default light and default dark (linear)
+function toggleGlobalTheme() {
+    const current = localStorage.getItem(THEME_KEY) || 'default';
+    const next = DARK_THEMES.includes(current) ? 'default' : 'linear';
+    setGlobalTheme(next);
 }
 
 // Apply on load

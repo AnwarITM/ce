@@ -1,0 +1,74 @@
+:root {
+  /* Canvas & Text */
+  --bg-color: #ffffff;
+  --text-color: #1d1d1f;
+  --text-secondary: #424245;
+  --text-muted: #86868b;
+  
+  /* Accents - Apple Blue */
+  --primary-color: #0066cc;
+  --primary-hover: #0077ed;
+  --primary-text: #ffffff;
+  
+  /* Surfaces - Apple Parchment */
+  --surface-1: #ffffff;
+  --surface-2: #f5f5f7;
+  --surface-3: #e8e8ed;
+  --surface-muted: #f5f5f7;
+  --surface-soft: #f5f5f7;
+  --surface-strong: #ffffff;
+  --surface-elevated: #ffffff;
+  
+  /* Gradients */
+  --gradient-primary: linear-gradient(180deg, #0077ed 0%, #0066cc 100%);
+  --gradient-bg: #ffffff;
+  
+  /* Borders */
+  --border-subtle: rgba(0, 0, 0, 0.12);
+  --border-shadow: 0 0 0 1px var(--border-subtle);
+  --surface-border: var(--border-subtle);
+  
+  /* Shadows */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 12px 30px rgba(0, 0, 0, 0.12);
+  --shadow-focus: 0 0 0 4px rgba(0, 102, 204, 0.2);
+  
+  /* Status */
+  --success-color: #34c759;
+  --danger-color: #ff3b30;
+  --warning-color: #ff9500;
+  
+  --status-done-bg: rgba(52, 199, 89, 0.1);
+  --status-done-text: #34c759;
+  --status-done-border: rgba(52, 199, 89, 0.2);
+  --status-outstanding-bg: rgba(255, 59, 48, 0.1);
+  --status-outstanding-text: #ff3b30;
+  --status-outstanding-border: rgba(255, 59, 48, 0.2);
+
+  /* Specifics */
+  --theme-toggle-bg: #f5f5f7;
+  --theme-toggle-border: #0066cc;
+  --button-primary-text: #ffffff;
+  --outline-color: #0066cc;
+
+  /* Apple Specific Overrides */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+  
+  /* Rounded-pill requirement */
+  --radius-pill: 9999px;
+}
+
+/* Apple often uses pill-shaped buttons and inputs */
+.btn {
+  border-radius: var(--radius-full) !important;
+}
+
+body {
+  background: var(--bg-color);
+  background-attachment: fixed;
+  color: var(--text-color);
+}

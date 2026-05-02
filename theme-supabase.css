@@ -1,0 +1,74 @@
+:root {
+  /* Canvas & Text */
+  --bg-color: #171717;
+  --text-color: #fafafa;
+  --text-secondary: #a1a1a1;
+  --text-muted: #707070;
+  
+  /* Accents - Supabase Green */
+  --primary-color: #3ecf8e;
+  --primary-hover: #34b27b;
+  --primary-text: #000000;
+  
+  /* Surfaces - Supabase Dark */
+  --surface-1: #1c1c1c;
+  --surface-2: #232323;
+  --surface-3: #2e2e2e;
+  --surface-muted: #1c1c1c;
+  --surface-soft: #1c1c1c;
+  --surface-strong: #232323;
+  --surface-elevated: #282828;
+  
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, #3ecf8e 0%, #34b27b 100%);
+  --gradient-bg: #171717;
+  
+  /* Borders */
+  --border-subtle: rgba(255, 255, 255, 0.1);
+  --border-shadow: 0 0 0 1px var(--border-subtle);
+  --surface-border: var(--border-subtle);
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.6);
+  --shadow-focus: 0 0 0 4px rgba(62, 207, 142, 0.2);
+  
+  /* Status */
+  --success-color: #3ecf8e;
+  --danger-color: #fa4b4b;
+  --warning-color: #f5a623;
+  
+  --status-done-bg: rgba(62, 207, 142, 0.1);
+  --status-done-text: #3ecf8e;
+  --status-done-border: rgba(62, 207, 142, 0.2);
+  --status-outstanding-bg: rgba(250, 75, 75, 0.1);
+  --status-outstanding-text: #fa4b4b;
+  --status-outstanding-border: rgba(250, 75, 75, 0.2);
+
+  /* Specifics */
+  --theme-toggle-bg: #1c1c1c;
+  --theme-toggle-border: #3ecf8e;
+  --button-primary-text: #000000;
+  --outline-color: #3ecf8e;
+
+  /* Supabase Specific Overrides */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-full: 9999px;
+  
+  /* Rounded-pill requirement */
+  --radius-pill: 9999px;
+}
+
+/* Supabase uses pill-shaped buttons in some contexts */
+.btn {
+  border-radius: var(--radius-full) !important;
+}
+
+body {
+  background: var(--bg-color);
+  background-attachment: fixed;
+  color: var(--text-color);
+}

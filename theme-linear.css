@@ -1,0 +1,63 @@
+:root {
+  /* Canvas & Text */
+  --bg-color: #010102;
+  --text-color: #f7f8f8;
+  --text-secondary: #b1b8c0;
+  --text-muted: #8a8f98;
+  
+  /* Accents - Linear Purple */
+  --primary-color: #5e6ad2;
+  --primary-hover: #4e5ba6;
+  --primary-text: #ffffff;
+  
+  /* Surfaces - Linear Dark */
+  --surface-1: #0f1011;
+  --surface-2: #161718;
+  --surface-3: #222326;
+  --surface-muted: #0a0a0a;
+  --surface-soft: #0f1011;
+  --surface-strong: #161718;
+  --surface-elevated: #1c1d1f;
+  
+  /* Gradients - Deep Dark Linear */
+  --gradient-primary: linear-gradient(135deg, #5e6ad2 0%, #7c89f8 100%);
+  --gradient-bg: linear-gradient(180deg, #010102 0%, #0f1011 100%);
+  
+  /* Borders */
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-shadow: 0 0 0 1px var(--border-subtle);
+  --surface-border: var(--border-subtle);
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.6), 0 2px 4px -1px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.7), 0 4px 6px -2px rgba(0, 0, 0, 0.5);
+  --shadow-focus: 0 0 0 4px rgba(94, 106, 210, 0.3);
+  
+  /* Status */
+  --success-color: #4ade80;
+  --danger-color: #f87171;
+  --warning-color: #fbbf24;
+  
+  --status-done-bg: rgba(74, 222, 128, 0.1);
+  --status-done-text: #4ade80;
+  --status-done-border: rgba(74, 222, 128, 0.2);
+  --status-outstanding-bg: rgba(248, 113, 113, 0.1);
+  --status-outstanding-text: #f87171;
+  --status-outstanding-border: rgba(248, 113, 113, 0.2);
+
+  /* Specifics */
+  --theme-toggle-bg: #0f1011;
+  --theme-toggle-border: #5e6ad2;
+  --button-primary-text: #ffffff;
+  --outline-color: #5e6ad2;
+
+  /* Theme-specific Overrides */
+  --radius-lg: 12px;
+}
+
+body {
+  background: var(--bg-color);
+  background-attachment: fixed;
+  color: var(--text-color);
+}
