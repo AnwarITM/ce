@@ -62,26 +62,25 @@ body {
 
 /* Base Button Style - Improved for Accessibility */
 button {
-    padding: 8px 16px;
-    border: 1px solid var(--neutral-300);
+    padding: 10px 20px;
+    border: none;
     border-radius: var(--border-radius);
     cursor: pointer;
-    background: var(--surface-strong);
-    color: var(--text-color);
-    transition: all var(--transition-fast);
-    font-size: 0.8125rem;
-    font-weight: 600;
+    background: var(--surface-muted);
+    color: var(--primary-color);
+    transition: all var(--transition-base);
+    font-size: 15px;
+    font-weight: 500;
     font-family: inherit;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 8px;
     line-height: 1;
 }
 
 button:hover:not(:disabled) {
-    background: var(--secondary-color);
-    border-color: var(--neutral-400);
+    background: var(--neutral-200);
 }
 
 button:focus {
@@ -90,11 +89,11 @@ button:focus {
 }
 
 button:active:not(:disabled) {
-    transform: translateY(1px);
+    transform: scale(0.98);
 }
 
 button:disabled {
-    opacity: 0.5;
+    opacity: 0.4;
     cursor: not-allowed;
 }
 
@@ -103,26 +102,21 @@ button:disabled {
 button[onclick*="addData"] {
     background: var(--primary-color);
     color: white !important;
-    border: none;
-    box-shadow: var(--shadow-sm);
 }
 
 .btn-primary:hover:not(:disabled),
 button[onclick*="addData"]:hover:not(:disabled) {
     background: var(--primary-hover);
-    box-shadow: var(--shadow-md);
 }
 
 /* Secondary/Glass Buttons */
 .btn-glass {
-    background: var(--surface-strong);
-    border: 1px solid var(--neutral-200);
-    color: var(--text-secondary);
+    background: var(--surface-muted);
+    color: var(--primary-color);
 }
 
 .btn-glass:hover:not(:disabled) {
-    background: var(--secondary-color);
-    color: var(--text-color);
+    background: var(--neutral-200);
 }
 
 /* Danger Button */
