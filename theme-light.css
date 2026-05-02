@@ -1,56 +1,53 @@
 :root {
-  /* ===== BASE ===== */
-  --bg-color: #f8fafc;              /* Slate-50 */
-  --card-bg: #ffffff;
-  --border-color: #e2e8f0;          /* Slate-200 */
-  --input-border: #cbd5e1;
-  --input-bg: #ffffff;
-  --input-text-focus: #0f172a;
-
-  /* ===== PRIMARY INDIGO ENTERPRISE ===== */
-  --primary-color: #4f46e5;         /* Indigo-600 */
-  --primary-hover: #4338ca;         /* Indigo-700 */
-  --primary-light: #6366f1;         /* Indigo-500 */
-  --secondary-color: #f1f5f9;       /* Slate-100 */
-  --gradient-primary: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
-
-  /* ===== TEXT ===== */
-  --text-color: #0f172a;            /* Slate-900 */
-  --text-secondary: #475569;        /* Slate-600 */
-  --text-muted: #64748b;            /* Slate-500 */
-  --header-text-color: #4f46e5;
-
-  /* ===== STATUS ===== */
-  --success-color: #10b981;
-  --danger-color: #ef4444;
-  --status-done-bg: #f0fdf4;        /* Green-50 */
-  --status-done-text: #166534;
-  --status-done-border: #dcfce7;
-  --status-outstanding-bg: #fef2f2; /* Red-50 */
-  --status-outstanding-text: #991b1b;
-  --status-outstanding-border: #fee2e2;
-
-  /* ===== SHADOW ===== */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  --shadow-focus: 0 0 0 4px rgba(79, 70, 229, 0.1);
-
-  /* ===== SURFACES ===== */
+  /* Canvas & Text */
+  --bg-color: #ffffff;
+  --text-color: #171717;
+  --text-secondary: #666666;
+  --text-muted: #888888;
+  
+  /* Accents */
+  --primary-color: #0070f3;
+  --primary-hover: #0060d3;
+  --primary-text: #ffffff;
+  
+  /* Surfaces */
+  --surface-1: #ffffff;
+  --surface-2: #fafafa;
+  --surface-3: #f5f5f5;
+  --surface-muted: #fafafa;
+  --surface-soft: #fafafa;
   --surface-strong: #ffffff;
   --surface-elevated: #ffffff;
-  --surface-muted: #f1f5f9;
-  --surface-soft: #f8fafc;
-  --surface-border: #e2e8f0;
-  --surface-border-strong: #cbd5e1;
   
-  --button-primary-text: #ffffff;
+  /* Borders (Shadow-based) */
+  --border-subtle: rgba(0, 0, 0, 0.08);
+  --border-shadow: 0 0 0 1px var(--border-subtle);
+  --surface-border: var(--border-subtle);
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 0 0 1px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 0 0 1px rgba(0, 0, 0, 0.08), 0 8px 16px rgba(0, 0, 0, 0.08);
+  --shadow-focus: 0 0 0 4px rgba(0, 112, 243, 0.15);
+  
+  /* Status */
+  --success-color: #0070f3;
+  --danger-color: #ee0000;
+  --warning-color: #f5a623;
+  
+  --status-done-bg: #ebf5ff;
+  --status-done-text: #0070f3;
+  --status-done-border: rgba(0, 112, 243, 0.1);
+  --status-outstanding-bg: #fff5f5;
+  --status-outstanding-text: #ee0000;
+  --status-outstanding-border: rgba(238, 0, 0, 0.1);
+
+  /* Specifics */
   --theme-toggle-bg: #ffffff;
-  --theme-toggle-border: #e2e8f0;
-  
-  --chip-active-bg: #4f46e5;
-  --chip-active-text: #ffffff;
-  --tab-active-bg: #ffffff;
+  --theme-toggle-border: rgba(0, 0, 0, 0.08);
+  --button-primary-text: #ffffff;
+  --outline-color: #0070f3;
+  --gradient-primary: linear-gradient(135deg, #0070f3 0%, #3291ff 100%);
 }
 
 body {
