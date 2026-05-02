@@ -7,17 +7,16 @@
   <title>Catatan Troubleshoot ATM</title>
   <link rel="stylesheet" href="design-tokens.css?v=20260110">
   <link rel="stylesheet" href="styles.css?v=20260110">
-  <link rel="stylesheet" href="seasonal-effects.css?v=20260110">
   <link id="theme-link" rel="stylesheet" href="theme-light.css?v=20260110">
   <script src="theme_manager.js?v=20260110"></script>
-  <script src="seasonal-effects.js?v=20260110" defer></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap');
 
     body {
       max-width: 1100px;
       margin: 0 auto;
-      padding: 24px;
+      padding: 16px;
+      padding-bottom: calc(var(--nav-height) + 32px);
       min-height: 100vh;
       color: var(--text-color);
       font-family: "Manrope", "Segoe UI", sans-serif;
@@ -42,7 +41,7 @@
     .page-header {
       position: sticky;
       top: 0;
-      z-index: 10;
+      z-index: var(--z-sticky);
       background: var(--surface-strong);
       padding: 16px;
       border: 1px solid var(--surface-border-strong);
@@ -378,7 +377,7 @@
 
 <body>
 
-  <div class="page-header seasonal-snow-target">
+  <div class="page-header">
     <div class="header-top">
       <h1 data-seasonal-title>Catatan Troubleshoot ATM</h1>
       <div class="count-pill">Total: <span id="totalCount">0</span></div>
@@ -389,7 +388,7 @@
   </div>
 
   <div class="tab-context">Tab aktif: <span id="activeTabLabel">Semua</span></div>
-  <div id="dataContainer" class="catatan-grid seasonal-snow-target"></div>
+  <div id="dataContainer" class="catatan-grid"></div>
 
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -610,6 +609,25 @@
       });
     }
   </script>
+    <!-- Persistent Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-link">
+            <span class="nav-icon">🏠</span>
+            <span>Home</span>
+        </a>
+        <a href="work_planner.html" class="nav-link">
+            <span class="nav-icon">📋</span>
+            <span>Planner</span>
+        </a>
+        <a href="notes_viewer.html" class="nav-link active">
+            <span class="nav-icon">📓</span>
+            <span>Notes</span>
+        </a>
+        <a href="cek_lembur/index.html" class="nav-link">
+            <span class="nav-icon">⏱</span>
+            <span>Lembur</span>
+        </a>
+    </nav>
 </body>
 
 </html>

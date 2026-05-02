@@ -31,12 +31,10 @@
     <!-- Styles -->
     <link rel="stylesheet" href="design-tokens.css?v=20260110">
     <link rel="stylesheet" href="styles.css?v=20260110">
-    <link rel="stylesheet" href="seasonal-effects.css?v=20260110">
     <link id="theme-link" rel="stylesheet" href="theme-light.css?v=20260110">
 
     <!-- Excel Parser -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-    <script src="seasonal-effects.js?v=20260110" defer></script>
 
     <style>
         :root {
@@ -52,25 +50,30 @@
             background: #f8fafc;
             color: #0f172a;
             font-family: var(--font-family);
+            padding-bottom: calc(var(--nav-height) + 32px); /* Room for bottom nav & FAB */
         }
 
         .page-container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 24px;
+            padding: 16px;
         }
 
         .app-header {
+            position: sticky;
+            top: 0;
+            background: #f8fafc;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 32px;
-            padding-bottom: 16px;
+            padding: 16px 0;
+            margin-bottom: 12px;
+            z-index: var(--z-sticky);
             border-bottom: 1px solid #e2e8f0;
         }
 
         .app-title {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 800;
             color: var(--primary-color);
             letter-spacing: -0.02em;
@@ -98,22 +101,27 @@
             text-align: center;
         }
 
-        /* Tabs - Enterprise Underline */
+        /* Tabs - Enterprise Underline (Sticky) */
         .tabs-wrapper {
+            position: sticky;
+            top: 56px; /* Below sticky header */
+            background: #f8fafc;
             display: flex;
             align-items: center;
             gap: 24px;
             border-bottom: 1px solid #e2e8f0;
-            margin-bottom: 24px;
+            margin-bottom: 16px;
+            padding: 4px 0;
             overflow-x: auto;
+            z-index: calc(var(--z-sticky) - 1);
         }
 
         .tab-item {
-            padding: 12px 4px;
+            padding: 8px 4px;
             cursor: pointer;
             white-space: nowrap;
             color: #64748b;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             position: relative;
             transition: all 0.2s;
@@ -131,30 +139,30 @@
             background: var(--primary-color);
         }
 
-        /* Dashboard Metrics */
+        /* Dashboard Metrics - Compact */
         .dashboard-row {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
-            margin-bottom: 24px;
+            gap: 12px;
+            margin-bottom: 16px;
         }
 
         .metric-card {
             background: #ffffff;
-            padding: 20px;
+            padding: 12px 16px;
             border-radius: 8px;
             border: 1px solid #e2e8f0;
             box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
 
         .metric-val {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 800;
             color: #0f172a;
         }
 
         .metric-label {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 700;
             text-transform: uppercase;
             color: #64748b;
@@ -291,7 +299,7 @@
             <div class="login-card">
                 <div class="login-logo">📋</div>
                 <h1 class="login-title">Work Planner</h1>
-                <p class="login-subtitle">Masukkan User ID untuk melanjutkan</p>
+                <p class="login-subtitle">Input User ID</p>
                 
                 <input type="text" id="loginUserId" class="login-input" placeholder="User ID (contoh: 1033)" 
                     onkeypress="if(event.key==='Enter')login()">
@@ -305,7 +313,7 @@
         <!-- Header -->
         <header class="app-header">
             <div class="header-left">
-                <div class="app-title" onclick="app.renameTab()" data-seasonal-title>Work Planner</div>
+                <div class="app-title" onclick="app.renameTab()">Work Planner</div>
             </div>
 
             <div class="header-right">
@@ -318,7 +326,7 @@
         <!-- User Info Bar -->
         <div id="userInfoBar" class="user-info-bar">
             <div class="user-avatar-small" id="userAvatar">👤</div>
-            <div class="user-info-text" id="userInfoText">Welcome, User</div>
+            <div class="user-info-text" id="userInfoText">User</div>
             <button class="logout-btn" onclick="logout()">Logout</button>
         </div>
 
@@ -379,9 +387,8 @@
         <div class="controls-card">
 
             <div class="main-toolbar">
-                <!-- Action Buttons: Side by Side on Mobile -->
+                <!-- Action Buttons -->
                 <div class="action-group">
-                    <button class="btn-glass btn-primary" onclick="app.addData()">+ Add Data</button>
                     <button class="btn-glass" onclick="app.resetStatus()">↺ Reset Status</button>
                 </div>
 
@@ -398,11 +405,11 @@
                 style="display:none; margin-top:8px; padding-top:8px; border-top:1px dashed rgba(0,0,0,0.1);">
                 <div class="mapping-grid">
                     <div>
-                        <div class="metric-label">Kolom WSID (Excel)</div>
+                        <div class="metric-label">WSID Column</div>
                         <select id="mapWSID" class="map-select"></select>
                     </div>
                     <div>
-                        <div class="metric-label">Kolom Plan (Excel)</div>
+                        <div class="metric-label">Plan Column</div>
                         <select id="mapPlan" class="map-select"></select>
                     </div>
                     <div style="display:flex; align-items:flex-end;">
@@ -419,7 +426,7 @@
                         onclick="app.setSortMode('date')">Urut Plan</button>
                     <button class="btn-glass btn-compact" data-sort-mode="manual"
                         onclick="app.setSortMode('manual')">Urut Manual</button>
-                    <span class="sort-hint">Drag otomatis pindah ke urutan manual</span>
+                    <span class="sort-hint">Drag to reorder</span>
                 </div>
             </div>
 
@@ -450,13 +457,13 @@
                     <!-- Rows injected by JS -->
                 </tbody>
             </table>
-            <div id="emptyState" class="empty-state" style="display:none;">
-                <div class="empty-state-icon">📋</div>
-                <div class="empty-state-title">Belum ada data</div>
-                <div class="empty-state-description">Mulai dengan menambahkan task secara manual atau import dari file Excel</div>
-                <div class="empty-state-actions">
-                    <button class="btn-glass btn-primary" onclick="app.addData()" style="margin:0;">+ Tambah Manual</button>
-                    <button class="btn-glass" onclick="$('#fileImport').click()" style="margin:0;">⬇ Import Excel</button>
+            <div id="emptyState" class="empty-state" style="display:none; text-align:center; padding:64px 24px;">
+                <div class="empty-state-icon" style="font-size:48px; margin-bottom:16px; opacity:0.3;">📋</div>
+                <div class="empty-state-title" style="font-size:16px; font-weight:700; color:#0f172a; margin-bottom:8px;">No Data</div>
+                <div class="empty-state-description" style="font-size:14px; color:#64748b; margin-bottom:32px;">Add items to get started.</div>
+                <div class="empty-state-actions" style="display:flex; gap:12px; justify-content:center;">
+                    <button class="btn-glass btn-primary" onclick="app.addData()" style="margin:0;">+ Add</button>
+                    <button class="btn-glass" onclick="$('#fileImport').click()" style="margin:0;">Import</button>
                 </div>
             </div>
         </div>
@@ -597,7 +604,7 @@
         async function logout() {
             const confirmed = await app.showConfirm({
                 title: 'Logout',
-                message: 'Apakah Anda yakin ingin keluar dari Work Planner?',
+                message: 'Logout?',
                 confirmText: 'Logout',
                 isDanger: true
             });
@@ -751,6 +758,28 @@
             }
         }
     </script>
+    <!-- Floating Action Button -->
+    <button class="fab" onclick="app.addData()" title="Add Data">+</button>
+
+    <!-- Persistent Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-link">
+            <span class="nav-icon">🏠</span>
+            <span>Home</span>
+        </a>
+        <a href="work_planner.html" class="nav-link active">
+            <span class="nav-icon">📋</span>
+            <span>Planner</span>
+        </a>
+        <a href="notes_viewer.html" class="nav-link">
+            <span class="nav-icon">📓</span>
+            <span>Notes</span>
+        </a>
+        <a href="cek_lembur/index.html" class="nav-link">
+            <span class="nav-icon">⏱</span>
+            <span>Lembur</span>
+        </a>
+    </nav>
 </body>
 
 </html>

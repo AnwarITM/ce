@@ -11,7 +11,6 @@ const urlsToCache = [
   v('./cek_lembur/index.html'),
   v('./styles.css'),
   v('./design-tokens.css'),
-  v('./seasonal-effects.css'),
   v('./theme-light.css'),
   v('./theme-dark.css'),
   './manifest.json',
@@ -21,7 +20,6 @@ const urlsToCache = [
   './icon-512x512.png',
   v('./work_planner.js'),
   v('./theme_manager.js'),
-  v('./seasonal-effects.js'),
   './cek_lembur/'
 ];
 

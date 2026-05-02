@@ -231,7 +231,7 @@ const app = {
         const tab = this.getCurrentTab();
         const confirmed = await this.showConfirm({
             title: 'Hapus Tab',
-            message: `Hapus tab "${tab.name}" dan semua datanya?`,
+            message: `Delete tab "${tab.name}"?`,
             isDanger: true
         });
 
@@ -658,7 +658,7 @@ const app = {
     async deleteAll() {
         const confirmed = await this.showConfirm({
             title: 'Hapus Semua',
-            message: 'Hapus SEMUA data di tab ini? Tindakan ini tidak bisa dibatalkan.',
+            message: 'Clear all items in this tab?',
             isDanger: true
         });
 
@@ -672,7 +672,7 @@ const app = {
     async resetStatus() {
         const confirmed = await this.showConfirm({
             title: 'Reset Status',
-            message: 'Kembalikan semua status ke OUTSTANDING?',
+            message: 'Reset all status to OUTSTANDING?',
             confirmText: 'Ya, Reset'
         });
 
@@ -861,7 +861,7 @@ const app = {
                 if (tab.data.length > 0) {
                     const confirmed = await this.showConfirm({
                         title: 'Import Data',
-                        message: `Import ${list.length} data? Data baru akan ditambahkan ke daftar yang sudah ada.`,
+                        message: `Import ${list.length} items?`,
                         confirmText: 'Ya, Import'
                     });
                     if (!confirmed) return;

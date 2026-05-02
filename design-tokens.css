@@ -91,9 +91,17 @@
   --status-outstanding-border: #fee2e2; /* Red-100 */
 
   /* ===== TRANSITIONS ===== */
-  --transition-fast: 100ms ease;
-  --transition-base: 200ms ease;
-  --transition-slow: 300ms ease;
+  /* ===== Z-INDEX HIERARCHY ===== */
+  --z-base: 1;
+  --z-sticky: 100;
+  --z-nav: 200;
+  --z-fab: 300;
+  --z-modal: 1000;
+  --z-overlay: 9999;
+
+  /* ===== LAYOUT TOKENS ===== */
+  --nav-height: 64px;
+  --header-height: 60px;
 }
 
 body {
