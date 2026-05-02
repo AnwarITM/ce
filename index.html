@@ -4,17 +4,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Welcome to Task Manager</title>
+  <title>Task Manager CE</title>
 
   <!-- PWA Meta -->
-  <meta name="theme-color" content="#00e5ff" />
+  <meta name="theme-color" content="#0070f3" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="TaskManager" />
   <meta name="mobile-web-app-capable" content="yes" />
-  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
-  <meta http-equiv="Pragma" content="no-cache" />
-  <meta http-equiv="Expires" content="0" />
+  
   <script>
     const APP_VERSION = '20260110';
     const CACHE_PREFIX = 'eps-work-planner-v';
@@ -29,11 +27,8 @@
       manifestLink.rel = 'manifest';
       manifestLink.href = 'manifest.json';
       document.head.appendChild(manifestLink);
-    } else {
-      console.info('PWA manifest disabled for unsupported origin:', location.protocol);
     }
 
-    // If version changes, drop old caches and force one refresh to load fresh assets
     if (CAN_USE_SERVICE_WORKER && 'caches' in window) {
       const savedVersion = localStorage.getItem('eps-app-version');
       const alreadyRefreshed = sessionStorage.getItem('eps-version-refreshed');
@@ -65,563 +60,168 @@
   <link rel="stylesheet" href="styles.css?v=20260110">
   <link id="theme-link" rel="stylesheet" href="theme-light.css?v=20260110">
   <script src="theme_manager.js?v=20260110"></script>
-  <script>
-    if (CAN_USE_SERVICE_WORKER && 'serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.getRegistration().then((reg) => reg && reg.update());
-      });
-    }
-  </script>
+  
   <style>
-    body {
-      min-height: 100dvh;
-      background-color: var(--bg-color);
-      color: var(--text-color);
-    }
-
-    .landing-wrap {
-      max-width: 1180px;
-      margin: 0 auto;
-      padding: 28px 20px 36px;
-      display: flex;
-      flex-direction: column;
-      gap: 28px;
-      position: relative;
-      z-index: 1;
-    }
-
     .hero-card {
+      background: var(--surface-1);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      box-shadow: var(--shadow-lg);
+      margin-top: var(--space-4);
       display: flex;
       flex-direction: column;
-      gap: 20px;
-      background: var(--surface-strong);
-      border: 1px solid var(--surface-border);
-      border-radius: 16px;
-      padding: 28px;
-      box-shadow: var(--shadow-xl);
+      gap: var(--space-6);
     }
 
     .hero-main {
       display: flex;
       justify-content: space-between;
-      gap: 20px;
       align-items: flex-start;
-    }
-
-    .hero-copy {
-      max-width: 640px;
+      gap: var(--space-6);
     }
 
     .hero-title {
-      margin: 10px 0 10px;
-      font-size: clamp(32px, 6vw, 52px);
-      font-weight: 700;
-      line-height: 1.05;
-      color: var(--text-color);
-      letter-spacing: 0;
+      font-size: clamp(32px, 8vw, 48px);
+      line-height: 1.1;
+      margin-bottom: var(--space-2);
     }
 
     .hero-sub {
-      margin: 0;
       color: var(--text-secondary);
-      font-size: 16px;
-      max-width: 58ch;
-      line-height: 1.7;
+      font-size: var(--font-size-lg);
+      max-width: 48ch;
+      margin-bottom: var(--space-6);
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: var(--space-3);
     }
 
     .pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 7px 12px;
-      border-radius: 999px;
-      background: rgba(8, 145, 178, 0.1);
-      color: var(--primary-color);
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      border: 1px solid rgba(8, 145, 178, 0.14);
-    }
-
-    .theme-btn {
-      min-width: 128px;
-      min-height: 44px;
-      background: var(--theme-toggle-bg);
-      border: 1px solid var(--theme-toggle-border);
-      border-radius: 8px;
-      padding: 10px 14px;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text-color);
-      box-shadow: var(--theme-toggle-shadow);
-      white-space: nowrap;
-    }
-
-    .theme-btn[data-theme-target="dark"]::before,
-    .theme-btn[data-theme-target="light"]::before {
-      content: "";
       display: inline-block;
-      width: 10px;
-      height: 10px;
-      border-radius: 999px;
-      margin-right: 8px;
-      vertical-align: middle;
-      background: var(--primary-color);
-      box-shadow: 0 0 0 4px rgba(8, 145, 178, 0.12);
-    }
-
-    .hero-meta,
-    .hero-actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .hero-actions {
-      margin-top: 20px;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      min-height: 32px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      background: var(--surface-muted);
-      border: 1px solid var(--surface-border);
-      color: var(--text-color);
-      font-size: 12px;
-      font-weight: 600;
-    }
-
-    .hero-link {
-      min-height: 46px;
-      padding: 12px 16px;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: 600;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
-    }
-
-    .hero-link:hover,
-    .hero-link:focus-visible {
-      transform: translateY(-1px);
-    }
-
-    .hero-link-primary {
-      background: var(--gradient-primary);
-      color: var(--button-primary-text);
-      box-shadow: 0 14px 28px rgba(8, 145, 178, 0.22);
-    }
-
-    .hero-link-secondary {
-      color: var(--text-color);
-      border: 1px solid var(--surface-border);
-      background: var(--surface-soft);
-    }
-
-    .section-head {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      max-width: 680px;
-    }
-
-    .section-label {
-      margin: 0;
-      font-size: 12px;
+      padding: 4px 10px;
+      background: var(--status-done-bg);
+      color: var(--status-done-text);
+      border-radius: var(--radius-full);
+      font-size: var(--font-size-xs);
       font-weight: 700;
-      letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: var(--primary-color);
-    }
-
-    .section-title {
-      margin: 0;
-      font-size: clamp(24px, 4vw, 34px);
-      line-height: 1.15;
-      color: var(--text-color);
-    }
-
-    .section-sub {
-      margin: 0;
-      font-size: 15px;
-      line-height: 1.7;
-      color: var(--text-secondary);
+      letter-spacing: 0.05em;
+      margin-bottom: var(--space-3);
     }
 
     .app-grid {
       display: grid;
-      gap: 16px;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--space-4);
+      margin-top: var(--space-6);
     }
 
     .app-card {
-      text-decoration: none;
-      color: var(--text-color);
-      background: var(--surface-elevated);
-      border: 1px solid var(--surface-border);
-      border-radius: 14px;
-      padding: 18px;
+      background: var(--surface-1);
+      border-radius: var(--radius-lg);
+      padding: var(--space-6);
       box-shadow: var(--shadow-md);
+      text-decoration: none;
+      color: inherit;
       display: flex;
       flex-direction: column;
-      gap: 16px;
-      align-items: flex-start;
-      transition: transform 0.18s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-      backdrop-filter: blur(16px);
-      min-height: 220px;
+      gap: var(--space-4);
+      transition: var(--transition-base);
     }
 
     .app-card:hover {
       transform: translateY(-4px);
-      box-shadow: var(--surface-shadow-hover);
-      border-color: rgba(8, 145, 178, 0.22);
-    }
-
-    .app-card:focus,
-    .app-card:focus-visible {
-      outline: 2px solid var(--outline-color);
-      outline-offset: 4px;
-    }
-
-    .app-card-top {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
+      box-shadow: var(--shadow-lg);
     }
 
     .app-icon {
-      width: 56px;
-      height: 56px;
-      border-radius: 14px;
-      display: inline-flex;
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      display: flex;
       align-items: center;
       justify-content: center;
       color: #fff;
-      box-shadow: var(--surface-shadow);
-      flex-shrink: 0;
-      transition: all var(--transition-base);
     }
 
-    .app-icon svg {
-      width: 26px;
-      height: 26px;
-      stroke: currentColor;
-    }
-
-    .app-icon--planner {
-      background: linear-gradient(135deg, #0f766e, #14b8a6);
-    }
-
-    .app-icon--notes {
-      background: linear-gradient(135deg, #2563eb, #38bdf8);
-    }
-
-    .app-icon--overtime {
-      background: linear-gradient(135deg, #7c3aed, #a855f7);
-    }
-
-    .app-card:hover .app-icon {
-      transform: scale(1.04);
-      box-shadow: var(--surface-shadow-hover);
-    }
-
-    .app-badge {
-      display: inline-flex;
-      align-items: center;
-      min-height: 32px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      background: var(--surface-muted);
-      color: var(--text-color);
-      font-size: 12px;
-      font-weight: 600;
-    }
+    .app-icon--planner { background: var(--gradient-primary); }
+    .app-icon--notes { background: linear-gradient(135deg, #7928ca, #ff0080); }
+    .app-icon--overtime { background: linear-gradient(135deg, #f5a623, #ff4d4d); }
 
     .app-title {
-      font-size: 18px;
-      font-weight: 700;
-      margin: 0;
-      color: var(--text-color);
+      font-size: var(--font-size-lg);
+      font-weight: 600;
     }
 
     .app-desc {
-      margin: 8px 0 0;
       color: var(--text-secondary);
-      font-size: 14px;
-      line-height: 1.6;
-    }
-
-    .app-footer {
-      margin-top: auto;
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding-top: 14px;
-      border-top: 1px solid var(--surface-border);
-      font-size: 13px;
-      color: var(--text-secondary);
-    }
-
-    .app-link-label {
-      font-weight: 600;
-      color: var(--primary-color);
-    }
-
-    .app-arrow {
-      font-size: 20px;
-      line-height: 1;
-      color: var(--text-muted);
-      transition: transform var(--transition-base), color var(--transition-base);
-    }
-
-    .app-card:hover .app-arrow,
-    .app-card:focus-visible .app-arrow {
-      transform: translateX(3px);
-      color: var(--primary-color);
+      font-size: var(--font-size-sm);
     }
 
     @media (max-width: 640px) {
-      body {
-        background-attachment: scroll;
-      }
-
-      .landing-wrap {
-        padding: 18px 14px 28px;
-        gap: 18px;
-      }
-
-      .hero-card {
-        padding: 20px 18px;
-        gap: 18px;
-      }
-
-      .hero-main {
-        flex-direction: column;
-      }
-
-      .hero-title {
-        font-size: clamp(28px, 9vw, 38px);
-      }
-
-      .hero-sub,
-      .section-sub {
-        font-size: 14px;
-      }
-
-      .hero-actions {
-        display: grid;
-        grid-template-columns: 1fr;
-      }
-
-      .hero-link,
-      .theme-btn {
-        width: 100%;
-      }
-
-      .app-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .app-card {
-        min-height: 0;
-      }
-
-      .app-footer {
-        align-items: flex-start;
-      }
+      .hero-main { flex-direction: column; }
+      .hero-actions { flex-direction: column; }
+      .hero-actions .btn { width: 100%; }
+      .hero-card { padding: var(--space-6); }
     }
   </style>
 </head>
 
-<body class="">
-  <div class="landing-wrap">
+<body>
+  <div class="container">
     <div class="hero-card">
       <div class="hero-main">
         <div class="hero-copy">
           <div class="pill">Dashboard</div>
           <h1 class="hero-title">
-            <a href="admin_notes.html" style="text-decoration: none; color: inherit; cursor: pointer;" data-seasonal-title>Task Manager CE</a>
+            <a href="admin_notes.html" style="text-decoration: none; color: inherit;" data-seasonal-title>Task Manager CE</a>
           </h1>
           <p class="hero-sub">Enterprise field tools for planner, notes, and overtime management.</p>
           <div class="hero-actions">
-            <a href="work_planner.html" class="hero-link hero-link-primary">Work Planner</a>
-            <a href="notes_viewer.html" class="hero-link hero-link-secondary">Notes</a>
-          </div>
-          <div class="hero-meta">
-            <span class="badge">Cepat</span>
-            <span class="badge">Ringan</span>
-            <span class="badge">Siaga</span>
+            <a href="work_planner.html" class="btn btn-primary">Work Planner</a>
+            <a href="notes_viewer.html" class="btn btn-secondary">Notes</a>
           </div>
         </div>
-        <button class="theme-btn" onclick="toggleGlobalTheme()" title="Switch Theme">Mode</button>
+        <button class="btn btn-secondary" onclick="toggleGlobalTheme()">Mode</button>
       </div>
     </div>
 
-    <div class="section-head">
-      <h2 class="section-title">Field Tools</h2>
-    </div>
-
-    <div class="app-grid">
-      <a href="work_planner.html" class="app-card">
-        <div class="app-card-top">
-          <div class="app-icon app-icon--planner" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3.5" y="4.5" width="17" height="15" rx="2"></rect>
-              <path d="M8 2.75v3.5M16 2.75v3.5M3.5 9.5h17"></path>
-              <path d="M8 13h3M8 16h6"></path>
-            </svg>
+    <div style="margin-top: var(--space-10);">
+      <h2 style="font-size: var(--font-size-xl); margin-bottom: var(--space-4);">Field Tools</h2>
+      <div class="app-grid">
+        <a href="work_planner.html" class="app-card">
+          <div class="app-icon app-icon--planner">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
           </div>
-          <span class="app-badge">Planner</span>
-        </div>
-        <div>
-          <p class="app-title">Work Planner</p>
-          <p class="app-desc">Task management and WSID import.</p>
-        </div>
-        <div class="app-footer">
-          <span class="app-link-label">Open Planner</span>
-          <span class="app-arrow" aria-hidden="true">→</span>
-        </div>
-      </a>
-      <a href="notes_viewer.html" class="app-card">
-        <div class="app-card-top">
-          <div class="app-icon app-icon--notes" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M7 3.5h7l4 4V20a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 6 20V5A1.5 1.5 0 0 1 7.5 3.5z"></path>
-              <path d="M14 3.5v4h4"></path>
-              <path d="M9 12h6M9 16h6"></path>
-            </svg>
+          <div>
+            <p class="app-title">Work Planner</p>
+            <p class="app-desc">Task management and WSID import.</p>
           </div>
-          <span class="app-badge">Catatan</span>
-        </div>
-        <div>
-          <p class="app-title">Notes</p>
-          <p class="app-desc">Quick access to essential notes.</p>
-        </div>
-        <div class="app-footer">
-          <span class="app-link-label">Open Notes</span>
-          <span class="app-arrow" aria-hidden="true">→</span>
-        </div>
-      </a>
-      <a href="cek_lembur/index.html" class="app-card">
-        <div class="app-card-top">
-          <div class="app-icon app-icon--overtime" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="13" r="7.5"></circle>
-              <path d="M12 9v4l2.5 1.5"></path>
-              <path d="M9 2.75h6"></path>
-            </svg>
+        </a>
+        <a href="notes_viewer.html" class="app-card">
+          <div class="app-icon app-icon--notes">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
           </div>
-          <span class="app-badge">Lembur</span>
-        </div>
-        <div>
-          <p class="app-title">Overtime Check</p>
-          <p class="app-desc">Excel calculation and summaries.</p>
-        </div>
-        <div class="app-footer">
-          <span class="app-link-label">Open Calculator</span>
-          <span class="app-arrow" aria-hidden="true">→</span>
-        </div>
-      </a>
+          <div>
+            <p class="app-title">Notes</p>
+            <p class="app-desc">Quick access to essential notes.</p>
+          </div>
+        </a>
+        <a href="cek_lembur/index.html" class="app-card">
+          <div class="app-icon app-icon--overtime">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          </div>
+          <div>
+            <p class="app-title">Overtime Check</p>
+            <p class="app-desc">Excel calculation and summaries.</p>
+          </div>
+        </a>
+      </div>
     </div>
   </div>
 
-  <!-- MODAL -->
-  <div id="myModal" class="modal">
-    <div class="modal-content">
-      <p>Halaman dimuat ulang</p>
-    </div>
-  </div>
-
-  <!-- TAP 5X SCRIPT -->
-  <script>
-    // Click on title "Task Manager CE" to access admin (1 click only)
-    const titleEl = document.querySelector('[data-seasonal-title]');
-    if (titleEl) {
-      titleEl.addEventListener('click', () => {
-        // Set session flag and redirect to admin notes
-        sessionStorage.setItem('showAdminLogin', 'true');
-        window.location.href = 'admin_notes.html';
-      });
-    }
-
-    // Body click for reload (existing feature - tap 5x)
-    let tapCount = 0;
-    let tapTimer;
-    document.body.addEventListener("click", () => {
-      tapCount++;
-      clearTimeout(tapTimer);
-      tapTimer = setTimeout(() => tapCount = 0, 1000);
-
-      if (tapCount === 5) {
-        tapCount = 0;
-        showModal();
-      }
-    });
-
-    function showModal() {
-      const modal = document.getElementById("myModal");
-      modal.style.display = "flex";
-
-      setTimeout(() => {
-        modal.style.display = "none";
-        location.reload();
-      }, 1500);
-    }
-  </script>
-
-  <!-- PWA Script: Service Worker + Install Prompt -->
-  <script>
-    if (CAN_USE_SERVICE_WORKER && 'serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistrations().then((regs) => {
-        regs.forEach((reg) => {
-          if (reg.active && reg.active.scriptURL !== SW_SCRIPT_URL) {
-            reg.unregister();
-          }
-        });
-      });
-
-      navigator.serviceWorker.register(SW_URL, { updateViaCache: 'none' })
-        .then((reg) => {
-          console.log('Service Worker registered from index.html', reg);
-          reg.update();
-        })
-        .catch((err) => console.error('SW registration failed', err));
-
-      let refreshing = false;
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (refreshing) return;
-        refreshing = true;
-        window.location.reload();
-      });
-    } else {
-      console.info('Service worker disabled for unsupported origin:', location.protocol, location.hostname);
-    }
-
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      console.log('Install prompt available');
-      // Tampilkan tombol install jika ingin
-    });
-
-    window.addEventListener('appinstalled', () => {
-      console.log('App installed from index.html');
-    });
-  </script>
-  <!-- Persistent Bottom Navigation -->
   <nav class="bottom-nav">
     <a href="index.html" class="nav-link active">
       <span class="nav-icon">🏠</span>
@@ -640,6 +240,16 @@
       <span>Lembur</span>
     </a>
   </nav>
+
+  <script>
+    const titleEl = document.querySelector('[data-seasonal-title]');
+    if (titleEl) {
+      titleEl.addEventListener('click', () => {
+        sessionStorage.setItem('showAdminLogin', 'true');
+        window.location.href = 'admin_notes.html';
+      });
+    }
+  </script>
 </body>
 
 </html>
