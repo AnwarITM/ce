@@ -75,13 +75,8 @@
   <style>
     body {
       min-height: 100dvh;
-      background-image:
-        linear-gradient(180deg, var(--page-overlay-start) 0%, var(--page-overlay-end) 100%),
-        var(--page-image);
-      background-position: center;
-      background-size: cover;
-      background-attachment: fixed;
-      background-color: var(--page-bg-solid);
+      background-color: var(--bg-color);
+      color: var(--text-color);
     }
 
     .landing-wrap {
@@ -99,14 +94,11 @@
       display: flex;
       flex-direction: column;
       gap: 20px;
-      background:
-        linear-gradient(145deg, var(--surface-strong), var(--surface-soft)),
-        radial-gradient(circle at top right, var(--hero-glow), transparent 32%);
+      background: var(--surface-strong);
       border: 1px solid var(--surface-border);
       border-radius: 16px;
       padding: 28px;
-      box-shadow: var(--hero-card-shadow);
-      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow-xl);
     }
 
     .hero-main {
@@ -629,6 +621,25 @@
       console.log('App installed from index.html');
     });
   </script>
+  <!-- Persistent Bottom Navigation -->
+  <nav class="bottom-nav">
+    <a href="index.html" class="nav-link active">
+      <span class="nav-icon">🏠</span>
+      <span>Home</span>
+    </a>
+    <a href="work_planner.html" class="nav-link">
+      <span class="nav-icon">📋</span>
+      <span>Planner</span>
+    </a>
+    <a href="notes_viewer.html" class="nav-link">
+      <span class="nav-icon">📓</span>
+      <span>Notes</span>
+    </a>
+    <a href="cek_lembur/index.html" class="nav-link">
+      <span class="nav-icon">⏱</span>
+      <span>Lembur</span>
+    </a>
+  </nav>
 </body>
 
 </html>
