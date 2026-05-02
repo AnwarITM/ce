@@ -1273,35 +1273,6 @@
             </div>
         </div>
 
-        <!-- Modal Overlay -->
-        <div id="dataModal" class="modal-overlay" style="display:none;">
-            <div class="modal-content glass-card">
-                <div class="modal-header">
-                    <h3 id="modalTitle">Add Data</h3>
-                    <button class="btn-close" onclick="app.closeModal()">✕</button>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" id="editId">
-                    <div class="input-group">
-                        <label>Data / WSID</label>
-                        <input type="text" id="mInputWsid" placeholder="Masukkan ID...">
-                    </div>
-                    <div class="input-group">
-                        <label>Catatan</label>
-                        <textarea id="mInputNotes" placeholder="Tambahkan catatan..."></textarea>
-                    </div>
-                    <div class="input-group">
-                        <label>Plan</label>
-                        <input type="text" id="mInputPlan" placeholder="Contoh: Jan 2024">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn-glass" onclick="app.closeModal()">Batal</button>
-                    <button class="btn-glass btn-primary" onclick="app.saveModalData()">Simpan Data</button>
-                </div>
-            </div>
-        </div>
-
         <!-- Tabs -->
         <div class="tabs-wrapper" id="tabsContainer">
             <div class="tab-add-btn" onclick="app.addTab()">+</div>
@@ -1419,7 +1390,7 @@
 
     <!-- Scripts -->
     <script src="theme_manager.js?v=20260110"></script>
-    <script src="work_planner.js?v=20260318"></script>
+    <script src="work_planner.js?v=20260501"></script>
     <script>
         // ============================================
         // FIREBASE CONFIG & LOGIN SYSTEM
@@ -1548,6 +1519,10 @@
         function loadWorkPlannerFromFirebase(userId) {
             // Use real-time listener for instant sync across devices
             db.ref('work_planner/' + userId).on('value', (snapshot) => {
+                // If we're currently pushing a local change, ignore incoming sync
+                // to prevent race conditions or "echo" overwrites
+                if (isLocalChange) return;
+
                 const data = snapshot.val();
 
                 // Initialize app.state if not exists
@@ -1557,51 +1532,34 @@
 
                 if (data && data.tabs) {
                     // Sync dari Firebase ke app state
-                    const firebaseTabs = Object.values(data.tabs || {});
+                    const firebaseTabs = Object.entries(data.tabs || {}).map(([id, tab]) => ({
+                        ...(tab || {}),
+                        id: tab?.id ?? Number(id)
+                    })).sort((a, b) => a.id - b.id);
+                    
                     const firebaseCurrentTabId = data.currentTabId || 0;
 
-                    // Check if data actually changed (to avoid re-rendering local changes)
+                    // Check if data actually changed
                     const hasChanges = JSON.stringify(app.state.tabs) !== JSON.stringify(firebaseTabs) ||
                                       app.state.currentTabId !== firebaseCurrentTabId;
 
                     if (hasChanges) {
-                        // Only update if data is different
                         app.state.tabs = firebaseTabs;
                         app.state.currentTabId = firebaseCurrentTabId;
 
-                        // Ensure each tab has proper structure
-                        app.state.tabs.forEach(tab => {
-                            if (!tab.data) tab.data = [];
-                            tab.data.forEach(row => {
-                                if (!row.id) row.id = 'row_' + Date.now() + Math.random();
-                                if (!row.status) row.status = 'outstanding';
-                                if (typeof row.sortOrder !== 'number') row.sortOrder = 0;
-                                // Backfill legacy field names
-                                if (!row.wsid && row.machineData) row.wsid = row.machineData;
-                                if (!row.plan && row.period) row.plan = row.period;
-                                // Compute wsidKey if missing
-                                if (!row.wsidKey && row.wsid) row.wsidKey = app.getWsidKey(row.wsid);
-                                // Compute planTs if missing
-                                if (!row.planTs && row.plan) {
-                                    const { ts } = app.parsePlanValue(row.plan);
-                                    row.planTs = ts;
-                                }
-                            });
-                            if (!tab.sortMode) tab.sortMode = 'date';
-                            if (!tab.excelConfig) tab.excelConfig = {};
-                        });
-
-                        app.saveState();
+                        app.normalizeState(true); // skipSave=true to avoid redundant Firebase sync
+                        originalSaveState(); // Save locally without triggering Firebase
                         app.renderTabs();
                         app.renderUI();
-                        console.log('🔄 Data synced from Firebase (remote change detected)');
+                        console.log('🔄 Data synced from Firebase');
                     }
                     isFirebaseSynced = true;
                 } else {
                     // No data in Firebase, start fresh
-                    app.state.tabs = [];
+                    app.state.tabs = [createNewTab(0)];
                     app.state.currentTabId = 0;
-                    app.saveState();
+                    app.normalizeState();
+                    originalSaveState();
                     app.renderTabs();
                     app.renderUI();
                     isFirebaseSynced = true;
@@ -1614,18 +1572,16 @@
         function saveWorkPlannerToFirebase(userId) {
             if (!userId || !isFirebaseSynced) return;
 
-            // Clear pending save if exists
             if (saveTimeout) clearTimeout(saveTimeout);
 
-            // Debounce 500ms for faster real-time sync
             saveTimeout = setTimeout(() => {
-                isLocalChange = true; // Mark as local change to avoid re-trigger
+                isLocalChange = true;
                 
-                // Batch write semua updates dalam 1x request
                 db.ref('work_planner/' + userId).update({
                     currentTabId: app.state.currentTabId,
                     tabs: app.state.tabs.reduce((acc, tab) => {
                         acc[tab.id] = {
+                            id: tab.id,
                             name: tab.name,
                             sortMode: tab.sortMode || 'date',
                             excelConfig: tab.excelConfig || {},
@@ -1636,19 +1592,24 @@
                 }, (error) => {
                     if (error) {
                         console.error('Firebase save error:', error);
+                        isLocalChange = false;
                     } else {
                         console.log('✅ Data saved to Firebase');
+                        // Small delay before allowing sync to process "echoes"
+                        setTimeout(() => { isLocalChange = false; }, 200);
                     }
-                    setTimeout(() => { isLocalChange = false; }, 100);
                 });
-            }, 500); // Save 500ms after user stops editing
+            }, 500);
         }
 
         // Override app.saveState to sync with Firebase
-        const originalSaveState = app.saveState;
+        const originalSaveState = app.saveState.bind(app);
         app.saveState = function() {
-            originalSaveState(); // Keep local storage as backup
+            originalSaveState();
             if (currentUserId && isFirebaseSynced) {
+                // Set isLocalChange to true immediately when a change happens locally
+                // This prevents the sync listener from overwriting the state while we wait for debounce
+                isLocalChange = true;
                 saveWorkPlannerToFirebase(currentUserId);
             }
         };

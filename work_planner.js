@@ -61,12 +61,38 @@ const app = {
             } catch (e) { console.error('Corrupt state', e); }
         }
 
-        if (this.state.tabs.length === 0) {
-            this.state.tabs = [createNewTab(0)];
+        this.normalizeState();
+        this.saveState();
+    },
+
+    normalizeState(skipSave = false) {
+        if (!this.state) {
+            this.state = { tabs: [], currentTabId: 0 };
         }
 
-        // Migrate old data: ensure each row has id + status
-        this.state.tabs.forEach(tab => {
+        if (!Array.isArray(this.state.tabs)) {
+            this.state.tabs = [];
+        }
+
+        if (this.state.tabs.length === 0) {
+            this.state.tabs = [createNewTab(0)];
+            this.state.currentTabId = 0;
+        }
+
+        const usedIds = new Set();
+        this.state.tabs.forEach((tab, tabIndex) => {
+            let tabId = Number(tab.id);
+            if (!Number.isFinite(tabId) || usedIds.has(tabId)) {
+                tabId = tabIndex;
+                while (usedIds.has(tabId)) tabId += 1;
+            }
+            tab.id = tabId;
+            usedIds.add(tabId);
+            tab.name = tab.name || `Tab ${tab.id + 1}`;
+            tab.excelConfig = tab.excelConfig || {
+                lastMapWsid: '',
+                lastMapPlan: ''
+            };
             tab.data = (tab.data || []).map((row, idx) => {
                 if (!row.id) row.id = 'm_' + Date.now() + Math.random();
                 if (!row.status) row.status = 'outstanding';
@@ -83,7 +109,11 @@ const app = {
             });
             tab.sortMode = tab.sortMode || 'date';
         });
-        this.saveState();
+
+        const currentTabId = Number(this.state.currentTabId);
+        const hasCurrentTab = this.state.tabs.some(tab => tab.id === currentTabId);
+        this.state.currentTabId = hasCurrentTab ? currentTabId : this.state.tabs[0].id;
+        if (!skipSave) this.saveState();
     },
 
     saveState() {
@@ -105,7 +135,9 @@ const app = {
     // --- Tab Management ---
     renderTabs() {
         const container = $('#tabsContainer');
+        if (!container) return;
         const addBtn = container.querySelector('.tab-add-btn');
+        if (!addBtn) return;
 
         // Clear existing tabs (keep add btn)
         Array.from(container.children).forEach(c => {
@@ -131,7 +163,13 @@ const app = {
     },
 
     addTab() {
-        const newId = this.state.tabs.length > 0 ? Math.max(...this.state.tabs.map(t => t.id)) + 1 : 0;
+        if (this.state.tabs.length >= 4) {
+            alert("Maksimal 4 tab diperbolehkan.");
+            return;
+        }
+        this.normalizeState();
+        const tabIds = this.state.tabs.map(t => Number(t.id)).filter(Number.isFinite);
+        const newId = tabIds.length > 0 ? Math.max(...tabIds) + 1 : 0;
         this.state.tabs.push(createNewTab(newId));
         this.switchTab(newId);
     },
