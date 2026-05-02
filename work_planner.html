@@ -152,9 +152,17 @@
         th, td {
             padding: 12px 8px;
             font-size: 13px;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            vertical-align: middle;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+            line-height: 1.4;
+        }
+
+        th {
             white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
         }
 
         .status-cell {
@@ -168,9 +176,9 @@
             }
             
             /* Column Widths for Mobile */
-            th:nth-child(1), td:nth-child(1) { width: 25px; text-align: center; } /* No */
-            th:nth-child(2), td:nth-child(2) { width: 70px; } /* WSID */
-            th:nth-child(3), td:nth-child(3) { width: auto; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; } /* Notes */
+            th:nth-child(1), td:nth-child(1) { width: 30px; text-align: center; } /* No */
+            th:nth-child(2), td:nth-child(2) { width: 80px; } /* WSID */
+            th:nth-child(3), td:nth-child(3) { width: auto; } /* Notes - allow full wrap */
             th:nth-child(4), td:nth-child(4) { width: 60px; text-align: center; } /* Plan */
             th:nth-child(5), td:nth-child(5) { width: 85px; text-align: center; } /* Status */
         }
@@ -283,7 +291,7 @@
 
         <div class="app-shell">
             <header class="app-header">
-                <div class="app-title" onclick="app.renameTab()">Work Planner</div>
+                <div class="app-title" style="cursor: pointer;" onclick="app.renameTab()">Work Planner</div>
                 <div style="display: flex; gap: var(--space-2);">
                     <button class="btn btn-secondary btn-compact" onclick="$('#fileImport').click()">Import</button>
                     <button class="btn btn-secondary btn-compact" onclick="app.exportTabData()">Export</button>
@@ -394,6 +402,21 @@
             <div style="display: flex; gap: var(--space-3);">
                 <button class="btn btn-secondary" style="flex: 1;" onclick="app.closeModal()">Batal</button>
                 <button class="btn btn-primary" style="flex: 1;" onclick="app.saveModalData()">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab Modal -->
+    <div id="tabModal" class="modal-overlay" onclick="if(event.target==this)app.closeTabModal()">
+        <div class="modal-content">
+            <h3 id="tabModalTitle" style="margin-bottom: var(--space-4);">Tambah Tab</h3>
+            <div style="margin-bottom: var(--space-6);">
+                <label class="metric-label">Nama Tab</label>
+                <input type="text" id="tabNameInput" class="cell-edit" placeholder="Nama tab baru..." onkeypress="if(event.key==='Enter')app.saveTabData()">
+            </div>
+            <div style="display: flex; gap: var(--space-3);">
+                <button class="btn btn-secondary" style="flex: 1;" onclick="app.closeTabModal()">Batal</button>
+                <button class="btn btn-primary" style="flex: 1;" onclick="app.saveTabData()">Simpan</button>
             </div>
         </div>
     </div>

@@ -224,18 +224,62 @@ const app = {
             return;
         }
         
-        const name = prompt("Masukkan nama tab baru:", `Tab ${this.state.tabs.length + 1}`);
-        if (name === null) return; // Cancelled
+        const modal = $('#tabModal');
+        const title = $('#tabModalTitle');
+        const input = $('#tabNameInput');
         
-        this.normalizeState();
-        const tabIds = this.state.tabs.map(t => Number(t.id)).filter(Number.isFinite);
-        const newId = tabIds.length > 0 ? Math.max(...tabIds) + 1 : 0;
+        title.textContent = "Tambah Tab";
+        input.value = `Tab ${this.state.tabs.length + 1}`;
+        this.state.isRenamingTab = false;
         
-        const newTab = createNewTab(newId);
-        newTab.name = name.trim() || `Tab ${newId + 1}`;
+        modal.style.display = 'flex';
+        input.focus();
+        input.select();
+    },
+
+    renameTab() {
+        const tab = this.getCurrentTab();
+        const modal = $('#tabModal');
+        const title = $('#tabModalTitle');
+        const input = $('#tabNameInput');
         
-        this.state.tabs.push(newTab);
-        this.switchTab(newId);
+        title.textContent = "Rename Tab";
+        input.value = tab.name;
+        this.state.isRenamingTab = true;
+        
+        modal.style.display = 'flex';
+        input.focus();
+        input.select();
+    },
+
+    closeTabModal() {
+        $('#tabModal').style.display = 'none';
+    },
+
+    saveTabData() {
+        const input = $('#tabNameInput');
+        const name = input.value.trim();
+        if (!name) return;
+
+        if (this.state.isRenamingTab) {
+            const tab = this.getCurrentTab();
+            tab.name = name;
+        } else {
+            this.normalizeState();
+            const tabIds = this.state.tabs.map(t => Number(t.id)).filter(Number.isFinite);
+            const newId = tabIds.length > 0 ? Math.max(...tabIds) + 1 : 0;
+            
+            const newTab = createNewTab(newId);
+            newTab.name = name;
+            
+            this.state.tabs.push(newTab);
+            this.state.currentTabId = newId;
+        }
+
+        this.saveState();
+        this.renderTabs();
+        this.renderUI();
+        this.closeTabModal();
     },
 
     async deleteTab() {
@@ -354,9 +398,9 @@ const app = {
 
             tr.innerHTML = `
                 <td class="col-order drag-handle" style="cursor: move;">${index + 1}</td>
-                <td onclick="app.openModal('${row.id}')"><div class="wsid-text">${row.wsid || '-'}</div></td>
-                <td onclick="app.openModal('${row.id}')"><div class="notes-text">${row.notes || ''}</div></td>
-                <td onclick="app.openModal('${row.id}')"><div>${row.plan || this.formatPlanTs(row.planTs)}</div></td>
+                <td onclick="app.openModal('${row.id}')">${row.wsid || '-'}</td>
+                <td onclick="app.openModal('${row.id}')">${row.notes || ''}</td>
+                <td onclick="app.openModal('${row.id}')">${row.plan || this.formatPlanTs(row.planTs)}</td>
                 <td class="status-cell" style="position: relative;">
                     <button class="status-btn ${statusClass}" onclick="event.stopPropagation(); app.toggleStatus('${row.id}')">${statusLabel}</button>
                     <button class="desktop-delete-btn" onclick="event.stopPropagation(); app.deleteOne('${row.id}')">Hapus</button>

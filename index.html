@@ -65,50 +65,90 @@
     .hero-card {
       background: var(--surface-1);
       border-radius: var(--radius-xl);
-      padding: var(--space-8);
+      padding: var(--space-8) var(--space-8) var(--space-6);
       box-shadow: var(--shadow-lg);
       margin-top: var(--space-4);
       display: flex;
       flex-direction: column;
-      gap: var(--space-6);
+      gap: var(--space-4);
+      position: relative;
     }
 
     .hero-main {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
+      align-items: center;
       gap: var(--space-6);
     }
 
     .hero-title {
-      font-size: clamp(32px, 8vw, 48px);
-      line-height: 1.1;
-      margin-bottom: var(--space-2);
+      font-size: clamp(28px, 7vw, 40px);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      margin: 0;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
-    .hero-sub {
-      color: var(--text-secondary);
-      font-size: var(--font-size-lg);
-      max-width: 48ch;
-      margin-bottom: var(--space-6);
-    }
-
-    .hero-actions {
+    /* Professional Theme Toggle */
+    .theme-toggle-wrapper {
       display: flex;
-      gap: var(--space-3);
+      align-items: center;
+      gap: var(--space-2);
     }
 
-    .pill {
+    .theme-switch {
+      position: relative;
       display: inline-block;
-      padding: 4px 10px;
-      background: var(--status-done-bg);
-      color: var(--status-done-text);
-      border-radius: var(--radius-full);
-      font-size: var(--font-size-xs);
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: var(--space-3);
+      width: 44px;
+      height: 24px;
+    }
+
+    .theme-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--surface-3);
+      transition: .4s;
+      border-radius: 24px;
+      border: 1px solid var(--surface-border);
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 2px;
+      bottom: 2px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+      box-shadow: var(--shadow-sm);
+    }
+
+    input:checked + .slider {
+      background-color: var(--primary-color);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(20px);
+    }
+
+    .theme-icon {
+      font-size: 14px;
+      user-select: none;
     }
 
     .app-grid {
@@ -173,23 +213,23 @@
   <div class="container">
     <div class="hero-card">
       <div class="hero-main">
-        <div class="hero-copy">
-          <div class="pill">Dashboard</div>
-          <h1 class="hero-title">
-            <a href="admin_notes.html" style="text-decoration: none; color: inherit;" data-seasonal-title>Task Manager CE</a>
-          </h1>
-          <p class="hero-sub">Enterprise field tools for planner, notes, and overtime management.</p>
-          <div class="hero-actions">
-            <a href="work_planner.html" class="btn btn-primary">Work Planner</a>
-            <a href="notes_viewer.html" class="btn btn-secondary">Notes</a>
-          </div>
+        <h1 class="hero-title">
+          <span data-seasonal-title style="cursor: pointer;">TASK MANAGER CE</span>
+        </h1>
+        
+        <div class="theme-toggle-wrapper">
+          <span class="theme-icon">☀️</span>
+          <label class="theme-switch">
+            <input type="checkbox" id="themeToggleCheckbox" onclick="toggleGlobalTheme()">
+            <span class="slider"></span>
+          </label>
+          <span class="theme-icon">🌙</span>
         </div>
-        <button class="btn btn-secondary" onclick="toggleGlobalTheme()">Mode</button>
       </div>
     </div>
 
-    <div style="margin-top: var(--space-10);">
-      <h2 style="font-size: var(--font-size-xl); margin-bottom: var(--space-4);">Field Tools</h2>
+    <div style="margin-top: var(--space-8);">
+      <h2 style="font-size: var(--font-size-xl); font-weight: 700; margin-bottom: var(--space-4); letter-spacing: -0.02em;">Field Tools</h2>
       <div class="app-grid">
         <a href="work_planner.html" class="app-card">
           <div class="app-icon app-icon--planner">
