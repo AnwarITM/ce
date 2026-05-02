@@ -4,391 +4,188 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Catatan Troubleshoot ATM</title>
+  <title>Notes • EPS</title>
+  
   <link rel="stylesheet" href="design-tokens.css?v=20260110">
   <link rel="stylesheet" href="styles.css?v=20260110">
   <link id="theme-link" rel="stylesheet" href="theme-light.css?v=20260110">
   <script src="theme_manager.js?v=20260110"></script>
+  
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap');
-
-    body {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 16px;
-      padding-bottom: calc(var(--nav-height) + 32px);
-      min-height: 100vh;
-      color: var(--text-color);
-      font-family: "Manrope", "Segoe UI", sans-serif;
-      background-color: var(--bg-color);
-    }
-
-    h1 {
-      color: var(--text-color);
-      margin: 0;
-      font-size: 24px;
-      font-weight: 800;
-      letter-spacing: -0.2px;
-      line-height: 1.2;
-    }
-
     .page-header {
+      background: var(--surface-1);
+      padding: var(--space-6);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      margin-bottom: var(--space-6);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
       position: sticky;
-      top: 0;
+      top: var(--space-4);
       z-index: var(--z-sticky);
-      background: var(--surface-strong);
-      padding: 16px;
-      border: 1px solid var(--surface-border);
-      border-radius: 12px;
-      box-shadow: var(--shadow-sm);
-      margin-bottom: 18px;
     }
 
     .header-top {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 10px;
-    }
-
-    .count-pill {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--text-color);
-      background: var(--surface-muted);
-      border: 1px solid var(--surface-border);
-      padding: 6px 10px;
-      border-radius: 999px;
-      display: inline-flex;
       align-items: center;
-      gap: 6px;
-      white-space: nowrap;
     }
 
-    .count-meta {
-      font-size: 12px;
-      color: var(--text-secondary);
-      margin-top: 6px;
-      font-weight: 600;
-    }
-
-    #search {
+    .search-input {
       width: 100%;
       padding: 12px 16px;
-      border: 1px solid var(--surface-border);
-      border-radius: 10px;
-      font-size: 15px;
-      background: var(--input-bg);
+      border-radius: var(--radius-md);
+      border: 1px solid transparent;
+      background: var(--surface-2);
       color: var(--text-color);
-      transition: all 0.2s ease;
+      font-family: inherit;
+      transition: var(--transition-base);
     }
 
-    #search::placeholder {
-      color: var(--text-muted);
-    }
-
-    #search:focus {
+    .search-input:focus {
       outline: none;
+      background: var(--bg-color);
       border-color: var(--primary-color);
       box-shadow: var(--shadow-focus);
     }
 
     .chip-row {
       display: flex;
-      gap: 8px;
+      gap: var(--space-2);
       overflow-x: auto;
-      padding: 8px 2px 4px;
-      scrollbar-width: none;
+      padding-bottom: var(--space-1);
       -ms-overflow-style: none;
+      scrollbar-width: none;
     }
-
-    .chip-row::-webkit-scrollbar {
-      display: none;
-    }
+    .chip-row::-webkit-scrollbar { display: none; }
 
     .chip {
-      border: 1px solid var(--surface-border);
-      background: var(--surface-strong);
-      color: var(--text-color);
-      border-radius: 999px;
-      padding: 7px 12px;
-      font-size: 13px;
+      background: var(--surface-2);
+      color: var(--text-secondary);
+      border: none;
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      font-size: var(--font-size-xs);
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.2s ease, border-color 0.2s ease;
       white-space: nowrap;
-    }
-
-    .chip:hover {
-      border-color: var(--primary-light);
+      transition: var(--transition-base);
     }
 
     .chip.active {
       background: var(--primary-color);
-      border-color: var(--primary-color);
-      color: var(--button-primary-text);
+      color: #fff;
     }
 
     .catatan-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 14px;
-      align-items: start;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: var(--space-4);
     }
 
-    .tab-context {
-      margin: 6px 0 12px;
-      font-weight: 700;
-      color: var(--text-secondary);
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .catatan {
-      border-radius: 14px;
-      overflow: hidden;
-      background: var(--surface-elevated);
-      border: 1px solid var(--surface-border-strong);
-      box-shadow: var(--surface-shadow);
-      transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    .catatan-card {
+      background: var(--surface-1);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      padding: var(--space-6);
       display: flex;
       flex-direction: column;
-      min-height: 180px;
-      overflow-anchor: none;
+      gap: var(--space-4);
+      transition: var(--transition-base);
     }
 
-    .catatan:hover {
-      box-shadow: var(--surface-shadow-hover);
-      border-color: var(--primary-light);
-    }
-
-    .card-head {
-      padding: 18px;
-      border-bottom: 1px solid var(--surface-border-strong);
-      background: var(--surface-strong);
+    .catatan-card:hover {
+      box-shadow: var(--shadow-lg);
     }
 
     .badge {
-      display: inline-flex;
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: 11px;
+      display: inline-block;
+      padding: 2px 8px;
+      background: var(--surface-2);
+      color: var(--text-secondary);
+      border-radius: var(--radius-sm);
+      font-size: 10px;
       font-weight: 700;
-      background: var(--surface-muted);
-      color: var(--text-color);
-      border: 1px solid var(--surface-border);
-      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
 
     .judul {
+      font-size: var(--font-size-lg);
       font-weight: 700;
-      font-size: 17px;
-      color: var(--text-color);
-      line-height: 1.4;
-      cursor: pointer;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
+      line-height: 1.3;
     }
 
     .summary {
-      padding: 16px 18px;
-      color: var(--text-color);
-      font-size: 14px;
+      font-size: var(--font-size-sm);
+      color: var(--text-secondary);
       line-height: 1.6;
       display: -webkit-box;
       -webkit-line-clamp: 3;
       -webkit-box-orient: vertical;
       overflow: hidden;
-      min-height: 76px;
-      max-height: 96px;
-      opacity: 1;
-      transition: max-height 0.2s ease, opacity 0.2s ease, padding 0.2s ease;
-    }
-
-    .catatan.open .summary {
-      max-height: 0;
-      opacity: 0;
-      padding-top: 0;
-      padding-bottom: 0;
-    }
-
-    .detail {
-      max-height: 0;
-      overflow: hidden;
-      opacity: 0;
-      transition: all 0.3s ease;
-    }
-
-    .detail.open {
-      max-height: 2000px;
-      opacity: 1;
     }
 
     .isi {
-      padding: 16px 18px;
+      font-size: var(--font-size-sm);
       line-height: 1.7;
-      font-size: 14px;
-      color: var(--text-color);
       white-space: pre-wrap;
-      word-wrap: break-word;
-      background: var(--surface-muted);
-      max-height: clamp(260px, 60vh, 680px);
-      overflow: auto;
-      scrollbar-gutter: stable;
-      box-shadow: var(--surface-inset-shadow);
+      display: none;
+      padding-top: var(--space-4);
+      border-top: 1px solid var(--surface-border);
     }
 
-    .card-footer {
-      padding: 14px 18px;
-      display: flex;
-      justify-content: flex-end;
-    }
+    .catatan-card.open .summary { display: none; }
+    .catatan-card.open .isi { display: block; }
 
-    .toggle-btn {
-      background: var(--button-strong-bg);
-      color: var(--button-strong-text);
-      border: 1px solid var(--button-strong-border);
-      border-radius: 10px;
-      padding: 10px 12px;
-      font-weight: 700;
-      font-size: 13px;
-      cursor: pointer;
-      box-shadow: var(--button-strong-shadow);
-      transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease;
-    }
-
-    .toggle-btn:hover {
-      transform: translateY(-1px);
-      box-shadow: var(--button-strong-shadow-hover);
-    }
-
-    .toggle-btn:active {
-      transform: translateY(0);
-      box-shadow: 0 8px 18px rgba(59, 130, 246, 0.18);
-    }
-
-    #dataContainer:empty::after {
-      content: 'Tidak ada catatan ditemukan';
-      display: block;
-      text-align: center;
-      padding: 60px 20px;
-      color: var(--text-muted);
-      font-style: italic;
-      font-size: 16px;
-      background: var(--surface-strong);
-      border: 1px solid var(--surface-border-strong);
-      border-radius: 14px;
-      margin-top: 20px;
-    }
-
-    /* Smooth scrollbar */
-    ::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: var(--scrollbar-track);
-      border-radius: 10px;
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: var(--scrollbar-thumb);
-      border-radius: 10px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      background: var(--scrollbar-thumb-hover);
-    }
-
-    /* Mobile responsive styles */
-    @media (max-width: 768px) {
-      body {
-        padding: 12px;
-        background-attachment: scroll;
-      }
-
-      h1 {
-        font-size: 22px;
-      }
-
-      .page-header {
-        padding: 14px;
-        border-radius: 12px;
-      }
-
-      #search {
-        padding: 12px 14px;
-        font-size: 14px;
-      }
-
-      .chip {
-        padding: 7px 11px;
-        font-size: 12px;
-      }
-
-      .group-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .catatan {
-        border-radius: 12px;
-      }
-
-      .card-head {
-        padding: 14px;
-      }
-
-      .summary,
-      .isi {
-        padding: 14px;
-      }
-    }
-
-    @media (max-width: 480px) {
-      body {
-        padding: 8px;
-      }
-
-      h1 {
-        font-size: 20px;
-      }
-
-      #search {
-        padding: 10px 12px;
-        font-size: 13px;
-      }
-
-      .toggle-btn {
-        width: 100%;
-      }
+    @media (max-width: 640px) {
+      .page-header { position: relative; top: 0; padding: var(--space-4); }
     }
   </style>
 </head>
 
 <body>
-
-  <div class="page-header">
-    <div class="header-top">
-      <h1 data-seasonal-title>Catatan Troubleshoot ATM</h1>
-      <div class="count-pill">Total: <span id="totalCount">0</span></div>
+  <div class="container">
+    <div class="page-header">
+      <div class="header-top">
+        <h1 style="font-size: var(--font-size-xl); font-weight: 700;">Notes</h1>
+        <div style="font-size: var(--font-size-xs); font-weight: 600; color: var(--text-muted);">
+          Total: <span id="totalCount">0</span>
+        </div>
+      </div>
+      <input type="text" id="search" class="search-input" placeholder="Cari catatan..." oninput="applyFilters()">
+      <div class="chip-row" id="chipRow"></div>
     </div>
-    <input type="text" id="search" placeholder="Cari catatan... (judul, kategori, isi)" oninput="applyFilters()">
-    <div class="chip-row" id="chipRow"></div>
-    <div class="count-meta">Menampilkan <span id="visibleCount">0</span> catatan</div>
+
+    <div id="dataContainer" class="catatan-grid"></div>
   </div>
 
-  <div class="tab-context">Tab aktif: <span id="activeTabLabel">Semua</span></div>
-  <div id="dataContainer" class="catatan-grid"></div>
+  <nav class="bottom-nav">
+    <a href="index.html" class="nav-link">
+      <span class="nav-icon">🏠</span>
+      <span>Home</span>
+    </a>
+    <a href="work_planner.html" class="nav-link">
+      <span class="nav-icon">📋</span>
+      <span>Planner</span>
+    </a>
+    <a href="notes_viewer.html" class="nav-link active">
+      <span class="nav-icon">📓</span>
+      <span>Notes</span>
+    </a>
+    <a href="cek_lembur/index.html" class="nav-link">
+      <span class="nav-icon">⏱</span>
+      <span>Lembur</span>
+    </a>
+  </nav>
 
-  <!-- Firebase SDK -->
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
   <script>
+    // Firebase Config (from original file)
     const firebaseConfig = {
       apiKey: "AIzaSyAqqwSS1KTnAjfGcqvV_-TRHMYXJlTjtlI",
       authDomain: "catatan-troubleshoot-atm-2b5a4.firebaseapp.com",
@@ -398,7 +195,6 @@
       messagingSenderId: "441198643571",
       appId: "1:441198643571:web:7ee3c056d933acb3515d06"
     };
-
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
@@ -406,222 +202,101 @@
     let tabsMap = {};
     let activeTab = 'all';
 
-    const searchInput = () => document.getElementById('search');
-    const normalize = (str = '') => String(str || '').trim();
-
-    const makeExcerpt = (text) => {
-      const clean = normalize(text);
-      return clean.length > 180 ? `${clean.slice(0, 180)}…` : clean;
-    };
-
-    const resolveTabName = (item = {}) => {
-      return item.tabName ||
-        (item.tabId && tabsMap[item.tabId]?.name) ||
-        item.kategori ||
-        'Tidak ada tab';
-    };
-
-    function setCounts(total, visible) {
-      document.getElementById('totalCount').textContent = total;
-      document.getElementById('visibleCount').textContent = visible;
+    function resolveTabName(item) {
+      return item.tabName || (item.tabId && tabsMap[item.tabId]?.name) || item.kategori || 'General';
     }
 
-    function renderChips(data) {
+    function renderChips() {
       const row = document.getElementById('chipRow');
       row.innerHTML = '';
       const counts = new Map();
-
-      Object.values(data || {}).forEach(item => {
-        const tabName = resolveTabName(item);
-        counts.set(tabName, (counts.get(tabName) || 0) + 1);
+      Object.values(semuaData).forEach(item => {
+        const name = resolveTabName(item);
+        counts.set(name, (counts.get(name) || 0) + 1);
       });
 
-      // Include tabs that belum ada catatan
-      Object.values(tabsMap).forEach(t => {
-        if (!counts.has(t.name)) counts.set(t.name, 0);
-      });
-
-      const sorted = Array.from(counts.keys()).sort((a, b) => a.localeCompare(b));
-      const allTabs = ['Semua', ...sorted];
-
-      allTabs.forEach(tab => {
+      const tabs = ['Semua', ...Array.from(counts.keys()).sort()];
+      tabs.forEach(tab => {
         const val = tab === 'Semua' ? 'all' : tab;
-        const chip = document.createElement('button');
-        chip.type = 'button';
-        chip.className = `chip ${activeTab === val ? 'active' : ''}`;
-        chip.textContent = tab === 'Semua' ? 'Semua' : `${tab} (${counts.get(tab) || 0})`;
-        chip.onclick = () => {
+        const btn = document.createElement('button');
+        btn.className = `chip ${activeTab === val ? 'active' : ''}`;
+        btn.textContent = tab === 'Semua' ? tab : `${tab} (${counts.get(tab)})`;
+        btn.onclick = () => {
           activeTab = val;
           document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-          chip.classList.add('active');
+          btn.classList.add('active');
           applyFilters();
         };
-        row.appendChild(chip);
+        row.appendChild(btn);
       });
     }
 
-    function buildCatatanCard(item) {
-      const card = document.createElement("div");
-      card.className = "catatan";
-
-      const head = document.createElement("div");
-      head.className = "card-head";
-
-      const badge = document.createElement("div");
-      badge.className = "badge";
+    function buildCard(item) {
+      const card = document.createElement('div');
+      card.className = 'catatan-card';
+      
+      const badge = document.createElement('div');
+      badge.className = 'badge';
       badge.textContent = resolveTabName(item);
 
-      const title = document.createElement("div");
-      title.className = "judul";
-      title.textContent = normalize(item?.judul) || "Tanpa judul";
+      const title = document.createElement('div');
+      title.className = 'judul';
+      title.textContent = item.judul || 'Untitled';
 
-      head.appendChild(badge);
-      head.appendChild(title);
+      const summary = document.createElement('div');
+      summary.className = 'summary';
+      summary.textContent = item.isi || '';
 
-      const summary = document.createElement("div");
-      summary.className = "summary";
-      summary.textContent = makeExcerpt(item?.isi);
+      const isi = document.createElement('div');
+      isi.className = 'isi';
+      isi.textContent = item.isi || '';
 
-      const detail = document.createElement("div");
-      detail.className = "detail";
-
-      const isi = document.createElement("div");
-      isi.className = "isi";
-      isi.textContent = normalize(item?.isi);
-      detail.appendChild(isi);
-
-      const footer = document.createElement("div");
-      footer.className = "card-footer";
-
-      const btn = document.createElement("button");
-      btn.className = "toggle-btn";
-      btn.textContent = "Buka detail";
-
-      const toggle = () => {
-        const open = detail.classList.toggle("open");
-        card.classList.toggle("open", open);
-        btn.textContent = open ? "Tutup" : "Buka detail";
+      const btn = document.createElement('button');
+      btn.className = 'btn btn-secondary btn-compact';
+      btn.textContent = 'Detail';
+      btn.style.marginTop = 'auto';
+      btn.onclick = () => {
+        const open = card.classList.toggle('open');
+        btn.textContent = open ? 'Tutup' : 'Detail';
       };
 
-      btn.onclick = toggle;
-      title.onclick = toggle;
-
-      footer.appendChild(btn);
-
-      card.appendChild(head);
+      card.appendChild(badge);
+      card.appendChild(title);
       card.appendChild(summary);
-      card.appendChild(detail);
-      card.appendChild(footer);
+      card.appendChild(isi);
+      card.appendChild(btn);
       return card;
     }
 
-    function renderList(data) {
-      const container = document.getElementById("dataContainer");
-      container.innerHTML = "";
-
-      const entries = Object.entries(data || {});
-      if (entries.length === 0) return;
-
-      entries
-        .sort((a, b) => {
-          const ja = normalize(a[1]?.judul).toLowerCase();
-          const jb = normalize(b[1]?.judul).toLowerCase();
-          return ja.localeCompare(jb);
-        })
-        .forEach(([, item]) => {
-          container.appendChild(buildCatatanCard(item));
-        });
-    }
-
     function applyFilters() {
-      const q = normalize(searchInput().value).toLowerCase();
-      const hasil = {};
-      let visible = 0;
-      const targetTab = activeTab.toLowerCase();
+      const q = document.getElementById('search').value.toLowerCase();
+      const container = document.getElementById('dataContainer');
+      container.innerHTML = '';
+      let count = 0;
 
-      for (const id in semuaData) {
-        const item = semuaData[id] || {};
-        const tabName = resolveTabName(item).toLowerCase();
-        const tabMatch = targetTab === 'all' || tabName === targetTab;
-        const gabung = `${item.judul || ''} ${item.kategori || ''} ${item.isi || ''}`.toLowerCase();
-        const qMatch = gabung.includes(q);
-
-        if (tabMatch && qMatch) {
-          hasil[id] = item;
-          visible++;
+      Object.values(semuaData).forEach(item => {
+        const tabMatch = activeTab === 'all' || resolveTabName(item) === activeTab;
+        const textMatch = `${item.judul} ${item.isi}`.toLowerCase().includes(q);
+        if (tabMatch && textMatch) {
+          container.appendChild(buildCard(item));
+          count++;
         }
-      }
-
-      setCounts(Object.keys(semuaData).length, visible);
-      document.getElementById('activeTabLabel').textContent = activeTab === 'all' ? 'Semua' : activeTab;
-      renderList(hasil);
-    }
-
-    function loadAll() {
-      Promise.all([
-        db.ref("tabs").once("value"),
-        db.ref("catatan").once("value")
-      ]).then(([tabsSnap, notesSnap]) => {
-        tabsMap = tabsSnap.val() || {};
-        semuaData = notesSnap.val() || {};
-        renderChips(semuaData);
-        setCounts(Object.keys(semuaData).length, Object.keys(semuaData).length);
-        document.getElementById('activeTabLabel').textContent = 'Semua';
-        renderList(semuaData);
       });
+      document.getElementById('totalCount').textContent = count;
     }
 
     window.onload = () => {
-      loadAll();
+      Promise.all([
+        db.ref("tabs").once("value"),
+        db.ref("catatan").once("value")
+      ]).then(([tSnap, cSnap]) => {
+        tabsMap = tSnap.val() || {};
+        semuaData = cSnap.val() || {};
+        renderChips();
+        applyFilters();
+      });
     };
   </script>
-  <script>
-    const APP_VERSION = '20260110';
-    const SW_URL = `./sw.js?v=${APP_VERSION}`;
-    const SW_SCRIPT_URL = new URL(SW_URL, location.href).href;
-
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistrations().then((regs) => {
-        regs.forEach((reg) => {
-          if (reg.active && reg.active.scriptURL !== SW_SCRIPT_URL) {
-            reg.unregister();
-          }
-        });
-      });
-
-      navigator.serviceWorker.register(SW_URL, { updateViaCache: 'none' }).then((reg) => {
-        reg.update();
-      }).catch((err) => {
-        console.error('SW registration failed', err);
-      });
-
-      let refreshing = false;
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (refreshing) return;
-        refreshing = true;
-        window.location.reload();
-      });
-    }
-  </script>
-    <!-- Persistent Bottom Navigation -->
-    <nav class="bottom-nav">
-        <a href="index.html" class="nav-link">
-            <span class="nav-icon">🏠</span>
-            <span>Home</span>
-        </a>
-        <a href="work_planner.html" class="nav-link">
-            <span class="nav-icon">📋</span>
-            <span>Planner</span>
-        </a>
-        <a href="notes_viewer.html" class="nav-link active">
-            <span class="nav-icon">📓</span>
-            <span>Notes</span>
-        </a>
-        <a href="cek_lembur/index.html" class="nav-link">
-            <span class="nav-icon">⏱</span>
-            <span>Lembur</span>
-        </a>
-    </nav>
 </body>
 
 </html>
