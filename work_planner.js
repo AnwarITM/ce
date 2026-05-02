@@ -137,11 +137,14 @@ const app = {
         const container = $('#tabsContainer');
         if (!container) return;
         const addBtn = container.querySelector('.tab-add-btn');
+        const delBtn = container.querySelector('.tab-delete-btn');
         if (!addBtn) return;
 
-        // Clear existing tabs (keep add btn)
+        // Clear existing tabs (keep control buttons)
         Array.from(container.children).forEach(c => {
-            if (!c.classList.contains('tab-add-btn')) c.remove();
+            if (!c.classList.contains('tab-add-btn') && !c.classList.contains('tab-delete-btn')) {
+                c.remove();
+            }
         });
 
         this.state.tabs.forEach(tab => {
@@ -354,7 +357,7 @@ const app = {
                 <td onclick="app.openModal('${row.id}')"><div class="wsid-text">${row.wsid || '-'}</div></td>
                 <td onclick="app.openModal('${row.id}')"><div class="notes-text">${row.notes || ''}</div></td>
                 <td onclick="app.openModal('${row.id}')"><div>${row.plan || this.formatPlanTs(row.planTs)}</div></td>
-                <td style="position: relative;">
+                <td class="status-cell" style="position: relative;">
                     <button class="status-btn ${statusClass}" onclick="event.stopPropagation(); app.toggleStatus('${row.id}')">${statusLabel}</button>
                     <button class="desktop-delete-btn" onclick="event.stopPropagation(); app.deleteOne('${row.id}')">Hapus</button>
                     <div class="swipe-action-delete" onclick="event.stopPropagation(); app.deleteOne('${row.id}')">Hapus</div>
@@ -370,47 +373,56 @@ const app = {
     },
 
     attachSwipeEvents(tr, id) {
-        // Skip swipe when touch-based drag-and-drop is active
         const isTouchDragActive = () => this.state.touchDragging;
 
         let startX = 0;
         let startY = 0;
         let isSwiping = false;
         let swipeTriggered = false;
+        let isRevealed = false;
         const MAX_SWIPE = 80;
 
+        // Close other swiped rows when starting a new touch
         tr.addEventListener('touchstart', (e) => {
-            if (e.target.closest('.drag-handle')) return; // don't start swipe on handle
-            // Reset transition for instant response
+            if (e.target.closest('.drag-handle')) return;
+            
+            // If another row is open, close it
+            document.querySelectorAll('.swipe-row[style*="translateX"]').forEach(row => {
+                if (row !== tr) row.style.transform = 'translateX(0)';
+            });
+
             tr.style.transition = 'none';
             startX = e.touches[0].clientX;
             startY = e.touches[0].clientY;
+            
+            // Adjust startX if already revealed
+            if (isRevealed) {
+                startX += MAX_SWIPE; 
+            }
+            
             isSwiping = true;
             swipeTriggered = false;
         }, { passive: true });
 
         tr.addEventListener('touchmove', (e) => {
-            if (isTouchDragActive()) return;
-            if (!isSwiping) return;
+            if (isTouchDragActive() || !isSwiping) return;
             const x = e.touches[0].clientX;
             const y = e.touches[0].clientY;
             const diffX = x - startX;
             const diffY = y - startY;
 
-            // Strict threshold for horizontal swipe vs vertical scroll
             if (!swipeTriggered) {
                 if (Math.abs(diffX) > 15 && Math.abs(diffX) > Math.abs(diffY)) {
                     swipeTriggered = true;
                 } else if (Math.abs(diffY) > 15) {
-                    isSwiping = false; // Vertical scroll takes priority
+                    isSwiping = false;
                     return;
                 }
             }
 
             if (swipeTriggered) {
-                // If it's a swipe, we might want to prevent vertical scrolling
-                // diffX < 0 is swipe left (to delete)
-                const move = diffX < 0 ? Math.max(diffX, -MAX_SWIPE) : 0;
+                // Prevent swiping right beyond 0
+                const move = Math.max(-MAX_SWIPE - 20, Math.min(0, diffX));
                 tr.style.transform = `translateX(${move}px)`;
             }
         }, { passive: true });
@@ -419,7 +431,6 @@ const app = {
             if (!isSwiping) return;
             isSwiping = false;
 
-            // Clean up: Snap to positions
             tr.style.transition = 'transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28)';
 
             const matrix = new WebKitCSSMatrix(window.getComputedStyle(tr).transform);
@@ -427,12 +438,22 @@ const app = {
 
             if (x < -40) {
                 tr.style.transform = `translateX(-${MAX_SWIPE}px)`;
+                isRevealed = true;
             } else {
                 tr.style.transform = 'translateX(0)';
+                isRevealed = false;
+            }
+        });
+        
+        // Click anywhere on the row to close swipe
+        tr.addEventListener('click', (e) => {
+            if (isRevealed && !e.target.classList.contains('swipe-action-delete')) {
+                tr.style.transform = 'translateX(0)';
+                isRevealed = false;
             }
         });
 
-        tr.oncontextmenu = (e) => { e.preventDefault(); }; // Disable long-press delete to avoid accidental data loss
+        tr.oncontextmenu = (e) => { e.preventDefault(); };
     },
 
     attachTouchReorder(tr, handle, row) {
