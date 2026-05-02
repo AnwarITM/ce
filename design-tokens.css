@@ -1,284 +1,56 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  /* ===== APPLE COLOR SYSTEM ===== */
-  --primary-color: #007AFF;        /* System Blue */
-  --primary-hover: #0062CC;
-  --primary-light: #47A1FF;
-  --primary-lighter: #8ECAFF;
+  /* Typography */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-size-base: 16px;
+  --font-size-sm: 14px;
+  --font-size-xs: 12px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+  --font-size-display: 32px;
   
-  /* ===== GRADIENTS ===== */
-  --gradient-primary: linear-gradient(135deg, #007AFF 0%, #47A1FF 100%);
-  --gradient-accent: linear-gradient(135deg, #47A1FF 0%, #3b82f6 100%);
-  --gradient-success: linear-gradient(135deg, #34C759 0%, #28A745 100%);
+  /* Spacing (8px base) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Border Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* Transitions */
+  --transition-base: 0.2s ease;
+  --transition-slow: 0.4s ease;
+
+  /* Layout */
+  --nav-height: 64px;
+  --container-max-width: 1200px;
   
-  /* ===== SEMANTIC COLORS ===== */
-  --success-color: #34C759;        /* Apple Green */
-  --success-dark: #28A745;
-  --warning-color: #FF9500;        /* Apple Orange */
-  --danger-color: #FF3B30;         /* Apple Red */
-  --danger-dark: #D70015;
-  --info-color: #5856D6;           /* Apple Purple */
-
-  /* ===== BACKGROUND COLORS ===== */
-  --bg-color-light: #FFFFFF;       /* System Background */
-  --bg-color-dark: #000000;        /* System Background Dark */
-  --bg-color: var(--bg-color-light);
-
-  /* ===== CARD & SURFACE ===== */
-  --card-bg-light: #FFFFFF;
-  --card-bg-dark: #1C1C1E;
-  --card-bg: var(--card-bg-light);
-  
-  --surface-light: #FFFFFF;
-  --surface-dark: #1C1C1E;
-  --surface-strong: #FFFFFF;
-  --surface-muted: #F5F5F7;        /* Secondary Fill */
-  --surface-border: rgba(0, 0, 0, 0.05);
-
-  /* ===== TEXT COLORS ===== */
-  --text-color-light: #1D1D1F;     /* Label Primary */
-  --text-color-dark: #FFFFFF;
-  --text-color: var(--text-color-light);
-  
-  --text-secondary-light: #86868B;    /* Label Secondary */
-  --text-secondary-dark: #8E8E93;
-  --text-secondary: var(--text-secondary-light);
-  
-  --text-muted-light: #AEAEB2;        /* Label Tertiary */
-  --text-muted-dark: #636366;
-  --text-muted: var(--text-muted-light);
-  
-  --text-light: #FFFFFF;
-  --header-text-color: #007AFF;
-
-  /* ===== SECONDARY & NEUTRAL ===== */
-  --secondary-color: #F5F5F7;
-  --neutral-200: #E5E5EA;
-  --neutral-300: #D1D1D6;
-  --neutral-400: #C7C7CC;
-
-  /* ===== BORDERS & OUTLINES ===== */
-  --border-radius: 12px;           /* Apple Standard */
-  --border-radius-lg: 16px;
-  --border-radius-sm: 8px;
-  
-  --border-color: rgba(0, 0, 0, 0.05);
-  --border-color-dark: rgba(255, 255, 255, 0.1);
-  --glass-border: 1px solid rgba(0, 0, 0, 0.05);
-  --glass-border-subtle: 1px solid rgba(0, 0, 0, 0.03);
-  --outline-color: #007AFF;
-
-  /* ===== SHADOWS - Premium & Soft ===== */
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.02);
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 4px 24px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.08);
-  --shadow-xl: 0 12px 48px rgba(0, 0, 0, 0.1);
-  
-  --shadow-focus: 0 0 0 4px rgba(0, 122, 255, 0.1);
-  
-  /* ===== STATUS BACKGROUNDS ===== */
-  --status-done-bg: #E8F5E9;
-  --status-done-text: #2E7D32;
-  --status-done-border: #C8E6C9;
-
-  --status-outstanding-bg: #FFEBEE;
-  --status-outstanding-text: #C62828;
-  --status-outstanding-border: #FFCDD2;
-
-  /* ===== TRANSITIONS ===== */
-  --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-base: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-
-  /* ===== Z-INDEX HIERARCHY ===== */
-  --z-base: 1;
+  /* Z-Index */
   --z-sticky: 100;
   --z-nav: 200;
-  --z-fab: 300;
-  --z-modal: 1000;
-  --z-overlay: 9999;
+  --z-modal: 300;
+  --z-fab: 400;
 
-  /* ===== LAYOUT TOKENS ===== */
-  --nav-height: 64px;
-  --header-height: 60px;
+  /* Deprecated/Compatibility - mapped to new tokens */
+  --border-radius: var(--radius-md);
+  --border-radius-lg: var(--radius-lg);
+  --border-radius-sm: var(--radius-sm);
 }
 
 body {
-  font-family: "SF Pro Display", "SF Pro Text", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: var(--font-family);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-/* ===== TYPOGRAPHY HIERARCHY ===== */
-h1, h2, h3, h4, h5, h6 {
-  line-height: 1.2;
-  font-weight: 600;
-  color: var(--text-color);
-  letter-spacing: -0.022em;
-}
-
-h1 { font-size: 2.25rem; }
-h2 { font-size: 1.875rem; }
-h3 { font-size: 1.5rem; }
-
-body {
-  font-size: 17px; /* Apple Standard Body Size */
-  line-height: 1.47059;
-  font-weight: 400;
-  letter-spacing: -0.022em;
-  color: var(--text-color);
-}
-
-small, .text-small {
-  font-size: 12px;
-  color: var(--text-secondary);
-}
-
-/* ===== WELCOME PAGE WITH GLASSMORPHISM ===== */
-.welcome-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  gap: 24px;
-  padding: 20px;
-  background: transparent !important;
-}
-
-.welcome-container h1 {
-  font-size: clamp(36px, 5vw, 52px);
-  font-weight: 700;
-  color: var(--primary-color);
-  margin: 0;
-  text-align: center;
-  text-shadow: 0 4px 12px rgba(8, 145, 178, 0.15);
-  transition: all var(--transition-slow);
-}
-
-.welcome-container h1 a {
-  text-decoration: none;
-  color: inherit;
-  cursor: pointer;
-  transition: all var(--transition-base);
-}
-
-.welcome-container h1 a:hover {
-  transform: scale(1.03);
-  text-shadow: 0 6px 16px rgba(8, 145, 178, 0.25);
-}
-
-.continue-btn {
-  padding: 18px 40px;
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  color: var(--primary-color);
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  border-radius: var(--border-radius-lg);
-  font-size: 18px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-base);
-  text-decoration: none;
-  box-shadow: var(--shadow-md);
-  min-width: 240px;
-  text-align: center;
-}
-
-.continue-btn:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
-  background: rgba(255, 255, 255, 0.9);
-  border-color: rgba(8, 145, 178, 0.3);
-}
-
-.continue-btn:active {
-  transform: translateY(-2px);
-}
-
-.continue-btn:focus {
-  outline: none;
-  box-shadow: var(--shadow-lg), var(--shadow-focus);
-}
-
-/* ===== MODAL WITH GLASSMORPHISM ===== */
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 1000;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  align-items: center;
-  justify-content: center;
-}
-
-.modal-content {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  padding: 40px;
-  border-radius: var(--border-radius-lg);
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  box-shadow: var(--shadow-xl);
-  text-align: center;
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--text-color);
-}
-
-/* Mobile responsive styles */
-@media (max-width: 768px) {
-  .welcome-container {
-    padding: 16px;
-    gap: 20px;
-  }
-
-  .welcome-container h1 {
-    font-size: clamp(28px, 6vw, 36px);
-  }
-  }
-
-  .continue-btn {
-    padding: 14px 32px;
-    font-size: 16px;
-    min-width: 200px;
-  }
-
-  .modal-content {
-    padding: 30px;
-    font-size: 18px;
-    margin: 20px;
-  }
-}
-
-@media (max-width: 480px) {
-  .welcome-container {
-    padding: 12px;
-    gap: 16px;
-  }
-
-  .welcome-container h1 {
-    font-size: clamp(24px, 7vw, 32px);
-  }
-
-  .continue-btn {
-    padding: 12px 24px;
-    font-size: 15px;
-    min-width: 180px;
-  }
-
-  .modal-content {
-    padding: 24px;
-    font-size: 16px;
-    margin: 16px;
-    border-radius: 16px;
-  }
 }
