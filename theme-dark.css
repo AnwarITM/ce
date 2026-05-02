@@ -1,56 +1,61 @@
 :root {
   /* Canvas & Text */
-  --bg-color: #010102;
-  --text-color: #f7f8f8;
-  --text-secondary: #b1b1b3;
-  --text-muted: #8a8f98;
+  --bg-color: #0a0002;
+  --text-color: #ffffff;
+  --text-secondary: #ffb3bf;
+  --text-muted: #80001b;
   
   /* Accents */
-  --primary-color: #5e6ad2;
-  --primary-hover: #828fff;
+  --primary-color: #FF0036;
+  --primary-hover: #ff335e;
   --primary-text: #ffffff;
   
   /* Surfaces */
-  --surface-1: #0f1011;
-  --surface-2: #141516;
-  --surface-3: #18191a;
-  --surface-muted: #0f1011;
-  --surface-soft: #0f1011;
-  --surface-strong: #0f1011;
-  --surface-elevated: #141516;
+  --surface-1: #1a0005;
+  --surface-2: #2a0008;
+  --surface-3: #3a000b;
+  --surface-muted: #1a0005;
+  --surface-soft: #1a0005;
+  --surface-strong: #1a0005;
+  --surface-elevated: #2a0008;
+  
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, #FF0036 0%, #ff335e 100%);
+  --gradient-bg: linear-gradient(180deg, #0a0002 0%, #1a0005 100%);
   
   /* Borders */
-  --border-subtle: #23252a;
+  --border-subtle: #4d0011;
   --border-shadow: 0 0 0 1px var(--border-subtle);
   --surface-border: var(--border-subtle);
   
   /* Shadows */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.6);
-  --shadow-focus: 0 0 0 4px rgba(94, 106, 210, 0.25);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.8);
+  --shadow-md: 0 4px 12px rgba(255, 0, 54, 0.2);
+  --shadow-lg: 0 12px 24px rgba(255, 0, 54, 0.3);
+  --shadow-focus: 0 0 0 4px rgba(255, 0, 54, 0.4);
   
   /* Status */
-  --success-color: #27a644;
-  --danger-color: #f87171;
+  --success-color: #34d399;
+  --danger-color: #FF0036;
   --warning-color: #f5a623;
   
-  --status-done-bg: rgba(39, 166, 68, 0.1);
-  --status-done-text: #27a644;
-  --status-done-border: rgba(39, 166, 68, 0.2);
-  --status-outstanding-bg: rgba(248, 113, 113, 0.1);
-  --status-outstanding-text: #f87171;
-  --status-outstanding-border: rgba(248, 113, 113, 0.2);
+  --status-done-bg: rgba(52, 211, 153, 0.1);
+  --status-done-text: #34d399;
+  --status-done-border: rgba(52, 211, 153, 0.2);
+  --status-outstanding-bg: rgba(255, 0, 54, 0.1);
+  --status-outstanding-text: #ff4d6d;
+  --status-outstanding-border: rgba(255, 0, 54, 0.2);
 
   /* Specifics */
-  --theme-toggle-bg: #0f1011;
-  --theme-toggle-border: #23252a;
+  --theme-toggle-bg: #1a0005;
+  --theme-toggle-border: #FF0036;
   --button-primary-text: #ffffff;
-  --outline-color: #5e6ad2;
-  --gradient-primary: linear-gradient(135deg, #5e6ad2 0%, #828fff 100%);
+  --outline-color: #FF0036;
+  --gradient-primary: linear-gradient(135deg, #FF0036 0%, #ff335e 100%);
 }
 
 body {
-  background-color: var(--bg-color);
+  background: var(--gradient-bg);
+  background-attachment: fixed;
   color: var(--text-color);
 }

@@ -8,9 +8,10 @@
 /* Base body styles */
 body {
     font-family: var(--font-family);
-    background-color: var(--bg-color);
+    background: var(--gradient-bg);
+    background-attachment: fixed;
     color: var(--text-color);
-    transition: background-color var(--transition-base), color var(--transition-base);
+    transition: background var(--transition-base), color var(--transition-base);
     font-size: var(--font-size-base);
     line-height: 1.5;
     min-height: 100dvh;

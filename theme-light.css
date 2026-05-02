@@ -1,56 +1,60 @@
 :root {
   /* Canvas & Text */
   --bg-color: #ffffff;
-  --text-color: #171717;
-  --text-secondary: #666666;
-  --text-muted: #888888;
+  --text-color: #1a1a1a;
+  --text-secondary: #4a4a4a;
+  --text-muted: #717171;
   
-  /* Accents */
-  --primary-color: #0070f3;
-  --primary-hover: #0060d3;
+  /* Accents - High Energy Red */
+  --primary-color: #FF0036;
+  --primary-hover: #D6002E;
   --primary-text: #ffffff;
   
   /* Surfaces */
   --surface-1: #ffffff;
-  --surface-2: #fafafa;
+  --surface-2: #fcfcfc;
   --surface-3: #f5f5f5;
-  --surface-muted: #fafafa;
-  --surface-soft: #fafafa;
+  --surface-muted: #fff5f6;
+  --surface-soft: #ffffff;
   --surface-strong: #ffffff;
   --surface-elevated: #ffffff;
   
-  /* Borders (Shadow-based) */
-  --border-subtle: rgba(0, 0, 0, 0.08);
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, #FF0036 0%, #ff4d6d 100%);
+  --gradient-bg: linear-gradient(180deg, #ffffff 0%, #fff0f3 100%);
+  
+  /* Borders */
+  --border-subtle: rgba(255, 0, 54, 0.1);
   --border-shadow: 0 0 0 1px var(--border-subtle);
   --surface-border: var(--border-subtle);
   
   /* Shadows */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 0 0 1px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
-  --shadow-lg: 0 0 0 1px rgba(0, 0, 0, 0.08), 0 8px 16px rgba(0, 0, 0, 0.08);
-  --shadow-focus: 0 0 0 4px rgba(0, 112, 243, 0.15);
+  --shadow-sm: 0 1px 2px rgba(255, 0, 54, 0.05);
+  --shadow-md: 0 4px 12px rgba(255, 0, 54, 0.08);
+  --shadow-lg: 0 12px 24px rgba(255, 0, 54, 0.12);
+  --shadow-focus: 0 0 0 4px rgba(255, 0, 54, 0.15);
   
   /* Status */
-  --success-color: #0070f3;
-  --danger-color: #ee0000;
+  --success-color: #10b981;
+  --danger-color: #FF0036;
   --warning-color: #f5a623;
   
-  --status-done-bg: #ebf5ff;
-  --status-done-text: #0070f3;
-  --status-done-border: rgba(0, 112, 243, 0.1);
-  --status-outstanding-bg: #fff5f5;
-  --status-outstanding-text: #ee0000;
-  --status-outstanding-border: rgba(238, 0, 0, 0.1);
+  --status-done-bg: #ecfdf5;
+  --status-done-text: #059669;
+  --status-done-border: #d1fae5;
+  --status-outstanding-bg: #fff1f2;
+  --status-outstanding-text: #FF0036;
+  --status-outstanding-border: #ffe4e6;
 
   /* Specifics */
   --theme-toggle-bg: #ffffff;
-  --theme-toggle-border: rgba(0, 0, 0, 0.08);
+  --theme-toggle-border: #FF0036;
   --button-primary-text: #ffffff;
-  --outline-color: #0070f3;
-  --gradient-primary: linear-gradient(135deg, #0070f3 0%, #3291ff 100%);
+  --outline-color: #FF0036;
 }
 
 body {
-  background-color: var(--bg-color);
+  background: var(--gradient-bg);
+  background-attachment: fixed;
   color: var(--text-color);
 }
