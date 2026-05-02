@@ -272,7 +272,6 @@
 
             <div id="userInfoBar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4); font-size: var(--font-size-sm);">
                 <div style="display: flex; align-items: center; gap: var(--space-2);">
-                    <span id="userAvatar" style="width: 24px; height: 24px; background: var(--surface-2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">U</span>
                     <span id="userInfoText">User</span>
                 </div>
                 <button class="btn btn-danger btn-compact" onclick="logout()">Logout</button>
@@ -280,7 +279,7 @@
 
             <!-- Tabs -->
             <div class="tabs-wrapper" id="tabsContainer">
-                <button class="btn btn-secondary btn-compact" onclick="app.addTab()">+</button>
+                <div class="tab-add-btn btn btn-secondary btn-compact" onclick="app.addTab()" style="cursor: pointer; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 0;">+</div>
             </div>
 
             <!-- Metrics -->
@@ -462,7 +461,6 @@
             document.getElementById('loginOverlay').style.display = 'none';
             setAuthViewState('auth-ready');
             const userName = sessionStorage.getItem('userName') || currentUserId;
-            document.getElementById('userAvatar').textContent = userName.charAt(0).toUpperCase();
             document.getElementById('userInfoText').textContent = `Welcome, ${userName}`;
         }
 
