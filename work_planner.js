@@ -220,10 +220,18 @@ const app = {
             this.showAlert("Maksimal 4 tab diperbolehkan.", "Limit Tab");
             return;
         }
+        
+        const name = prompt("Masukkan nama tab baru:", `Tab ${this.state.tabs.length + 1}`);
+        if (name === null) return; // Cancelled
+        
         this.normalizeState();
         const tabIds = this.state.tabs.map(t => Number(t.id)).filter(Number.isFinite);
         const newId = tabIds.length > 0 ? Math.max(...tabIds) + 1 : 0;
-        this.state.tabs.push(createNewTab(newId));
+        
+        const newTab = createNewTab(newId);
+        newTab.name = name.trim() || `Tab ${newId + 1}`;
+        
+        this.state.tabs.push(newTab);
         this.switchTab(newId);
     },
 
