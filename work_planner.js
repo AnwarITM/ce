@@ -388,8 +388,19 @@ const app = {
 
         this.sortableInstance = Sortable.create(tbody, {
             handle: '.drag-handle',
-            animation: 150,
+            animation: 200,
+            delay: 150, // Essential for mobile to allow scrolling
+            delayOnTouchOnly: true,
+            touchStartThreshold: 5, // Prevent accidental drags
+            ghostClass: 'sortable-ghost',
+            chosenClass: 'sortable-chosen',
+            dragClass: 'sortable-drag',
+            onStart: (evt) => {
+                if (navigator.vibrate) navigator.vibrate(20); // Haptic feedback
+                document.body.classList.add('is-dragging');
+            },
             onEnd: (evt) => {
+                document.body.classList.remove('is-dragging');
                 const { newIndex, oldIndex, item } = evt;
                 if (oldIndex === newIndex) return;
 

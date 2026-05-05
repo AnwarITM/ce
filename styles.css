@@ -137,6 +137,48 @@ th {
     letter-spacing: 0.05em;
 }
 
+/* Drag and Drop Professional Styles */
+.drag-handle {
+    cursor: grab !important;
+    user-select: none;
+    color: var(--text-secondary);
+    font-weight: 600;
+    position: relative;
+    padding-left: 12px !important;
+}
+
+.drag-handle::before {
+    content: "⋮⋮";
+    position: absolute;
+    left: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.3;
+    font-size: 10px;
+}
+
+.sortable-ghost {
+    opacity: 0.3;
+    background: var(--primary-color) !important;
+}
+
+.sortable-chosen {
+    background: var(--surface-2) !important;
+    box-shadow: var(--shadow-lg);
+}
+
+.sortable-drag {
+    opacity: 1 !important;
+    background: var(--surface-1) !important;
+    transform: scale(1.02);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    z-index: 1000;
+}
+
+body.is-dragging * {
+    cursor: grabbing !important;
+}
+
 /* Inputs */
 input.cell-edit,
 textarea.cell-edit {
