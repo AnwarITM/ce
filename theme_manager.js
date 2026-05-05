@@ -11,10 +11,11 @@ const THEME_MANIFEST = {
     'linear': `theme-linear.css?v=${THEME_VERSION}`,
     'vercel': `theme-vercel.css?v=${THEME_VERSION}`,
     'apple': `theme-apple.css?v=${THEME_VERSION}`,
-    'supabase': `theme-supabase.css?v=${THEME_VERSION}`
+    'supabase': `theme-supabase.css?v=${THEME_VERSION}`,
+    'liquid-glass': `theme-liquid-glass.css?v=${THEME_VERSION}`
 };
 
-const DARK_THEMES = ['linear', 'supabase'];
+const DARK_THEMES = ['linear', 'supabase', 'liquid-glass'];
 
 // Function to update UI state based on theme
 function updateThemeUI(themeId) {

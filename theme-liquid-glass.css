@@ -1,0 +1,86 @@
+:root {
+  /* Canvas & Text */
+  --text-color: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --text-muted: rgba(255, 255, 255, 0.5);
+  
+  /* Accents */
+  --primary-color: rgba(255, 255, 255, 0.2);
+  --primary-hover: rgba(255, 255, 255, 0.3);
+  --primary-text: #ffffff;
+  
+  /* Surfaces - Glassmorphism */
+  --surface-1: rgba(255, 255, 255, 0.05); /* Cards */
+  --surface-2: rgba(255, 255, 255, 0.08); /* Secondary panels */
+  --surface-3: rgba(255, 255, 255, 0.12); /* Hovers */
+  --surface-muted: rgba(0, 0, 0, 0.2);
+  --surface-soft: rgba(255, 255, 255, 0.03);
+  --surface-strong: rgba(255, 255, 255, 0.15);
+  --surface-elevated: rgba(255, 255, 255, 0.1);
+  
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, rgba(255,255,255,0.4), rgba(255,255,255,0.1));
+  /* Aurora / Deep Space vibe */
+  --gradient-bg: linear-gradient(135deg, #0f172a 0%, #312e81 50%, #4c1d95 100%);
+  
+  /* Borders - Soft Highlights */
+  --border-subtle: rgba(255, 255, 255, 0.1);
+  --border-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+  --surface-border: rgba(255, 255, 255, 0.1);
+  
+  /* Shadows */
+  --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 8px 16px -4px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+  --shadow-lg: 0 16px 32px -4px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+  --shadow-focus: 0 0 0 4px rgba(255, 255, 255, 0.2);
+  
+  /* Status */
+  --success-color: #34d399;
+  --danger-color: #fb7185;
+  --warning-color: #fbbf24;
+  
+  --status-done-bg: rgba(52, 211, 153, 0.15);
+  --status-done-text: #6ee7b7;
+  --status-done-border: rgba(52, 211, 153, 0.3);
+  --status-outstanding-bg: rgba(251, 113, 133, 0.15);
+  --status-outstanding-text: #fda4af;
+  --status-outstanding-border: rgba(251, 113, 133, 0.3);
+
+  /* Specifics */
+  --theme-toggle-bg: rgba(255, 255, 255, 0.1);
+  --theme-toggle-border: rgba(255, 255, 255, 0.2);
+  --button-primary-text: #ffffff;
+  --outline-color: rgba(255, 255, 255, 0.5);
+  
+  /* Add Backdrop Filter support through classes where needed, but since it's global theme we attach to main surfaces if possible */
+}
+
+/* Glassmorphism overrides */
+.card, .table-responsive, .modal-content, .bottom-nav, .header, .hero-card, .app-card, .btn-secondary, input.cell-edit, textarea.cell-edit {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+}
+
+.btn-primary {
+  background: var(--gradient-primary);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.bottom-nav {
+  background: rgba(15, 23, 42, 0.6) !important;
+}
+
+body {
+  background: var(--gradient-bg);
+  background-attachment: fixed;
+  color: var(--text-color);
+}
