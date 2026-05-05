@@ -145,6 +145,7 @@ th {
     font-weight: 600;
     position: relative;
     padding-left: 22px !important; /* Increased for wider hit area */
+    touch-action: none; /* ESSENTIAL: Prevents scrolling when touching the handle */
 }
 
 .drag-handle::before {
@@ -172,10 +173,10 @@ th {
 .sortable-fallback {
     opacity: 1 !important;
     background: var(--surface-1) !important;
-    transform: scale(1.02);
     box-shadow: 0 10px 25px rgba(0,0,0,0.1);
     z-index: 9999 !important; /* Ensure it floats above everything */
     pointer-events: none; /* Prevent ghost from intercepting touch events */
+    transition: none !important; /* Prevents lag if tr had a transition */
 }
 
 body.is-dragging * {

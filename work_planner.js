@@ -398,6 +398,8 @@ const app = {
             forceFallback: true, // Forces custom drag image for touch devices
             fallbackClass: 'sortable-fallback',
             fallbackOnBody: true, // Appends the ghost to body so it isn't clipped
+            fallbackTolerance: 3, // Solves some touch scrolling issues
+            scroll: true, // Auto-scroll while dragging
             onStart: (evt) => {
                 if (navigator.vibrate) navigator.vibrate(20); // Haptic feedback
                 document.body.classList.add('is-dragging');
