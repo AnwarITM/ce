@@ -168,12 +168,14 @@ th {
     box-shadow: var(--shadow-lg);
 }
 
-.sortable-drag {
+.sortable-drag,
+.sortable-fallback {
     opacity: 1 !important;
     background: var(--surface-1) !important;
     transform: scale(1.02);
     box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    z-index: 1000;
+    z-index: 9999 !important; /* Ensure it floats above everything */
+    pointer-events: none; /* Prevent ghost from intercepting touch events */
 }
 
 body.is-dragging * {

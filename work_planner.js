@@ -395,6 +395,9 @@ const app = {
             ghostClass: 'sortable-ghost',
             chosenClass: 'sortable-chosen',
             dragClass: 'sortable-drag',
+            forceFallback: true, // Forces custom drag image for touch devices
+            fallbackClass: 'sortable-fallback',
+            fallbackOnBody: true, // Appends the ghost to body so it isn't clipped
             onStart: (evt) => {
                 if (navigator.vibrate) navigator.vibrate(20); // Haptic feedback
                 document.body.classList.add('is-dragging');
