@@ -144,17 +144,18 @@ th {
     color: var(--text-secondary);
     font-weight: 600;
     position: relative;
-    padding-left: 12px !important;
+    padding-left: 22px !important; /* Increased for wider hit area */
 }
 
 .drag-handle::before {
     content: "⋮⋮";
     position: absolute;
-    left: 4px;
+    left: 6px;
     top: 50%;
     transform: translateY(-50%);
-    opacity: 0.3;
-    font-size: 10px;
+    opacity: 0.5; /* More visible */
+    font-size: 14px; /* Larger icon */
+    letter-spacing: -1px;
 }
 
 .sortable-ghost {

@@ -461,10 +461,11 @@ const app = {
     },
 
     attachSwipeEvents(tr, id) {
-        const isTouchDragActive = () => this.state.touchDragging;
+        const isTouchDragActive = () => document.body.classList.contains('is-dragging');
 
         let startX = 0;
         let startY = 0;
+        let startTime = 0;
         let isSwiping = false;
         let swipeTriggered = false;
         let isRevealed = false;
@@ -472,7 +473,9 @@ const app = {
 
         // Close other swiped rows when starting a new touch
         tr.addEventListener('touchstart', (e) => {
-            if (e.target.closest('.drag-handle')) return;
+            const touchX = e.touches[0].clientX - tr.getBoundingClientRect().left;
+            // Prevent swipe if handle is touched OR if touch is very close to the left edge (margin of error)
+            if (e.target.closest('.drag-handle') || touchX < 60) return;
             
             document.querySelectorAll('.swipe-row[style*="translateX"]').forEach(row => {
                 if (row !== tr) row.style.transform = 'translateX(0)';
@@ -481,6 +484,7 @@ const app = {
             tr.style.transition = 'none';
             startX = e.touches[0].clientX;
             startY = e.touches[0].clientY;
+            startTime = Date.now();
             
             if (isRevealed) {
                 startX += MAX_SWIPE; 
@@ -491,13 +495,23 @@ const app = {
         }, { passive: true });
 
         tr.addEventListener('touchmove', (e) => {
-            if (isTouchDragActive() || !isSwiping) return;
+            if (isTouchDragActive() || !isSwiping) {
+                isSwiping = false;
+                return;
+            }
+            
             const x = e.touches[0].clientX;
             const y = e.touches[0].clientY;
             const diffX = x - startX;
             const diffY = y - startY;
 
             if (!swipeTriggered) {
+                // If they hold for > 200ms without significant horizontal movement, assume they are trying to drag or just holding
+                if (Date.now() - startTime > 200 && Math.abs(diffX) < 15) {
+                    isSwiping = false;
+                    return;
+                }
+
                 if (Math.abs(diffX) > 15 && Math.abs(diffX) > Math.abs(diffY)) {
                     swipeTriggered = true;
                 } else if (Math.abs(diffY) > 15) {
